@@ -1,5 +1,6 @@
 #include "parser.h"
 #include "tokenizer.h"
+#include "create_state_machine.h"
 #include <iostream>
 #include <stdexcept>
 
@@ -13,9 +14,9 @@ ParseCreateQuery(std::vector<std::pair<Token, std::string>> &tokens,
 
   for (auto [token, word] : tokens) {
     // std::cout<<"token: "<<token<<", word: "<<word<<std::endl;
-    if (!csm.check_transition(token, word)) {
+    if (!csm.CheckTransition(token, word)) {
       // std::cout<<"token: "<<token<<", word: "<<word<<std::endl;
-      throw std::runtime_error("Failed to parse create query at: " + word);
+      throw std::runtime_error(csm.GetErrorMsg() + " But found " + word);
     }
   }
 
