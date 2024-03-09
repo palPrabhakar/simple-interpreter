@@ -23,12 +23,13 @@ bool CreateStateMachine::CheckTransition(Token token, std::string word) {
   case END:
     return check_end_state();
   default:
+    current_state = undefined;
     return false;
   }
 }
 
 std::string CreateStateMachine::GetErrorMsg() {
-  if (current_state == error) {
+  if (current_state == error || current_state == undefined) {
     err_msg = "Failed to parse create query.";
     for (auto val : expected_next_state) {
       switch (val) {
@@ -54,6 +55,7 @@ std::string CreateStateMachine::GetErrorMsg() {
       }
     }
   }
+
   return err_msg;
 }
 

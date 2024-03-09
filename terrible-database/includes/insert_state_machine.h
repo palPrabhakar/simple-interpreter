@@ -1,42 +1,39 @@
-#ifndef CREATE_STATE_MACHINE_H
-#define CREATE_STATE_MACHINE_H
+#ifndef INSERT_STATE_MACHINE_H
+#define INSERT_STATE_MACHINE_H
 
 #include "state_machine.h"
 #include "tokenizer.h"
-#include "data_types.h"
 #include <string>
 #include <unordered_set>
 #include <vector>
 
 namespace tdb {
-class CreateStateMachine: StateMachine {
+class InsertStateMachine : StateMachine {
 public:
-  CreateStateMachine() {
+  InsertStateMachine() {
     current_state = begin;
-    expected_next_state.insert(create);
+    expected_next_state.insert(insert);
   }
 
-  // end of parsing
   bool EOP() { return current_state == end; }
+
   bool CheckTransition(Token token, std::string word);
   std::string GetErrorMsg();
 
   std::string table_name;
-  std::vector<std::string> col_names;
-  std::vector<Data_Type> col_types;
+  std::vector<std::string> col_values;
 
 private:
   // clang-format off
   enum State {
-      begin,
-      create,
-      tbl_name,
-      with,
-      col_name,
-      col_type,
-      end,
-      error,
-      undefined
+    begin,
+    insert,
+    tbl_name,
+    values,
+    col_value,
+    end,
+    error,
+    undefined
   };
   // clang-format on
 
@@ -44,11 +41,10 @@ private:
   std::unordered_set<State> expected_next_state;
   std::string err_msg;
 
-  bool check_create_state();
+  bool check_insert_state();
   bool check_tbl_name_state(std::string word);
-  bool check_col_name_state(std::string word);
-  bool check_col_type_state(Data_Type type);
-  bool check_with_state();
+  bool check_values_state();
+  bool check_col_val_state(std::string word);
   bool check_end_state();
 };
 } // namespace tdb
