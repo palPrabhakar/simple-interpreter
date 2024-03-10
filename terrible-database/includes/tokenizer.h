@@ -18,13 +18,16 @@ enum Token {
     SELECT,
     WHERE,
     FROM,
-    OP_EQ, // ==
-    OP_GT, // >
-    OP_LT, // <
+    OP_EQ,  // ==
+    OP_NEQ, // !=
+    OP_GT,  // >
+    OP_LT,  // <
     OP_EQGT, // >=
     OP_EQLT, // <=
     AND,
     OR,
+    LEFT_PAREN,
+    RIGHT_PAREN,
     TYPE_INT,
     TYPE_DOUBLE,
     TYPE_STRING,
@@ -42,12 +45,15 @@ const std::unordered_map<std::string, Token> token_lookup = {
     { "where", WHERE },
     { "from", FROM },
     { "==", OP_EQ },
+    { "!=", OP_NEQ },
     { ">", OP_GT },
     { "<", OP_LT },
     { ">=", OP_EQGT },
     { "<=", OP_EQLT },
     { "and", AND },
     { "or", OR },
+    { "(", LEFT_PAREN },
+    { ")", RIGHT_PAREN },
     { "int", TYPE_INT },
     { "double", TYPE_DOUBLE},
     { "string", TYPE_STRING},

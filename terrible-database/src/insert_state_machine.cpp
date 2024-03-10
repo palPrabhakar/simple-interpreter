@@ -1,7 +1,4 @@
 #include "insert_state_machine.h"
-#include "tokenizer.h"
-#include <cmath>
-#include <math.h>
 
 namespace tdb {
 bool InsertStateMachine::CheckTransition(Token token, std::string word) {
@@ -108,6 +105,7 @@ bool InsertStateMachine::check_col_val_state(std::string word) {
 bool InsertStateMachine::check_end_state() {
   if (current_state == col_value && expected_next_state.contains(end)) {
     current_state = end;
+    expected_next_state.clear();
     return true;
   }
 

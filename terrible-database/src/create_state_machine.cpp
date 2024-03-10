@@ -129,6 +129,7 @@ bool CreateStateMachine::check_with_state() {
 bool CreateStateMachine::check_end_state() {
   if (current_state == col_type && expected_next_state.contains(end)) {
     current_state = end;
+    expected_next_state.clear();
     return true;
   }
 
