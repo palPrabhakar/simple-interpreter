@@ -25,7 +25,6 @@ std::vector<std::string> ParseWhereClause(Token_Vector &tokens,
 }
 
 std::string ParseExpression(Token_Vector &tokens, std::size_t &index) {
-  // std::vector<std::string> operations;
   ExprStateMachine esm;
 
   std::string operation;
@@ -79,12 +78,6 @@ std::vector<std::string> ParseLogicalOP(Token_Vector &tokens,
                              tokens[index + 1].second);
   }
 
-  // std::cout<<"\n\n====DEBUG====\n\n";
-  // for(auto &str: left) {
-  //   std::cout<<str<<std::endl;
-  // }
-  // std::cout<<"\n";
-  //
   assert(index < tokens.size() && "ParseLogicalOP: Index out of range");
 
   if (tokens[index].first == AND || tokens[index].first == OR) {
@@ -114,7 +107,9 @@ std::vector<std::string> ParseLogicalOP(Token_Vector &tokens,
     operators.push_back(str_op);
     ++index;
   } else {
-    throw std::runtime_error("Failed to parse where clause. Expected right parenthesis. But found " + tokens[index].second);
+    throw std::runtime_error(
+        "Failed to parse where clause. Expected right parenthesis. But found " +
+        tokens[index].second);
   }
 
   return operators;
@@ -128,9 +123,7 @@ ParseCreateQuery(std::vector<std::pair<Token, std::string>> &tokens,
   CreateStateMachine csm;
 
   for (auto [token, word] : tokens) {
-    // std::cout<<"token: "<<token<<", word: "<<word<<std::endl;
     if (!csm.CheckTransition(token, word)) {
-      // std::cout<<"token: "<<token<<", word: "<<word<<std::endl;
       throw std::runtime_error(csm.GetErrorMsg() + " But found " + word);
     }
   }

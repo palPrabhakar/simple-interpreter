@@ -1,15 +1,15 @@
 #ifndef CREATE_STATE_MACHINE_H
 #define CREATE_STATE_MACHINE_H
 
+#include "data_types.h"
 #include "state_machine.h"
 #include "tokenizer.h"
-#include "data_types.h"
 #include <string>
 #include <unordered_set>
 #include <vector>
 
 namespace tdb {
-class CreateStateMachine: StateMachine {
+class CreateStateMachine : StateMachine {
 public:
   CreateStateMachine() {
     current_state = begin;

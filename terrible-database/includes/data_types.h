@@ -9,6 +9,6 @@ enum Data_Type {
     DT_STRING
 };
 // clang-format on
-}
+} // namespace tdb
 
 #endif

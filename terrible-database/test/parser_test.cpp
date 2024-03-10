@@ -171,15 +171,16 @@ TEST(ParserTest, ExprParsing) {
         try {
           tdb::ParseExpression(tokens, index);
         } catch (std::exception &err) {
-          EXPECT_TRUE(std::string(err.what()).find("Expected a binary operator.") !=
-                      std::string::npos);
+          EXPECT_TRUE(
+              std::string(err.what()).find("Expected a binary operator.") !=
+              std::string::npos);
           throw;
         }
       },
       std::runtime_error);
 
   tokens = tdb::ReadInputQuery(" ( col1 <  )");
-  index =  0;
+  index = 0;
   EXPECT_THROW(
       {
         try {
@@ -199,8 +200,9 @@ TEST(ParserTest, ExprParsing) {
         try {
           tdb::ParseExpression(tokens, index);
         } catch (std::exception &err) {
-          EXPECT_TRUE(std::string(err.what()).find("Expected right parenthesis.") !=
-                      std::string::npos);
+          EXPECT_TRUE(
+              std::string(err.what()).find("Expected right parenthesis.") !=
+              std::string::npos);
           throw;
         }
       },

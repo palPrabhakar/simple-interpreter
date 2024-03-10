@@ -16,7 +16,9 @@ public:
   }
 
   bool EOP() { return current_state == right_paren; }
-  bool CheckErrorState() { return current_state == error || current_state == undefined; }
+  bool CheckErrorState() {
+    return current_state == error || current_state == undefined;
+  }
   bool CheckTransition(Token token, std::string word);
   std::string GetErrorMsg();
 
