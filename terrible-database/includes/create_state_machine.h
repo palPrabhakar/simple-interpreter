@@ -18,6 +18,11 @@ public:
 
   // end of parsing
   bool EOP() { return current_state == end; }
+
+  bool CheckErrorState() {
+    return current_state == error || current_state == undefined;
+  }
+
   bool CheckTransition(Token token, std::string word);
   std::string GetErrorMsg();
 

@@ -3,14 +3,14 @@
 #include "expr_state_machine.h"
 #include "insert_state_machine.h"
 #include "tokenizer.h"
+#include "update_state_machine.h"
 #include <cassert>
 #include <iostream>
 #include <stdexcept>
 
 namespace tdb {
 
-std::vector<std::string> ParseWhereClause(Token_Vector &tokens,
-                                          std::size_t &index) {
+std::vector<std::string> ParseWhereClause(Token_Vector &tokens, size_t &index) {
   auto operations = ParseLogicalOP(tokens, ++index);
 
   assert(index < tokens.size() && "ParseWhereClause: Index out of range");
@@ -24,7 +24,7 @@ std::vector<std::string> ParseWhereClause(Token_Vector &tokens,
   return operations;
 }
 
-std::string ParseExpression(Token_Vector &tokens, std::size_t &index) {
+std::string ParseExpression(Token_Vector &tokens, size_t &index) {
   ExprStateMachine esm;
 
   std::string operation;
@@ -52,8 +52,7 @@ std::string ParseExpression(Token_Vector &tokens, std::size_t &index) {
   return operation;
 }
 
-std::vector<std::string> ParseLogicalOP(Token_Vector &tokens,
-                                        std::size_t &index) {
+std::vector<std::string> ParseLogicalOP(Token_Vector &tokens, size_t &index) {
   std::vector<std::string> operators;
   std::vector<std::string> left;
   std::vector<std::string> right;
@@ -115,9 +114,48 @@ std::vector<std::string> ParseLogicalOP(Token_Vector &tokens,
   return operators;
 }
 
-std::vector<std::string>
-ParseCreateQuery(std::vector<std::pair<Token, std::string>> &tokens,
-                 std::size_t &index) {
+std::vector<std::string> ParseUpdateQuery(Token_Vector &tokens, size_t &index) {
+  std::vector<std::string> operators;
+
+  UpdateStateMachine usm;
+  usm.RegisterCallBack([&tokens, &index]() {
+    auto operations = ParseWhereClause(tokens, index);
+    --index;
+    return operations;
+  });
+
+  assert(index < tokens.size() && "ParseUpdateQuery: Index out of range\n");
+
+  for (; index < tokens.size(); ++index) {
+    if (!usm.CheckTransition(tokens[index].first, tokens[index].second)) {
+      if (usm.CheckErrorState()) {
+        throw std::runtime_error(usm.GetErrorMsg() + " But found " +
+                                 tokens[index].second);
+      }
+      break;
+    }
+  }
+
+  if (usm.EOP()) {
+    std::cout << "\nSuccefully Parsed Update Query\n";
+    std::cout << "Table Name: " << usm.table_name << "\n";
+    for (size_t i = 0; i < usm.col_names.size(); ++i) {
+      std::cout << "Col Name: " << usm.col_names[i]
+                << ", Col Value: " << usm.col_values[i] << "\n";
+    }
+    std::cout<<"Where clause op: \n";
+    for(auto op: usm.where_clause) {
+      std::cout<<op<<"\n";
+    }
+    std::cout<<"\n";
+  } else {
+    throw std::runtime_error("Failed to parse update query\n");
+  }
+
+  return operators;
+}
+
+std::vector<std::string> ParseCreateQuery(Token_Vector &tokens, size_t &index) {
   std::vector<std::string> operators;
 
   CreateStateMachine csm;
@@ -143,9 +181,7 @@ ParseCreateQuery(std::vector<std::pair<Token, std::string>> &tokens,
   return operators;
 }
 
-std::vector<std::string>
-ParseInsertQuery(std::vector<std::pair<Token, std::string>> &tokens,
-                 std::size_t &index) {
+std::vector<std::string> ParseInsertQuery(Token_Vector &tokens, size_t &index) {
   std::vector<std::string> operators;
 
   InsertStateMachine ism;
@@ -188,8 +224,8 @@ std::vector<std::string> ParseInputQuery(std::string input_query) {
     case INSERT:
       operators = ParseInsertQuery(tokens, index);
       break;
-    case WHERE:
-      operators = ParseWhereClause(tokens, index);
+    case UPDATE:
+      operators = ParseUpdateQuery(tokens, index);
       break;
     default:
       throw std::runtime_error("invalid query");

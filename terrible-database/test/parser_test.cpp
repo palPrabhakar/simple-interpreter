@@ -210,19 +210,23 @@ TEST(ParserTest, ExprParsing) {
 }
 
 TEST(ParserTest, WhereClause) {
-  auto operations = tdb::ParseInputQuery("where ( col1 == 100 )");
-
+  auto tokens = tdb::ReadInputQuery("where ( col1 == 100 )");
+  size_t index = 0;
+  auto operations = tdb::ParseWhereClause(tokens, index);
   EXPECT_EQ(operations[0], "col1 == 100");
 
-  operations =
-      tdb::ParseInputQuery("where ( ( col1 == 100 ) and ( col2 == 50 ) )");
+  tokens = tdb::ReadInputQuery("where ( ( col1 == 100 ) and ( col2 == 50 ) )");
+  index = 0;
+  operations = tdb::ParseWhereClause(tokens, index);
 
   EXPECT_EQ(operations[0], "col1 == 100");
   EXPECT_EQ(operations[1], "col2 == 50");
   EXPECT_EQ(operations[2], "and");
 
-  operations = tdb::ParseInputQuery(
+  tokens = tdb::ReadInputQuery(
       "where ( ( ( col1 == 100 ) and ( col2 == lol ) ) or ( col3 != 50 ) )");
+  index = 0;
+  operations = tdb::ParseWhereClause(tokens, index);
 
   EXPECT_EQ(operations[0], "col1 == 100");
   EXPECT_EQ(operations[1], "col2 == lol");
@@ -230,9 +234,11 @@ TEST(ParserTest, WhereClause) {
   EXPECT_EQ(operations[3], "col3 != 50");
   EXPECT_EQ(operations[4], "or");
 
-  operations =
-      tdb::ParseInputQuery("where ( ( ( col1 == 100 ) and ( col2 == lol ) ) or "
-                           "( ( col3 != 50 ) and ( col4 > 11 ) ) )");
+  tokens =
+      tdb::ReadInputQuery("where ( ( ( col1 == 100 ) and ( col2 == lol ) ) or "
+                          "( ( col3 != 50 ) and ( col4 > 11 ) ) )");
+  index = 0;
+  operations = tdb::ParseWhereClause(tokens, index);
 
   EXPECT_EQ(operations[0], "col1 == 100");
   EXPECT_EQ(operations[1], "col2 == lol");
@@ -242,13 +248,16 @@ TEST(ParserTest, WhereClause) {
   EXPECT_EQ(operations[5], "and");
   EXPECT_EQ(operations[6], "or");
 
-  EXPECT_THROW(tdb::ParseInputQuery("where ( ( ( col1 == 100 ) ) )"),
-               std::runtime_error);
+  tokens = tdb::ReadInputQuery("where ( ( ( col1 == 100 ) ) )");
+  index = 0;
+  EXPECT_THROW(tdb::ParseWhereClause(tokens, index), std::runtime_error);
 
   EXPECT_THROW(
       {
         try {
-          auto op = tdb::ParseInputQuery("where ( ( col1 == 100 ) and )");
+          auto tokens = tdb::ReadInputQuery("where ( ( col1 == 100 ) and )");
+          size_t index = 0;
+          auto op = tdb::ParseWhereClause(tokens, index);
         } catch (std::exception &err) {
           EXPECT_TRUE(
               std::string(err.what()).find("Expected left parenthesis.") !=
@@ -261,7 +270,10 @@ TEST(ParserTest, WhereClause) {
   EXPECT_THROW(
       {
         try {
-          auto op = tdb::ParseInputQuery("where ( ( col1 == 100 ) and ( ) )");
+          auto tokens =
+              tdb::ReadInputQuery("where ( ( col1 == 100 ) and ( ) )");
+          size_t index = 0;
+          auto op = tdb::ParseWhereClause(tokens, index);
         } catch (std::exception &err) {
           EXPECT_TRUE(
               std::string(err.what()).find("Expected left parenthesis.") !=
@@ -274,8 +286,10 @@ TEST(ParserTest, WhereClause) {
   EXPECT_THROW(
       {
         try {
-          auto op =
-              tdb::ParseInputQuery("where ( ( col1 == 100 ) and ( col2 ) )");
+          auto tokens =
+              tdb::ReadInputQuery("where ( ( col1 == 100 ) and ( col2 ) )");
+          size_t index = 0;
+          auto op = tdb::ParseWhereClause(tokens, index);
         } catch (std::exception &err) {
           EXPECT_TRUE(
               std::string(err.what()).find("Expected a binary operator.") !=
@@ -288,14 +302,66 @@ TEST(ParserTest, WhereClause) {
   EXPECT_THROW(
       {
         try {
-          operations = tdb::ParseInputQuery(
+          auto tokens = tdb::ReadInputQuery(
               "where ( ( ( col1 == 100 ) and ( col2 == lol ) ) or "
               "( ( col3 != 50 ) and ( col4 > 11 ) )");
-
+          size_t index = 0;
+          auto op = tdb::ParseWhereClause(tokens, index);
         } catch (std::exception &err) {
           EXPECT_TRUE(
               std::string(err.what()).find("Expected right parenthesis.") !=
               std::string::npos);
+          throw;
+        }
+      },
+      std::runtime_error);
+}
+
+TEST(ParserTest, UpdateQueries) {
+  EXPECT_NO_THROW(tdb::ParseInputQuery(
+      "Update random_table values col1 100 col2 200 where ( col1 < 100 )"));
+
+  EXPECT_NO_THROW(
+      tdb::ParseInputQuery("Update random_table values col1 100 col2 200"));
+
+  EXPECT_NO_THROW(
+      tdb::ParseInputQuery("Update random_table values col1 100 col2 200 where "
+                           "( ( col1 < 100 ) and ( col2 != lol ) )"));
+
+  EXPECT_THROW(
+      {
+        try {
+          tdb::ParseInputQuery("Update random_table col1 100");
+        } catch (std::exception &err) {
+          EXPECT_TRUE(
+              std::string(err.what()).find("Expected keyword values.") !=
+              std::string::npos);
+          throw;
+        }
+      },
+      std::runtime_error);
+
+  EXPECT_THROW(
+      {
+        try {
+          tdb::ParseInputQuery(
+              "Update random_table values col1 where ( col1 > 100 )");
+        } catch (std::exception &err) {
+          EXPECT_TRUE(std::string(err.what()).find("Expected column value.") !=
+                      std::string::npos);
+          throw;
+        }
+      },
+      std::runtime_error);
+
+  EXPECT_THROW(
+      {
+        try {
+          tdb::ParseInputQuery(
+              "Update random_table values where ( col1 > 100 )");
+        } catch (std::exception &err) {
+          EXPECT_TRUE(std::string(err.what()).find("Expected column name.") !=
+                      std::string::npos);
           throw;
         }
       },
