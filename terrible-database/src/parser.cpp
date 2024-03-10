@@ -2,6 +2,7 @@
 #include "create_state_machine.h"
 #include "expr_state_machine.h"
 #include "insert_state_machine.h"
+#include "select_state_machine.h"
 #include "tokenizer.h"
 #include "update_state_machine.h"
 #include <cassert>
@@ -143,13 +144,57 @@ std::vector<std::string> ParseUpdateQuery(Token_Vector &tokens, size_t &index) {
       std::cout << "Col Name: " << usm.col_names[i]
                 << ", Col Value: " << usm.col_values[i] << "\n";
     }
-    std::cout<<"Where clause op: \n";
-    for(auto op: usm.where_clause) {
-      std::cout<<op<<"\n";
+    std::cout << "Where clause op: \n";
+    for (auto op : usm.where_clause) {
+      std::cout << op << "\n";
     }
-    std::cout<<"\n";
+    std::cout << "\n";
   } else {
     throw std::runtime_error("Failed to parse update query\n");
+  }
+
+  return operators;
+}
+
+std::vector<std::string> ParseSelectQuery(Token_Vector &tokens, size_t &index) {
+  std::vector<std::string> operators;
+
+  SelectStateMachine ssm;
+  ssm.RegisterCallBack([&tokens, &index]() {
+    auto operations = ParseWhereClause(tokens, index);
+    --index;
+    return operations;
+  });
+
+  assert(index < tokens.size() && "ParseSelectQuery: Index out of range\n");
+
+  for (; index < tokens.size(); ++index) {
+    if (!ssm.CheckTransition(tokens[index].first, tokens[index].second)) {
+      if (ssm.CheckErrorState()) {
+        throw std::runtime_error(ssm.GetErrorMsg() + " But found " +
+                                 tokens[index].second);
+      }
+      break;
+    }
+  }
+
+  if (ssm.EOP()) {
+    std::cout << "\nSuccefully Parsed Select Query\n";
+    std::cout << "Table Name: " << ssm.table_name << "\n";
+    if (ssm.col_names.size() == 0) {
+      std::cout << "Col Name: *\n";
+    } else {
+      for (size_t i = 0; i < ssm.col_names.size(); ++i) {
+        std::cout << "Col Name: " << ssm.col_names[i] << "\n";
+      }
+    }
+    std::cout << "Where clause op: \n";
+    for (auto op : ssm.where_clause) {
+      std::cout << op << "\n";
+    }
+    std::cout << "\n";
+  } else {
+    throw std::runtime_error("Failed to parse select query\n");
   }
 
   return operators;
@@ -226,6 +271,9 @@ std::vector<std::string> ParseInputQuery(std::string input_query) {
       break;
     case UPDATE:
       operators = ParseUpdateQuery(tokens, index);
+      break;
+    case SELECT:
+      operators = ParseSelectQuery(tokens, index);
       break;
     default:
       throw std::runtime_error("invalid query");

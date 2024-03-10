@@ -1,5 +1,4 @@
-#ifndef UPDATE_STATE_MACHINE_H
-#define UPDATE_STATE_MACHINE_H
+#pragma once
 
 #include "state_machine.h"
 #include "tokenizer.h"
@@ -9,8 +8,6 @@
 #include <vector>
 
 namespace tdb {
-
-using Token_Vector = std::vector<std::pair<Token, std::string>>;
 
 class UpdateStateMachine : StateMachine {
 public:
@@ -66,5 +63,3 @@ private:
   bool check_end_state();
 };
 } // namespace tdb
-
-#endif

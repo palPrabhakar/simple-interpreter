@@ -1,5 +1,4 @@
-#ifndef TOKENS_H
-#define TOKENS_H
+#pragma once
 
 #include <sstream>
 #include <string>
@@ -18,6 +17,7 @@ enum Token {
     SELECT,
     WHERE,
     FROM,
+    STAR,
     OP_EQ,  // ==
     OP_NEQ, // !=
     OP_GT,  // >
@@ -44,6 +44,7 @@ const std::unordered_map<std::string, Token> token_lookup = {
     { "select", SELECT },
     { "where", WHERE },
     { "from", FROM },
+    { "*", STAR },
     { "==", OP_EQ },
     { "!=", OP_NEQ },
     { ">", OP_GT },
@@ -65,5 +66,3 @@ const std::unordered_map<std::string, Token> token_lookup = {
 std::vector<std::pair<Token, std::string>>
 ReadInputQuery(std::string input_query);
 } // namespace tdb
-
-#endif

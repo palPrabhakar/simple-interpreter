@@ -367,3 +367,53 @@ TEST(ParserTest, UpdateQueries) {
       },
       std::runtime_error);
 }
+
+TEST(ParserTest, SelectQuery) {
+  EXPECT_NO_THROW(tdb::ParseInputQuery("select col1 col2 from some_table"));
+
+  EXPECT_NO_THROW(tdb::ParseInputQuery("select * from some_table"));
+
+  EXPECT_NO_THROW(tdb::ParseInputQuery(
+      "select col1 col2 from some_table where ( col1 > 100 )"));
+
+  EXPECT_NO_THROW(
+      tdb::ParseInputQuery("select * from some_table where ( col1 > 100 )"));
+
+  EXPECT_THROW(
+      {
+        try {
+          auto op = tdb::ParseInputQuery("select from some_table");
+        } catch (std::exception &err) {
+          EXPECT_TRUE(std::string(err.what()).find("Expected keyword star.") !=
+                      std::string::npos);
+          EXPECT_TRUE(std::string(err.what()).find("Expected column name.") !=
+                      std::string::npos);
+          throw;
+        }
+      },
+      std::runtime_error);
+
+  EXPECT_THROW(
+      {
+        try {
+          auto op = tdb::ParseInputQuery("select * from");
+        } catch (std::exception &err) {
+          EXPECT_TRUE(std::string(err.what()).find("Expected table name.") !=
+                      std::string::npos);
+          throw;
+        }
+      },
+      std::runtime_error);
+
+  EXPECT_THROW(
+      {
+        try {
+          auto op = tdb::ParseInputQuery("select col1 from");
+        } catch (std::exception &err) {
+          EXPECT_TRUE(std::string(err.what()).find("Expected table name.") !=
+                      std::string::npos);
+          throw;
+        }
+      },
+      std::runtime_error);
+}

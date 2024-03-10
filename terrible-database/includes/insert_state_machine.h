@@ -1,5 +1,4 @@
-#ifndef INSERT_STATE_MACHINE_H
-#define INSERT_STATE_MACHINE_H
+#pragma once
 
 #include "state_machine.h"
 #include "tokenizer.h"
@@ -52,5 +51,3 @@ private:
   bool check_end_state();
 };
 } // namespace tdb
-
-#endif

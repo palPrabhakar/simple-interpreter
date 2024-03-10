@@ -1,5 +1,4 @@
-#ifndef DATA_TYPES_H
-#define DATA_TYPES_H
+#pragma once
 
 namespace tdb {
 // clang-format off
@@ -10,5 +9,3 @@ enum Data_Type {
 };
 // clang-format on
 } // namespace tdb
-
-#endif

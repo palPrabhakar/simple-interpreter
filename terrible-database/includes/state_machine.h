@@ -1,5 +1,4 @@
-#ifndef STATE_MACHINE_H
-#define STATE_MACHINE_H
+#pragma once
 
 #include "tokenizer.h"
 
@@ -12,5 +11,3 @@ public:
   virtual bool CheckErrorState() = 0;
 };
 } // namespace tdb
-
-#endif

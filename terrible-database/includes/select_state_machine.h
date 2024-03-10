@@ -1,21 +1,25 @@
 #pragma once
 
-#include "data_types.h"
 #include "state_machine.h"
 #include "tokenizer.h"
+#include <functional>
 #include <string>
 #include <unordered_set>
 #include <vector>
 
 namespace tdb {
-class CreateStateMachine : StateMachine {
+
+class SelectStateMachine : StateMachine {
 public:
-  CreateStateMachine() {
+  SelectStateMachine() {
     current_state = begin;
-    expected_next_state.insert(create);
+    expected_next_state.insert(select);
   }
 
-  // end of parsing
+  void RegisterCallBack(std::function<std::vector<std::string>()> func) {
+    callback_func = func;
+  }
+
   bool EOP() { return current_state == end; }
 
   bool CheckErrorState() {
@@ -24,35 +28,39 @@ public:
 
   bool CheckTransition(Token token, std::string word);
   std::string GetErrorMsg();
-
   std::string table_name;
+  // empty col_names => all columns
   std::vector<std::string> col_names;
-  std::vector<Data_Type> col_types;
+  std::vector<std::string> where_clause;
 
 private:
   // clang-format off
   enum State {
-      begin,
-      create,
-      tbl_name,
-      with,
-      col_name,
-      col_type,
-      end,
-      error,
-      undefined
+    begin,
+    select,
+    star,
+    from,
+    tbl_name,
+    column_name,
+    where,
+    end,
+    error,
+    undefined
   };
   // clang-format on
 
   enum State current_state;
   std::unordered_set<State> expected_next_state;
   std::string err_msg;
+  std::function<std::vector<std::string>()> callback_func;
 
-  bool check_create_state();
+  bool check_select_state();
+  bool check_star_state();
+  bool check_from_state();
   bool check_tbl_name_state(std::string word);
   bool check_col_name_state(std::string word);
-  bool check_col_type_state(Data_Type type);
-  bool check_with_state();
+  bool check_where_state();
   bool check_end_state();
 };
 } // namespace tdb
+

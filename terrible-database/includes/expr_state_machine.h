@@ -1,5 +1,4 @@
-#ifndef EXPR_STATE_MACHINE_H
-#define EXPR_STATE_MACHINE_H
+#pragma once
 
 #include "state_machine.h"
 #include "tokenizer.h"
@@ -53,5 +52,3 @@ private:
   bool check_right_paren_state();
 };
 } // namespace tdb
-
-#endif
