@@ -3,7 +3,6 @@
 #include "json/json.h"
 #include <cstdint>
 #include <fstream>
-#include <iostream>
 #include <memory>
 #include <stdexcept>
 
@@ -57,15 +56,12 @@ Table ReadOperator::ReadTable() {
   builder["collectComments"] = false;
   JSONCPP_STRING errs;
   if (!parseFromStream(builder, ifs, &data, &errs)) {
-    // std::cout<<errs<<std::endl;
     throw std::runtime_error(errs.c_str());
   }
-  std::cout << data << std::endl;
 
   size_t ncols = data["schema"]["ncols"].asUInt64();
   size_t nrows = data["schema"]["nrows"].asUInt64();
-
-  // std::cout<<ncols<<", "<<nrows<<std::endl;
+  auto table_name = data["schema"]["name"].asString();
 
   const Json::Value cols = data["schema"]["columns"];
   const Json::Value types = data["schema"]["types"];
@@ -81,45 +77,20 @@ Table ReadOperator::ReadTable() {
     col_types.emplace_back(static_cast<Data_Type>(types[i].asInt()));
   }
 
-  // std::cout<<"col_names.size(): "<<col_names.size()<<std::endl;
-
-  // std::cout<<"shape: "<<ncols<<", "<<nrows<<std::endl;
-  Table table(ncols, nrows, col_types);
-  // std::cout<<"shape: "<<table.GetColumnSize()<<", "<<table.GetRowSize()<<std::endl;
+  Table table(ncols, nrows, table_name, col_names, col_types);
 
   for (size_t i = 0; i < col_names.size(); ++i) {
     const Json::Value col_val = data["data"][col_names[i]];
-    // std::cout<<"Calling GetColumn";
     auto ptr = GetColumn(col_val, col_types[i], nrows);
-    // if(col_types[i] == DT_INT) {
-    //   int64_t val;
-    //   ptr->get_value(0, val);
-    //   std::cout<<"int val: "<<val<<std::endl;
-    // } else {
-    //   std::string val;
-    //   ptr->get_value(0, val);
-    //   std::cout<<"string val: "<<val<<std::endl;
-    // }
     table.SetColumn(i, std::move(ptr));
   }
 
-  // std::cout<<"Table Read Complete\n";
-  // std::cout<<"row_size: "<<table.GetRowSize()<<std::endl;
-  // std::cout<<"col_size: "<<table.GetColumnSize()<<std::endl;
-  BaseColumn *col1 = table.GetColumn(0);
-  // if(!col1) {
-  //   std::cout<<"nullptr"<<std::endl;
-  // }
-  // std::string name;
-  // col1->get_value(0, name);
-  // std::cout<<"name: "<<name<<std::endl;
   return table;
 }
 
 std::unique_ptr<BaseColumn> ReadOperator::GetColumn(const Json::Value &data,
                                                     const Data_Type type,
                                                     const size_t size) {
-  // std::cout<<"GetColumn: "<<static_cast<int>(type)<<std::endl;
   switch (type) {
   case DT_INT:
     return GetColumn<int64_t>(data, size);
