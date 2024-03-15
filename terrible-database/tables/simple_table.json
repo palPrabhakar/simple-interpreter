@@ -1,0 +1,13 @@
+{
+  "schema": {
+    "name": "SimpleTable",
+    "ncols": 2,
+    "nrows": 2,
+    "columns": ["name", "age"],
+    "types": [2, 0]
+  },
+  "data": {
+    "name": ["John", "Doe"],
+    "age": [33, 44]
+  }
+}
