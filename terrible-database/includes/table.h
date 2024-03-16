@@ -2,6 +2,7 @@
 
 #include "columns.h"
 #include "data_types.h"
+#include <algorithm>
 #include <cassert>
 #include <memory>
 #include <stdexcept>
@@ -44,6 +45,13 @@ public:
 
   BaseColumn *GetColumn(size_t col) { return columns[col].get(); }
 
+  std::unique_ptr<BaseColumn> ReleaseColumn(size_t col) {
+    // ReleaseColumn leaves the table in indeterminate state
+    std::unique_ptr<BaseColumn> column;
+    column.swap(columns[col]);
+    return column;
+  }
+
   void SetColumn(size_t col, std::unique_ptr<BaseColumn> column) {
     assert(col < n_cols && "Column index out of bounds");
     columns[col] = std::move(column);
@@ -54,6 +62,15 @@ public:
   std::string GetColumnName(size_t col) {
     assert(col < n_cols && "Column index out of bounds");
     return column_names[col];
+  }
+
+  size_t GetColumnIndex(std::string col_name) {
+    if (auto it = std::find(column_names.begin(), column_names.end(), col_name);
+        it != column_names.end()) {
+      return std::distance(column_names.begin(), it);
+    } else {
+      throw std::runtime_error("Invalid column name\n");
+    }
   }
 
   Data_Type GetColumnType(size_t col) {

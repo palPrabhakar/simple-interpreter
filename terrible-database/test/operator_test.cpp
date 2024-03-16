@@ -1,27 +1,18 @@
-#include "read_op.h"
-#include "write_op.h"
+#include "project_operator.h"
+#include "read_operator.h"
+#include "write_operator.h"
 #include "gtest/gtest.h"
 
 TEST(OperatorTest, ReadOperator) {
-  tdb::ReadOperator op("/home/pal/workspace/terrible-softwares/terrible-database/tables/simple_table.json");
-  auto table = op.ReadTable();
+  tdb::ReadOperator read_op("/home/pal/workspace/terrible-softwares/terrible-database/tables/simple_table.json");
+  read_op.Execute();
 
-  auto write_op = tdb::WriteOp();
-  write_op.WriteTable(std::move(table));
+  tdb::ProjectOperator proj_op({"name"});
+  proj_op.AddData(read_op.GetData());
+  proj_op.Execute();
 
-  // std::cout<<"col_size: "<<table.GetColumnSize()<<std::endl;
-  // std::cout<<"row_size: "<<table.GetRowSize()<<std::endl;
-
-  // tdb::BaseColumn *col0 = table.GetColumn(0);
-  // std::string name;
-  // col0->get_value(0, name);
-  // std::cout<<name<<std::endl;
-
-  // tdb::BaseColumn *col1 = table.GetColumn(1);
-  // tdb::Column<int64_t> *ptr = static_cast<tdb::Column<int64_t> *>(col1);
-  // int64_t age;
-  // ptr->get_value(0, age);
-  // std::cout<<age<<std::endl;
-
+  auto write_op = tdb::WriteOperator();
+  write_op.AddData(proj_op.GetData());
+  write_op.Execute();
   // EXPECT_NO_THROW(op.ReadTable());
 }

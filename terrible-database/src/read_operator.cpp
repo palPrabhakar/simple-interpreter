@@ -1,4 +1,4 @@
-#include "read_op.h"
+#include "read_operator.h"
 #include "data_types.h"
 #include "json/json.h"
 #include <cstdint>
@@ -47,7 +47,7 @@ ReadOperator::GetColumn<std::string>(const Json::Value &data, const size_t size)
   return std::make_unique<Column<std::string>>(size, std::move(vec));
 }
 
-Table ReadOperator::ReadTable() {
+void ReadOperator::ReadTable() {
   Json::Value data;
   std::ifstream ifs;
   ifs.open(file_name);
@@ -77,15 +77,16 @@ Table ReadOperator::ReadTable() {
     col_types.emplace_back(static_cast<Data_Type>(types[i].asInt()));
   }
 
-  Table table(ncols, nrows, table_name, col_names, col_types);
+  assert(tables.size() == 0 && "Vec<Table> not empty\n");
+
+  tables.emplace_back(std::make_unique<Table>(ncols, nrows, table_name, col_names, col_types));
+  // Table table(ncols, nrows, table_name, col_names, col_types);
 
   for (size_t i = 0; i < col_names.size(); ++i) {
     const Json::Value col_val = data["data"][col_names[i]];
     auto ptr = GetColumn(col_val, col_types[i], nrows);
-    table.SetColumn(i, std::move(ptr));
+    tables[0]->SetColumn(i, std::move(ptr));
   }
-
-  return table;
 }
 
 std::unique_ptr<BaseColumn> ReadOperator::GetColumn(const Json::Value &data,

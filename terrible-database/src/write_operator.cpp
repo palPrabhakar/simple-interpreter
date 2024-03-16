@@ -1,18 +1,18 @@
-#include "write_op.h"
+#include "write_operator.h"
 #include <iostream>
 #include <format>
 #include <sstream>
 
 namespace tdb {
-  void WriteOp::WriteTable(Table table) {
-    // std::cout<<"WriteOp::WriteTable"<<std::endl;
-    auto ncols = table.GetColumnSize();
-    auto nrows = table.GetRowSize();
+  void WriteOperator::WriteTable() {
+    std::cout<<"WriteOp::WriteTable"<<std::endl;
+    auto ncols = tables[0]->GetColumnSize();
+    auto nrows = tables[0]->GetRowSize();
 
-    std::cout<<table.GetTableName()<<"\n";
+    std::cout<<tables[0]->GetTableName()<<"\n";
     std::stringstream ss;
     for(size_t i = 0; i < ncols; ++i) {
-      ss<<table.GetColumnName(i)<<"\t";
+      ss<<tables[0]->GetColumnName(i)<<"\t";
     }
 
     auto col_names = ss.str();
@@ -22,15 +22,15 @@ namespace tdb {
     std::cout<<dash<<"\n";
     for(size_t i = 0; i < nrows; ++i) {
       for(size_t j = 0; j < ncols; ++j) {
-        switch(table.GetColumnType(j)) {
+        switch(tables[0]->GetColumnType(j)) {
           case DT_INT:
-            std::cout<<table.GetValue<sINT>(j, i)<<"\t";
+            std::cout<<tables[0]->GetValue<sINT>(j, i)<<"\t";
             break;
           case DT_DOUBLE:
-            std::cout<<table.GetValue<sDOUBLE>(j, i)<<"\t";
+            std::cout<<tables[0]->GetValue<sDOUBLE>(j, i)<<"\t";
             break;
           case DT_STRING:
-            std::cout<<table.GetValue<sSTRING>(j, i)<<"\t";
+            std::cout<<tables[0]->GetValue<sSTRING>(j, i)<<"\t";
             break;
           default:
             break;
@@ -38,5 +38,6 @@ namespace tdb {
       }
       std::cout<<"\n";
     }
+    std::cout<<"\n";
   }
 }
