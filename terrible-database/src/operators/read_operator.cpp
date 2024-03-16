@@ -1,4 +1,4 @@
-#include "read_operator.h"
+#include "operators/read_operator.h"
 #include "data_types.h"
 #include "json/json.h"
 #include <cstdint>

@@ -1,10 +1,10 @@
 #include "parser.h"
-#include "create_state_machine.h"
-#include "expr_state_machine.h"
-#include "insert_state_machine.h"
-#include "select_state_machine.h"
 #include "tokenizer.h"
-#include "update_state_machine.h"
+#include "fsms/create_state_machine.h"
+#include "fsms/expr_state_machine.h"
+#include "fsms/insert_state_machine.h"
+#include "fsms/select_state_machine.h"
+#include "fsms/update_state_machine.h"
 #include <cassert>
 #include <iostream>
 #include <stdexcept>

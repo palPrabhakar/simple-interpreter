@@ -1,4 +1,4 @@
-#include "project_operator.h"
+#include "operators/project_operator.h"
 #include <memory>
 
 namespace tdb {

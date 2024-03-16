@@ -1,21 +1,18 @@
-#include "select_state_machine.h"
-#include <cmath>
+#include "fsms/update_state_machine.h"
 
 namespace tdb {
-bool SelectStateMachine::CheckTransition(Token token, std::string word) {
+bool UpdateStateMachine::CheckTransition(Token token, std::string word) {
   switch (token) {
-  case SELECT:
-    return check_select_state();
-  case FROM:
-    return check_from_state();
-  case STAR:
-    return check_star_state();
+  case UPDATE:
+    return check_update_state();
   case TEXT:
-    if (current_state == from) {
+    if (current_state == update) {
       return check_tbl_name_state(word);
     } else {
-      return check_col_name_state(word);
+      return check_col_name_state(word) || check_col_val_state(word);
     }
+  case VALUES:
+    return check_values_state();
   case WHERE:
     return check_where_state();
   case END:
@@ -26,19 +23,19 @@ bool SelectStateMachine::CheckTransition(Token token, std::string word) {
   }
 }
 
-std::string SelectStateMachine::GetErrorMsg() {
+std::string UpdateStateMachine::GetErrorMsg() {
   if (current_state == error || current_state == undefined) {
     err_msg = "Failed to parse update query.";
     for (auto val : expected_next_state) {
       switch (val) {
-      case select:
-        err_msg += " Expected keyword select.";
+      case update:
+        err_msg += " Expected keyword update.";
         break;
       case tbl_name:
         err_msg += " Expected table name.";
         break;
-      case star:
-        err_msg += " Expected keyword star.";
+      case values:
+        err_msg += " Expected keyword values.";
         break;
       case column_name:
         err_msg += " Expected column name.";
@@ -46,8 +43,8 @@ std::string SelectStateMachine::GetErrorMsg() {
       case where:
         err_msg += " Expected keyword where.";
         break;
-      case from:
-        err_msg += " Expected keyword from.";
+      case column_value:
+        err_msg += " Expected column value.";
         break;
       case end:
         err_msg += " Expected endline character.";
@@ -60,36 +57,11 @@ std::string SelectStateMachine::GetErrorMsg() {
   return err_msg;
 }
 
-bool SelectStateMachine::check_select_state() {
-  if (expected_next_state.contains(select)) {
-    expected_next_state.clear();
-    expected_next_state.insert(star);
-    expected_next_state.insert(column_name);
-    current_state = select;
-    return true;
-  }
-
-  current_state = error;
-  return false;
-}
-
-bool SelectStateMachine::check_star_state() {
-  if(expected_next_state.contains(star)) {
-    expected_next_state.clear();
-    expected_next_state.insert(from);
-    current_state = star;
-    return true;
-  }
-
-  current_state = error;
-  return false;
-}
-
-bool SelectStateMachine::check_from_state() {
-  if(expected_next_state.contains(from)) {
+bool UpdateStateMachine::check_update_state() {
+  if (expected_next_state.contains(update)) {
     expected_next_state.clear();
     expected_next_state.insert(tbl_name);
-    current_state = from;
+    current_state = update;
     return true;
   }
 
@@ -97,12 +69,10 @@ bool SelectStateMachine::check_from_state() {
   return false;
 }
 
-
-bool SelectStateMachine::check_tbl_name_state(std::string word) {
+bool UpdateStateMachine::check_tbl_name_state(std::string word) {
   if (expected_next_state.contains(tbl_name)) {
     expected_next_state.clear();
-    expected_next_state.insert(where);
-    expected_next_state.insert(end);
+    expected_next_state.insert(values);
     current_state = tbl_name;
     table_name = word;
     return true;
@@ -112,12 +82,23 @@ bool SelectStateMachine::check_tbl_name_state(std::string word) {
   return false;
 }
 
-bool SelectStateMachine::check_col_name_state(std::string word) {
-  if (expected_next_state.contains(column_name)) {
+bool UpdateStateMachine::check_values_state() {
+  if (expected_next_state.contains(values)) {
     expected_next_state.clear();
     expected_next_state.insert(column_name);
-    expected_next_state.insert(from);
-    current_state = column_name;
+    current_state = values;
+    return true;
+  }
+
+  current_state = error;
+  return false;
+}
+
+bool UpdateStateMachine::check_col_name_state(std::string word) {
+  if (expected_next_state.contains(column_name)) {
+    expected_next_state.clear();
+    expected_next_state.insert(column_value);
+    current_state = column_value;
     col_names.push_back(word);
     return true;
   }
@@ -126,7 +107,22 @@ bool SelectStateMachine::check_col_name_state(std::string word) {
   return false;
 }
 
-bool SelectStateMachine::check_where_state() {
+bool UpdateStateMachine::check_col_val_state(std::string word) {
+  if (expected_next_state.contains(column_value)) {
+    expected_next_state.clear();
+    expected_next_state.insert(end);
+    expected_next_state.insert(column_name);
+    expected_next_state.insert(where);
+    current_state = column_value;
+    col_values.push_back(word);
+    return true;
+  }
+
+  current_state = error;
+  return false;
+}
+
+bool UpdateStateMachine::check_where_state() {
   if (expected_next_state.contains(where)) {
     current_state = where;
     expected_next_state.clear();
@@ -139,7 +135,7 @@ bool SelectStateMachine::check_where_state() {
   return false;
 }
 
-bool SelectStateMachine::check_end_state() {
+bool UpdateStateMachine::check_end_state() {
   if (expected_next_state.contains(end)) {
     current_state = end;
     expected_next_state.clear();

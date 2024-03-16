@@ -1,10 +1,8 @@
-file(GLOB HEADER_FILES ${CMAKE_SOURCE_DIR}/includes/*.h)
-
-file(GLOB SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/*.cpp)
+file(GLOB_RECURSE SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/*.cpp)
 
 find_package(jsoncpp REQUIRED)
 
-add_library(tdb ${SOURCE_FILES} ${HEADER_FILES})
+add_library(tdb ${SOURCE_FILES})
 
 target_include_directories(tdb PUBLIC ${CMAKE_SOURCE_DIR}/includes)
 

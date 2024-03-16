@@ -1,6 +1,6 @@
-#include "project_operator.h"
-#include "read_operator.h"
-#include "write_operator.h"
+#include "operators/project_operator.h"
+#include "operators/read_operator.h"
+#include "operators/write_operator.h"
 #include "gtest/gtest.h"
 
 TEST(OperatorTest, ReadOperator) {
