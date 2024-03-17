@@ -8,7 +8,6 @@
 #include <vector>
 
 namespace tdb {
-
 class SelectStateMachine : StateMachine {
 public:
   SelectStateMachine() {
@@ -16,7 +15,7 @@ public:
     expected_next_state.insert(select);
   }
 
-  void RegisterCallBack(std::function<std::vector<std::string>()> func) {
+  void RegisterCallBack(std::function<Operator_Ptr()> func) {
     callback_func = func;
   }
 
@@ -30,8 +29,8 @@ public:
   std::string GetErrorMsg();
   std::string table_name;
   // empty col_names => all columns
+  Operator_Ptr where_op;
   std::vector<std::string> col_names;
-  std::vector<std::string> where_clause;
 
 private:
   // clang-format off
@@ -52,7 +51,7 @@ private:
   enum State current_state;
   std::unordered_set<State> expected_next_state;
   std::string err_msg;
-  std::function<std::vector<std::string>()> callback_func;
+  std::function<Operator_Ptr()> callback_func;
 
   bool check_select_state();
   bool check_star_state();

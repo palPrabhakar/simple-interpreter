@@ -3,25 +3,24 @@
 #include "tokenizer.h"
 #include <string>
 #include <vector>
+#include "operators/operator.h"
+#include <memory>
 
 namespace tdb {
 
 using Token_Vector = std::vector<std::pair<Token, std::string>>;
+using Operator_Ptr = std::unique_ptr<Operator>;
+using BinaryOp_Ptr = std::unique_ptr<BinaryOperator>;
+using Operator_Vec = std::vector<Operator_Ptr>;
 
-std::vector<std::string> ParseInputQuery(std::string input_query);
+Operator_Ptr ParseWhereClause(Token_Vector &tokens, size_t &index);
+BinaryOp_Ptr ParseExpression(Token_Vector &tokens, size_t &index);
+BinaryOp_Ptr ParseLogicalOP(Token_Vector &tokens, size_t &index);
 
-std::vector<std::string> ParseCreateQuery(Token_Vector &tokens, size_t &index);
-
-std::vector<std::string> ParseInsertQuery(Token_Vector &tokens, size_t &index);
-
-std::vector<std::string> ParseWhereClause(Token_Vector &tokens, size_t &index);
-
-std::string ParseExpression(Token_Vector &tokens, size_t &index);
-
-std::vector<std::string> ParseLogicalOP(Token_Vector &tokens, size_t &index);
-
-std::vector<std::string> ParseUpdateQuery(Token_Vector &tokens, size_t &index);
-
-std::vector<std::string> ParseSelectQuery(Token_Vector &tokens, size_t &index);
+Operator_Vec ParseInputQuery(std::string input_query);
+Operator_Vec ParseCreateQuery(Token_Vector &tokens, size_t &index);
+Operator_Vec ParseInsertQuery(Token_Vector &tokens, size_t &index);
+Operator_Vec ParseUpdateQuery(Token_Vector &tokens, size_t &index);
+Operator_Vec ParseSelectQuery(Token_Vector &tokens, size_t &index);
 
 } // namespace tdb

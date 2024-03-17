@@ -7,7 +7,7 @@
     "types": [2, 0]
   },
   "data": {
-    "name": ["John", "Doe"],
+    "name": ["john", "doe"],
     "age": [33, 44]
   }
 }

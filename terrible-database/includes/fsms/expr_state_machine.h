@@ -28,6 +28,8 @@ public:
   Token op_token;
   std::string column_val;
 
+  BinaryOp_Ptr GetOperator();
+
 private:
   enum State {
     begin,

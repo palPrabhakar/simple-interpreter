@@ -1,7 +1,10 @@
 #include "fsms/expr_state_machine.h"
+#include "operators/filter_operator.h"
 #include "tokenizer.h"
 #include <cmath>
 #include <math.h>
+#include <memory>
+#include <stdexcept>
 
 namespace tdb {
 bool ExprStateMachine::CheckTransition(Token token, std::string word) {
@@ -27,6 +30,7 @@ bool ExprStateMachine::CheckTransition(Token token, std::string word) {
   case OP_EQGT:
     if (check_op_state(token)) {
       str_op = word;
+      op_token = token;
       return true;
     }
   default:
@@ -121,4 +125,25 @@ bool ExprStateMachine::check_right_paren_state() {
   return false;
 }
 
+BinaryOp_Ptr ExprStateMachine::GetOperator() {
+  switch (op_token) {
+  case OP_EQ:
+    return std::make_unique<EqualityFilter>(column_name, column_val);
+  case OP_NEQ:
+    return std::make_unique<NonEqualityFilter>(column_name, column_val);
+  case OP_GT:
+    return std::make_unique<GreaterThanFilter>(column_name, column_val);
+  case OP_LT:
+    return std::make_unique<LessThanFilter>(column_name, column_val);
+    break;
+  case OP_EQGT:
+    return std::make_unique<GreaterEqualFilter>(column_name, column_val);
+    break;
+  case OP_EQLT:
+    return std::make_unique<LessEqualFilter>(column_name, column_val);
+    break;
+  default:
+    throw std::runtime_error("ESM: Invalid Operator\n");
+  }
+}
 } // namespace tdb

@@ -131,7 +131,7 @@ bool SelectStateMachine::check_where_state() {
     current_state = where;
     expected_next_state.clear();
     expected_next_state.insert(end);
-    where_clause = callback_func();
+    where_op = callback_func();
     return true;
   }
 

@@ -3,7 +3,9 @@
 #include "operators/read_operator.h"
 #include "operators/set_operator.h"
 #include "operators/write_operator.h"
+#include "parser.h"
 #include "gtest/gtest.h"
+#include <format>
 
 TEST(OperatorTest, ReadOperator) {
   tdb::ReadOperator read_op("/home/pal/workspace/terrible-softwares/"
@@ -28,4 +30,31 @@ TEST(OperatorTest, ReadOperator) {
   write_op.AddData(proj_op.GetData());
   write_op.Execute();
   // EXPECT_NO_THROW(op.ReadTable());
+}
+
+TEST(OperatorTest, TestPipeline) {
+  {
+    auto operators = tdb::ParseInputQuery("Select * from simple_table");
+
+    EXPECT_TRUE(operators.size() == 3);
+    tdb::Table_Vec vec;
+    for (auto &op : operators) {
+      op->AddData(std::move(vec));
+      op->Execute();
+      vec = std::move(op->GetData());
+    }
+  }
+
+  {
+    auto operators = tdb::ParseInputQuery("Select * from simple_table Where ( "
+                                          "( name == john ) OR ( age > 40 ) )");
+
+    EXPECT_TRUE(operators.size() == 4);
+    tdb::Table_Vec vec;
+    for (auto &op : operators) {
+      op->AddData(std::move(vec));
+      op->Execute();
+      vec = std::move(op->GetData());
+    }
+  }
 }
