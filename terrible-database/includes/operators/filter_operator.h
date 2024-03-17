@@ -18,7 +18,9 @@ public:
   }
 
   std::vector<size_t> GetArgResults(Table_Ptr &ptr) {
-    Execute();
+    auto col_idx = ptr->GetColumnIndex(col_name);
+    type = ptr->GetColumnType(col_idx);
+    FilterColumns(ptr);
     return std::move(arg_results);
   }
 
@@ -40,7 +42,9 @@ protected:
         static_cast<A *>(this)->FilterStrings(ptr, value);
         break;
       default:
-        throw std::runtime_error("Filter Op: Invalid Type\n");
+        std::cout << "type: " << type << std::endl;
+        throw std::runtime_error(
+            "Filter Op: Invalid column type. Column name: " + col_name + "\n");
       }
     } catch (std::invalid_argument const &ex) {
       std::cout << "Filter Operator: Value and Column type mismatch\n";
