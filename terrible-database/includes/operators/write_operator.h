@@ -13,8 +13,7 @@ public:
     this->tables.emplace_back(std::move(tables[0]));
   }
 
-  void Execute() {
-    WriteTable(); }
+  void Execute() { WriteTable(); }
 
   Table_Vec GetData() { return std::move(tables); }
 

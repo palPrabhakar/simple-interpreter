@@ -18,7 +18,7 @@ ReadOperator::GetColumn<int64_t>(const Json::Value &data, const size_t size) {
     vec.push_back(data[i].asInt64());
   }
 
-  return std::make_unique<Column<int64_t>>(size, std::move(vec));
+  return std::make_unique<Int64Column>(size, std::move(vec));
 }
 
 template <>
@@ -31,7 +31,7 @@ ReadOperator::GetColumn<double>(const Json::Value &data, const size_t size) {
     vec.push_back(data[i].asDouble());
   }
 
-  return std::make_unique<Column<double>>(size, std::move(vec));
+  return std::make_unique<DoubleColumn>(size, std::move(vec));
 }
 
 template <>
@@ -44,7 +44,7 @@ ReadOperator::GetColumn<std::string>(const Json::Value &data, const size_t size)
     vec.emplace_back(data[i].asString());
   }
 
-  return std::make_unique<Column<std::string>>(size, std::move(vec));
+  return std::make_unique<StringColumn>(size, std::move(vec));
 }
 
 void ReadOperator::ReadTable() {

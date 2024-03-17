@@ -5,10 +5,10 @@
 
 namespace tdb {
   void WriteOperator::WriteTable() {
-    std::cout<<"WriteOp::WriteTable"<<std::endl;
     auto ncols = tables[0]->GetColumnSize();
     auto nrows = tables[0]->GetRowSize();
 
+    std::cout<<"\n";
     std::cout<<tables[0]->GetTableName()<<"\n";
     std::stringstream ss;
     for(size_t i = 0; i < ncols; ++i) {

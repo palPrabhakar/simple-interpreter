@@ -21,7 +21,7 @@ public:
 template <typename T> class Column : public BaseColumn {
 public:
   Column(size_t nsize) : vec(nsize), n_rows(nsize) {}
-  Column(size_t nsize, std::vector<T> &&values): vec(values), n_rows(nsize) {}
+  Column(size_t nsize, std::vector<T> &&values) : vec(values), n_rows(nsize) {}
 
   void get_value(std::size_t index, int64_t &value) {
     if constexpr (std::is_same_v<T, int64_t>) {
@@ -71,8 +71,42 @@ public:
     }
   }
 
-private:
+protected:
   std::vector<T> vec;
   size_t n_rows;
 };
+
+class Int64Column : public Column<int64_t> {
+public:
+  Int64Column(size_t nsize) : Column<int64_t>(nsize) {}
+  Int64Column(size_t nsize, std::vector<int64_t> &&values)
+      : Column<int64_t>(nsize, std::move(values)) {}
+
+  int64_t &operator[](std::size_t idx) { return vec[idx]; }
+
+  const int64_t &operator[](std::size_t idx) const { return vec[idx]; }
+};
+
+class DoubleColumn : public Column<double> {
+public:
+  DoubleColumn(size_t nsize) : Column<double>(nsize) {}
+  DoubleColumn(size_t nsize, std::vector<double> &&values)
+      : Column<double>(nsize, std::move(values)) {}
+
+  double &operator[](std::size_t idx) { return vec[idx]; }
+
+  const double &operator[](std::size_t idx) const { return vec[idx]; }
+};
+
+class StringColumn : public Column<std::string> {
+public:
+  StringColumn(size_t nsize) : Column<std::string>(nsize) {}
+  StringColumn(size_t nsize, std::vector<std::string> &&values)
+      : Column<std::string>(nsize, std::move(values)) {}
+
+  std::string &operator[](std::size_t idx) { return vec[idx]; }
+
+  const std::string &operator[](std::size_t idx) const { return vec[idx]; }
+};
+
 } // namespace tdb
