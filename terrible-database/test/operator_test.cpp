@@ -11,7 +11,7 @@ TEST(OperatorTest, ReadOperator) {
   read_op.Execute();
 
   auto un_op =
-      tdb::UnionOperator(std::make_unique<tdb::EqualityFilter>("age", "44"),
+      tdb::UnionOperator(std::make_unique<tdb::GreaterThanFilter>("age", "40"),
                          std::make_unique<tdb::EqualityFilter>("name", "John"));
   un_op.AddData(read_op.GetData());
   un_op.Execute();

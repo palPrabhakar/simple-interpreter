@@ -30,16 +30,19 @@ protected:
   Data_Type type;
 
   void FilterColumns(Table_Ptr &ptr) {
+    auto col_idx = ptr->GetColumnIndex(this->col_name);
+    auto *col = ptr->GetColumn(col_idx);
+    auto row_size = ptr->GetRowSize();
     try {
       switch (type) {
       case DT_INT:
-        static_cast<A *>(this)->FilterInt64(ptr, std::stoi(value));
+        static_cast<A *>(this)->FilterInt64(col, std::stoi(value), row_size);
         break;
       case DT_DOUBLE:
-        static_cast<A *>(this)->FilterDouble(ptr, std::stod(value));
+        static_cast<A *>(this)->FilterDouble(col, std::stod(value), row_size);
         break;
       case DT_STRING:
-        static_cast<A *>(this)->FilterStrings(ptr, value);
+        static_cast<A *>(this)->FilterStrings(col, value, row_size);
         break;
       default:
         std::cout << "type: " << type << std::endl;
@@ -57,66 +60,79 @@ public:
   EqualityFilter(std::string col_name, std::string col_val)
       : FilterOperator<EqualityFilter>(col_name, col_val) {}
 
-  void FilterStrings(Table_Ptr &ptr, std::string val) {
-    auto col_idx = ptr->GetColumnIndex(this->col_name);
-    auto *cols = ptr->GetColumn(col_idx);
-    auto row_size = ptr->GetRowSize();
-    StringColumn *scols = static_cast<StringColumn *>(cols);
-    for (auto i = 0; i < row_size; ++i) {
-      if ((*scols)[i] == val)
-        this->arg_results.push_back(i);
-    }
-  }
+  void FilterStrings(BaseColumn *ptr, std::string val, size_t row_size);
 
-  void FilterInt64(Table_Ptr &ptr, int64_t val) {
-    auto col_idx = ptr->GetColumnIndex(this->col_name);
-    auto *cols = ptr->GetColumn(col_idx);
-    auto row_size = ptr->GetRowSize();
-    Int64Column *icols = static_cast<Int64Column *>(cols);
-    for (auto i = 0; i < row_size; ++i) {
-      if ((*icols)[i] == val)
-        this->arg_results.push_back(i);
-    }
-  }
+  void FilterInt64(BaseColumn *ptr, int64_t val, size_t row_size);
 
-  void FilterDouble(Table_Ptr &ptr, double val) {
-    auto col_idx = ptr->GetColumnIndex(this->col_name);
-    auto *cols = ptr->GetColumn(col_idx);
-    auto row_size = ptr->GetRowSize();
-    DoubleColumn *icols = static_cast<DoubleColumn *>(cols);
-    for (auto i = 0; i < row_size; ++i) {
-      if ((*icols)[i] == val)
-        this->arg_results.push_back(i);
-    }
-  }
+  void FilterDouble(BaseColumn *ptr, double val, size_t row_size);
 };
 
-// class LessThanFilter : public FilterOperator<LessThanFilter> {
-// private:
-//   void FilterColumns(Table_Ptr &ptr);
-//   void FilterStrings(Table_Ptr &ptr);
-//   void FilterInt64(Table_Ptr &ptr);
-//   void FilterDouble(Table_Ptr &ptr);
+class NonEqualityFilter : public FilterOperator<NonEqualityFilter> {
+public:
+  NonEqualityFilter(std::string col_name, std::string col_val)
+      : FilterOperator<NonEqualityFilter>(col_name, col_val) {}
 
-//   bool negate;
-// };
+  void FilterStrings(BaseColumn *ptr, std::string val, size_t row_size);
 
-// class LessEqualFilter : public FilterOperator<LessEqualFilter> {
-//   private:
-//   void FilterColumns(Table_Ptr &ptr);
-//   void FilterStrings(Table_Ptr &ptr);
-//   void FilterInt64(Table_Ptr &ptr);
-//   void FilterDouble(Table_Ptr &ptr);
+  void FilterInt64(BaseColumn *ptr, int64_t val, size_t row_size);
 
-// };
+  void FilterDouble(BaseColumn *ptr, double val, size_t row_size);
+};
 
-// class GreaterEqualFilter : public FilterOperator<GreaterEqualFilter> {
-//   private:
-//   void FilterColumns(Table_Ptr &ptr);
-//   void FilterStrings(Table_Ptr &ptr);
-//   void FilterInt64(Table_Ptr &ptr);
-//   void FilterDouble(Table_Ptr &ptr);
+class LessThanFilter : public FilterOperator<LessThanFilter> {
+public:
+  LessThanFilter(std::string col_name, std::string col_val)
+      : FilterOperator<LessThanFilter>(col_name, col_val) {}
 
-// };
+  void FilterStrings(BaseColumn *ptr, std::string val, size_t row_size) {
+    throw std::runtime_error("LessThanFilter doesn't support strings\n");
+  }
+
+  void FilterInt64(BaseColumn *ptr, int64_t val, size_t row_size);
+
+  void FilterDouble(BaseColumn *ptr, double val, size_t row_size);
+};
+
+class GreaterThanFilter : public FilterOperator<GreaterThanFilter> {
+public:
+  GreaterThanFilter(std::string col_name, std::string col_val)
+      : FilterOperator<GreaterThanFilter>(col_name, col_val) {}
+
+  void FilterStrings(BaseColumn *ptr, std::string val, size_t row_size) {
+    throw std::runtime_error("GreaterThanFilter doesn't support strings\n");
+  }
+
+  void FilterInt64(BaseColumn *ptr, int64_t val, size_t row_size);
+
+  void FilterDouble(BaseColumn *ptr, double val, size_t row_size);
+};
+
+class LessEqualFilter : public FilterOperator<LessEqualFilter> {
+public:
+  LessEqualFilter(std::string col_name, std::string col_val)
+      : FilterOperator<LessEqualFilter>(col_name, col_val) {}
+
+  void FilterStrings(BaseColumn *ptr, std::string val, size_t row_size) {
+    throw std::runtime_error("LessEqualFilter doesn't support strings\n");
+  }
+
+  void FilterInt64(BaseColumn *ptr, int64_t val, size_t row_size);
+
+  void FilterDouble(BaseColumn *ptr, double val, size_t row_size);
+};
+
+class GreaterEqualFilter : public FilterOperator<GreaterEqualFilter> {
+public:
+  GreaterEqualFilter(std::string col_name, std::string col_val)
+      : FilterOperator<GreaterEqualFilter>(col_name, col_val) {}
+
+  void FilterStrings(BaseColumn *ptr, std::string val, size_t row_size) {
+    throw std::runtime_error("GreaterEqualFilter doesn't support strings\n");
+  }
+
+  void FilterInt64(BaseColumn *ptr, int64_t val, size_t row_size);
+
+  void FilterDouble(BaseColumn *ptr, double val, size_t row_size);
+};
 
 } // namespace tdb
