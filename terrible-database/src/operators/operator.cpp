@@ -35,11 +35,11 @@ std::unique_ptr<BaseColumn> BinaryOperator::GetColumn(size_t idx,
                                                       Data_Type type) {
   switch (type) {
   case DT_INT:
-    return GetColumn<int64_t, Int64Column>(idx);
+    return GetColumn<sINT::type, Int64Column>(idx);
   case DT_DOUBLE:
-    return GetColumn<double, DoubleColumn>(idx);
+    return GetColumn<sDOUBLE::type, DoubleColumn>(idx);
   case DT_STRING:
-    return GetColumn<std::string, StringColumn>(idx);
+    return GetColumn<sSTRING::type, StringColumn>(idx);
   default:
     throw std::runtime_error("BinaryOperator: Invalid column type\n");
   }

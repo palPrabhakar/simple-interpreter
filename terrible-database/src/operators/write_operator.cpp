@@ -24,13 +24,13 @@ namespace tdb {
       for(size_t j = 0; j < ncols; ++j) {
         switch(tables[0]->GetColumnType(j)) {
           case DT_INT:
-            std::cout<<tables[0]->GetValue<sINT>(j, i)<<"\t";
+            std::cout<<tables[0]->GetValue<sINT::type>(j, i)<<"\t";
             break;
           case DT_DOUBLE:
-            std::cout<<tables[0]->GetValue<sDOUBLE>(j, i)<<"\t";
+            std::cout<<tables[0]->GetValue<sDOUBLE::type>(j, i)<<"\t";
             break;
           case DT_STRING:
-            std::cout<<tables[0]->GetValue<sSTRING>(j, i)<<"\t";
+            std::cout<<tables[0]->GetValue<sSTRING::type>(j, i)<<"\t";
             break;
           default:
             break;

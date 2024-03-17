@@ -24,19 +24,17 @@ public:
   void SetRowSize(size_t size) { n_rows = size; }
   void SetColumnSize(size_t size) { n_cols = size; }
 
-  template <typename T> T::type GetValue(size_t col, size_t row) {
+  template <typename T> T GetValue(size_t col, size_t row) {
     assert(col < n_cols && "Column index out of bounds");
     assert(row < n_rows && "Row index out of bounds");
 
-    using Val_Type = typename T::type;
-
-    Val_Type val;
+    T val;
     columns[col]->get_value(row, val);
     return val;
   }
 
   template <typename T>
-  void SetValue(size_t col, size_t row, typename T::type val) {
+  void SetValue(size_t col, size_t row, T val) {
     assert(col < n_cols && "Column index out of bounds");
     assert(row < n_rows && "Row index out of bounds");
 

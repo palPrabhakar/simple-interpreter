@@ -61,9 +61,7 @@ public:
       : FilterOperator<EqualityFilter>(col_name, col_val) {}
 
   void FilterStrings(BaseColumn *ptr, std::string val, size_t row_size);
-
   void FilterInt64(BaseColumn *ptr, int64_t val, size_t row_size);
-
   void FilterDouble(BaseColumn *ptr, double val, size_t row_size);
 };
 
@@ -73,9 +71,7 @@ public:
       : FilterOperator<NonEqualityFilter>(col_name, col_val) {}
 
   void FilterStrings(BaseColumn *ptr, std::string val, size_t row_size);
-
   void FilterInt64(BaseColumn *ptr, int64_t val, size_t row_size);
-
   void FilterDouble(BaseColumn *ptr, double val, size_t row_size);
 };
 
@@ -89,7 +85,6 @@ public:
   }
 
   void FilterInt64(BaseColumn *ptr, int64_t val, size_t row_size);
-
   void FilterDouble(BaseColumn *ptr, double val, size_t row_size);
 };
 
@@ -103,7 +98,6 @@ public:
   }
 
   void FilterInt64(BaseColumn *ptr, int64_t val, size_t row_size);
-
   void FilterDouble(BaseColumn *ptr, double val, size_t row_size);
 };
 
@@ -117,7 +111,6 @@ public:
   }
 
   void FilterInt64(BaseColumn *ptr, int64_t val, size_t row_size);
-
   void FilterDouble(BaseColumn *ptr, double val, size_t row_size);
 };
 
@@ -131,7 +124,6 @@ public:
   }
 
   void FilterInt64(BaseColumn *ptr, int64_t val, size_t row_size);
-
   void FilterDouble(BaseColumn *ptr, double val, size_t row_size);
 };
 
