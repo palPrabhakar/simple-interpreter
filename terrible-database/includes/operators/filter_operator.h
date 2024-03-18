@@ -36,7 +36,7 @@ protected:
     try {
       switch (type) {
       case DT_INT:
-        static_cast<A *>(this)->FilterInt64(col, std::stoi(value), row_size);
+        static_cast<A *>(this)->FilterInt64(col, std::stol(value), row_size);
         break;
       case DT_DOUBLE:
         static_cast<A *>(this)->FilterDouble(col, std::stod(value), row_size);

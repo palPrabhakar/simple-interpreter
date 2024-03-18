@@ -49,9 +49,11 @@ void FileWriter::WriteTable() {
   auto nrows = tables[0]->GetRowSize();
 
   Json::Value obj;
-  obj["name"] = tables[0]->GetTableName();
-  obj["ncols"] = ncols;
-  obj["nrows"] = nrows;
+  Json::Value schema(Json::objectValue);
+
+  schema["name"] = tables[0]->GetTableName();
+  schema["ncols"] = ncols;
+  schema["nrows"] = nrows;
 
   Json::Value columns(Json::arrayValue);
   Json::Value types(Json::arrayValue);
@@ -65,8 +67,9 @@ void FileWriter::WriteTable() {
     data[col_name] = GetColumn(i, col_type);
   }
 
-  obj["columns"] = columns;
-  obj["types"] = types;
+  schema["columns"] = columns;
+  schema["types"] = types;
+  obj["schema"] = schema;
   obj["data"] = data;
 
   Json::StreamWriterBuilder builder;

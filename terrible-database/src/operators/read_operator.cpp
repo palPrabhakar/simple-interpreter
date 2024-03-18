@@ -36,7 +36,8 @@ ReadOperator::GetColumn<double>(const Json::Value &data, const size_t size) {
 
 template <>
 std::unique_ptr<BaseColumn>
-ReadOperator::GetColumn<std::string>(const Json::Value &data, const size_t size) {
+ReadOperator::GetColumn<std::string>(const Json::Value &data,
+                                     const size_t size) {
   std::vector<std::string> vec;
   vec.reserve(size);
 
@@ -79,7 +80,8 @@ void ReadOperator::ReadTable() {
 
   assert(tables.size() == 0 && "Vec<Table> not empty\n");
 
-  tables.emplace_back(std::make_unique<Table>(ncols, nrows, table_name, col_names, col_types));
+  tables.emplace_back(
+      std::make_unique<Table>(ncols, nrows, table_name, col_names, col_types));
   // Table table(ncols, nrows, table_name, col_names, col_types);
 
   for (size_t i = 0; i < col_names.size(); ++i) {

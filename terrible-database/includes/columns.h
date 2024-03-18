@@ -85,6 +85,11 @@ public:
   int64_t &operator[](std::size_t idx) { return vec[idx]; }
 
   const int64_t &operator[](std::size_t idx) const { return vec[idx]; }
+
+  void append(int64_t val) {
+    vec.push_back(val);
+    n_rows++;
+  }
 };
 
 class DoubleColumn : public Column<double> {
@@ -96,6 +101,11 @@ public:
   double &operator[](std::size_t idx) { return vec[idx]; }
 
   const double &operator[](std::size_t idx) const { return vec[idx]; }
+
+  void append(double val) {
+    vec.push_back(val);
+    n_rows++;
+  }
 };
 
 class StringColumn : public Column<std::string> {
@@ -107,6 +117,11 @@ public:
   std::string &operator[](std::size_t idx) { return vec[idx]; }
 
   const std::string &operator[](std::size_t idx) const { return vec[idx]; }
+
+  void append(std::string val) {
+    vec.emplace_back(val);
+    n_rows++;
+  }
 };
 
 } // namespace tdb

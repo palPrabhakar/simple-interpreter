@@ -61,9 +61,24 @@ TEST(OperatorTest, TestPipeline) {
 
 TEST(OperatorTest, TestCreatePipeline) {
   {
-    auto operators = tdb::ParseInputQuery("create test_table with col1 int col2 double col3 string");
+    auto operators = tdb::ParseInputQuery(
+        "create test_table with col1 int col2 double col3 string");
 
     EXPECT_TRUE(operators.size() == 2);
+    tdb::Table_Vec vec;
+    for (auto &op : operators) {
+      op->AddData(std::move(vec));
+      op->Execute();
+      vec = std::move(op->GetData());
+    }
+  }
+}
+
+TEST(OperatorTest, TestInsertPipeline) {
+  {
+    auto operators = tdb::ParseInputQuery("insert test_table values 42 2.5 lol");
+
+    EXPECT_TRUE(operators.size() == 3);
     tdb::Table_Vec vec;
     for (auto &op : operators) {
       op->AddData(std::move(vec));

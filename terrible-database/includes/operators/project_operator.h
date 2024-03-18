@@ -11,7 +11,7 @@ public:
       : column_names(col_names) {}
 
   void AddData(Table_Vec tables) {
-    assert(tables.size() == 1 && "WriteOperator: Tables size > 1\n");
+    assert(tables.size() == 1 && "ProjectOperator: Tables size > 1\n");
     input_tables.emplace_back(std::move(tables[0]));
   }
 

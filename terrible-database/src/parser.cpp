@@ -9,6 +9,7 @@
 #include "operators/read_operator.h"
 #include "operators/set_operator.h"
 #include "operators/write_operator.h"
+#include "operators/insert_operator.h"
 #include "tokenizer.h"
 #include <cassert>
 #include <format>
@@ -232,30 +233,32 @@ Operator_Vec ParseCreateQuery(Token_Vector &tokens, size_t &index) {
   return operators;
 }
 
-// Operator_Vec ParseInsertQuery(Token_Vector &tokens, size_t &index) {
-//   Operator_Vec operators;
+Operator_Vec ParseInsertQuery(Token_Vector &tokens, size_t &index) {
+  Operator_Vec operators;
 
-//   InsertStateMachine ism;
+  InsertStateMachine ism;
 
-//   for (auto [token, word] : tokens) {
-//     if (!ism.CheckTransition(token, word)) {
-//       throw std::runtime_error(ism.GetErrorMsg() + " But found " + word);
-//     }
-//   }
+  for (auto [token, word] : tokens) {
+    if (!ism.CheckTransition(token, word)) {
+      throw std::runtime_error(ism.GetErrorMsg() + " But found " + word);
+    }
+  }
 
-//   if (ism.EOP()) {
-//     std::cout << "\nSuccefully Parsed Insert Query\n";
-//     std::cout << "Table Name: " << ism.table_name << "\n";
-//     for (auto val : ism.col_values) {
-//       std::cout << "Col Value: " << val << "\n";
-//     }
-//     std::cout << "\n";
-//   } else {
-//     throw std::runtime_error("Failed to parse insert query\n");
-//   }
+  if (!ism.EOP()) {
+    throw std::runtime_error("Failed to parse insert query\n");
+  }
 
-//   return operators;
-// }
+  auto file_path = std::format(
+      "/home/pal/workspace/terrible-softwares/terrible-database/tables/{}.json",
+      ism.table_name);
+  operators.emplace_back(std::make_unique<ReadOperator>(file_path));
+
+  operators.emplace_back(std::make_unique<InsertOperator>(ism.col_values));
+
+  operators.emplace_back(std::make_unique<FileWriter>());
+
+  return operators;
+}
 
 Operator_Vec ParseInputQuery(std::string input_query) {
   auto tokens = ReadInputQuery(input_query);
@@ -273,7 +276,7 @@ Operator_Vec ParseInputQuery(std::string input_query) {
       operators = ParseCreateQuery(tokens, index);
       break;
     case INSERT:
-      // operators = ParseInsertQuery(tokens, index);
+      operators = ParseInsertQuery(tokens, index);
       break;
     case UPDATE:
       // operators = ParseUpdateQuery(tokens, index);
