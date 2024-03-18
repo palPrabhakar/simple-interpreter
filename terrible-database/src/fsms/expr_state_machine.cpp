@@ -8,6 +8,8 @@
 
 namespace tdb {
 bool ExprStateMachine::CheckTransition(Token token, std::string word) {
+  // if the current state is righ_paren
+  // then Expr has been parsed or
   if (current_state == right_paren)
     return false;
 
@@ -28,11 +30,7 @@ bool ExprStateMachine::CheckTransition(Token token, std::string word) {
   case OP_GT:
   case OP_EQLT:
   case OP_EQGT:
-    if (check_op_state(token)) {
-      str_op = word;
-      op_token = token;
-      return true;
-    }
+    return check_op_state(token, word);
   default:
     current_state = undefined;
     return false;
@@ -80,11 +78,13 @@ bool ExprStateMachine::check_col_name_state(std::string word) {
   return false;
 }
 
-bool ExprStateMachine::check_op_state(Token token) {
+bool ExprStateMachine::check_op_state(Token token, std::string word) {
   if (expected_next_state.size() == 1 && expected_next_state.contains(op)) {
     current_state = op;
     expected_next_state.clear();
     expected_next_state.insert(col_value);
+    op_token = token;
+    str_op = word;
     return true;
   }
   current_state = error;

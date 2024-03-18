@@ -2,16 +2,14 @@
 
 #include "state_machine.h"
 #include "tokenizer.h"
-#include <string>
 #include <unordered_set>
-#include <vector>
 
 namespace tdb {
-class ExprStateMachine : StateMachine {
+class JoinStateMachine : StateMachine {
 public:
-  ExprStateMachine() {
+  JoinStateMachine() {
     current_state = begin;
-    expected_next_state.insert(left_paren);
+    expected_next_state.insert(tbl_name);
   }
 
   bool EOP() { return current_state == right_paren; }
@@ -21,36 +19,45 @@ public:
   }
 
   bool CheckTransition(Token token, std::string word);
+
   std::string GetErrorMsg();
 
-  std::string column_name;
+  std::string left_table;
+  std::string right_table;
+  std::string left_column;
+  std::string right_column;
   std::string str_op;
   Token op_token;
-  std::string column_val;
 
-  BinaryOp_Ptr GetOperator();
+  // BinaryOp_Ptr GetOperator();
 
 private:
   enum State {
     begin,
+    tbl_name,
+    join,
+    on,
     col_name,
-    col_value,
+    op,
     left_paren,
     right_paren,
-    op,
     end,
     error,
-    undefined,
+    undefined
   };
 
   enum State current_state;
   std::unordered_set<State> expected_next_state;
   std::string err_msg;
 
+  bool check_tbl_name_state(std::string word);
+  bool check_join_state();
+  bool check_on_state();
   bool check_col_name_state(std::string word);
   bool check_op_state(Token token, std::string word);
-  bool check_col_val_state(std::string word);
   bool check_left_paren_state();
   bool check_right_paren_state();
+  bool check_where_state();
+  bool check_end_state();
 };
 } // namespace tdb

@@ -22,5 +22,6 @@ Operator_Vec ParseCreateQuery(Token_Vector &tokens, size_t &index);
 Operator_Vec ParseInsertQuery(Token_Vector &tokens, size_t &index);
 Operator_Vec ParseUpdateQuery(Token_Vector &tokens, size_t &index);
 Operator_Vec ParseSelectQuery(Token_Vector &tokens, size_t &index);
+Operator_Vec ParseJoinClause(Token_Vector &tokens, size_t &index);
 
 } // namespace tdb

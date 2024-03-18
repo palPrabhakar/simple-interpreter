@@ -33,6 +33,8 @@ enum Token {
     TYPE_STRING,
     VALUES,
     WITH,
+    JOIN,
+    ON,
     END
 };
 
@@ -59,7 +61,9 @@ const std::unordered_map<std::string, Token> token_lookup = {
     { "double", TYPE_DOUBLE},
     { "string", TYPE_STRING},
     { "values", VALUES },
-    { "with", WITH }
+    { "with", WITH },
+    { "join", JOIN },
+    { "on", ON }
 };
 // clang-format on
 

@@ -18,6 +18,8 @@ bool SelectStateMachine::CheckTransition(Token token, std::string word) {
     }
   case WHERE:
     return check_where_state();
+  case JOIN:
+    return check_join_state();
   case END:
     return check_end_state();
   default:
@@ -28,7 +30,7 @@ bool SelectStateMachine::CheckTransition(Token token, std::string word) {
 
 std::string SelectStateMachine::GetErrorMsg() {
   if (current_state == error || current_state == undefined) {
-    err_msg = "Failed to parse update query.";
+    err_msg = "Failed to parse select query.";
     for (auto val : expected_next_state) {
       switch (val) {
       case select:
@@ -48,6 +50,9 @@ std::string SelectStateMachine::GetErrorMsg() {
         break;
       case from:
         err_msg += " Expected keyword from.";
+        break;
+      case join:
+        err_msg += " Expected keyword join.";
         break;
       case end:
         err_msg += " Expected endline character.";
@@ -103,6 +108,7 @@ bool SelectStateMachine::check_tbl_name_state(std::string word) {
     expected_next_state.clear();
     expected_next_state.insert(where);
     expected_next_state.insert(end);
+    expected_next_state.insert(join);
     current_state = tbl_name;
     table_name = word;
     return true;
@@ -131,7 +137,21 @@ bool SelectStateMachine::check_where_state() {
     current_state = where;
     expected_next_state.clear();
     expected_next_state.insert(end);
-    where_op = callback_func();
+    where_op = where_cb_func();
+    return true;
+  }
+
+  current_state = error;
+  return false;
+}
+
+bool SelectStateMachine::check_join_state() {
+  if (expected_next_state.contains(join)) {
+    current_state = join;
+    expected_next_state.clear();
+    expected_next_state.insert(where);
+    expected_next_state.insert(end);
+    auto join_op = join_cb_func();
     return true;
   }
 

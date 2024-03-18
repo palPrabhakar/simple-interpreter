@@ -2,14 +2,15 @@
 #include "fsms/create_state_machine.h"
 #include "fsms/expr_state_machine.h"
 #include "fsms/insert_state_machine.h"
+#include "fsms/join_state_machine.h"
 #include "fsms/select_state_machine.h"
 #include "fsms/update_state_machine.h"
 #include "operators/create_operator.h"
+#include "operators/insert_operator.h"
 #include "operators/project_operator.h"
 #include "operators/read_operator.h"
 #include "operators/set_operator.h"
 #include "operators/write_operator.h"
-#include "operators/insert_operator.h"
 #include "tokenizer.h"
 #include <cassert>
 #include <format>
@@ -31,6 +32,35 @@ Operator_Ptr ParseWhereClause(Token_Vector &tokens, size_t &index) {
   }
 
   return operations;
+}
+
+Operator_Vec ParseJoinClause(Token_Vector &tokens, size_t &index) {
+  JoinStateMachine jsm;
+
+  for (; index < tokens.size(); ++index) {
+    if (!jsm.CheckTransition(tokens[index].first, tokens[index].second)) {
+      if (jsm.CheckErrorState()) {
+        throw std::runtime_error(jsm.GetErrorMsg() + " But found " +
+                                 tokens[index].second);
+      }
+      break;
+    }
+  }
+
+  if (!jsm.EOP()) {
+    throw std::runtime_error("Failed to parse join clause\n");
+  } else {
+    std::cout << "\n=====\n";
+    std::cout << "Successfully parse join clause\n";
+    std::cout << "left_table: " << jsm.left_table << "\n";
+    std::cout << "right_table: " << jsm.right_table << "\n";
+    std::cout << "left_column: " << jsm.left_column << "\n";
+    std::cout << "right_column: " << jsm.right_column << "\n";
+    std::cout << "operator: " << jsm.str_op << "\n";
+    std::cout << "=====\n";
+  }
+
+  return Operator_Vec{};
 }
 
 BinaryOp_Ptr ParseExpression(Token_Vector &tokens, size_t &index) {
@@ -169,10 +199,17 @@ Operator_Vec ParseSelectQuery(Token_Vector &tokens, size_t &index) {
   Operator_Vec operators;
 
   SelectStateMachine ssm;
-  ssm.RegisterCallBack([&tokens, &index]() {
-    auto operations = ParseWhereClause(tokens, index);
+  ssm.RegisterWhereCallBack([&tokens, &index]() {
+    auto op = ParseWhereClause(tokens, index);
     --index;
-    return operations;
+    return op;
+  });
+
+  ssm.RegisterJoinCallBack([&tokens, &index]() {
+    --index;
+    auto operators = ParseJoinClause(tokens, index);
+    --index;
+    return operators;
   });
 
   assert(index < tokens.size() && "ParseSelectQuery: Index out of range\n");
@@ -226,7 +263,8 @@ Operator_Vec ParseCreateQuery(Token_Vector &tokens, size_t &index) {
     throw std::runtime_error("Failed to parse create query\n");
   }
 
-  operators.emplace_back(std::make_unique<CreateOperator>(csm.table_name, csm.col_names, csm.col_types));
+  operators.emplace_back(std::make_unique<CreateOperator>(
+      csm.table_name, csm.col_names, csm.col_types));
 
   operators.emplace_back(std::make_unique<FileWriter>());
 

@@ -401,3 +401,12 @@ TEST(ParserTest, SelectQuery) {
       },
       std::runtime_error);
 }
+
+TEST(ParserTest, JoinQueries) {
+  EXPECT_NO_THROW(tdb::ParseInputQuery(
+      "Select * from t1 join t2 on ( t1.col1 == t2.col2 )"));
+
+  EXPECT_NO_THROW(
+      tdb::ParseInputQuery("Select * from t1 join t2 on ( t1.col1 == t2.col2 ) "
+                           "where ( ( t1.col1 > 100 ) and ( t2.col2 < 50 ) )"));
+}

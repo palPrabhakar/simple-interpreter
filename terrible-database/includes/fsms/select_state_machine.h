@@ -15,8 +15,12 @@ public:
     expected_next_state.insert(select);
   }
 
-  void RegisterCallBack(std::function<Operator_Ptr()> func) {
-    callback_func = func;
+  void RegisterWhereCallBack(std::function<Operator_Ptr()> func) {
+    where_cb_func = func;
+  }
+
+  void RegisterJoinCallBack(std::function<Operator_Vec()> func) {
+    join_cb_func = func;
   }
 
   bool EOP() { return current_state == end; }
@@ -42,6 +46,8 @@ private:
     tbl_name,
     column_name,
     where,
+    join,
+    on,
     end,
     error,
     undefined
@@ -51,7 +57,8 @@ private:
   enum State current_state;
   std::unordered_set<State> expected_next_state;
   std::string err_msg;
-  std::function<Operator_Ptr()> callback_func;
+  std::function<Operator_Ptr()> where_cb_func;
+  std::function<Operator_Vec()> join_cb_func;
 
   bool check_select_state();
   bool check_star_state();
@@ -60,6 +67,7 @@ private:
   bool check_col_name_state(std::string word);
   bool check_where_state();
   bool check_end_state();
+  bool check_join_state();
 };
 } // namespace tdb
 

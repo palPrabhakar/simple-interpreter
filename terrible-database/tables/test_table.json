@@ -1,11 +1,11 @@
 {
-   "data" : 
+   "data" :
    {
       "col1" : [ 42, 42 ],
       "col2" : [ 2.5, 2.5 ],
       "col3" : [ "lol", "lol" ]
    },
-   "schema" : 
+   "schema" :
    {
       "columns" : [ "col1", "col2", "col3" ],
       "name" : "test_table",
