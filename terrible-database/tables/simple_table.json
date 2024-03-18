@@ -1,6 +1,6 @@
 {
   "schema": {
-    "name": "SimpleTable",
+    "name": "simple_table",
     "ncols": 2,
     "nrows": 2,
     "columns": ["name", "age"],

@@ -26,7 +26,7 @@ TEST(OperatorTest, ReadOperator) {
   proj_op.AddData(un_op.GetData());
   proj_op.Execute();
 
-  auto write_op = tdb::WriteOperator();
+  auto write_op = tdb::StdOutWriter();
   write_op.AddData(proj_op.GetData());
   write_op.Execute();
   // EXPECT_NO_THROW(op.ReadTable());
@@ -50,6 +50,20 @@ TEST(OperatorTest, TestPipeline) {
                                           "( name == john ) OR ( age > 40 ) )");
 
     EXPECT_TRUE(operators.size() == 4);
+    tdb::Table_Vec vec;
+    for (auto &op : operators) {
+      op->AddData(std::move(vec));
+      op->Execute();
+      vec = std::move(op->GetData());
+    }
+  }
+}
+
+TEST(OperatorTest, TestCreatePipeline) {
+  {
+    auto operators = tdb::ParseInputQuery("create test_table with col1 int col2 double col3 string");
+
+    EXPECT_TRUE(operators.size() == 2);
     tdb::Table_Vec vec;
     for (auto &op : operators) {
       op->AddData(std::move(vec));

@@ -4,6 +4,7 @@
 #include "fsms/insert_state_machine.h"
 #include "fsms/select_state_machine.h"
 #include "fsms/update_state_machine.h"
+#include "operators/create_operator.h"
 #include "operators/project_operator.h"
 #include "operators/read_operator.h"
 #include "operators/set_operator.h"
@@ -204,36 +205,32 @@ Operator_Vec ParseSelectQuery(Token_Vector &tokens, size_t &index) {
   operators.emplace_back(std::make_unique<ProjectOperator>(ssm.col_names));
 
   // Add Write Operator
-  operators.emplace_back(std::make_unique<WriteOperator>());
+  operators.emplace_back(std::make_unique<StdOutWriter>());
 
   return operators;
 }
 
-// Operator_Vec ParseCreateQuery(Token_Vector &tokens, size_t &index) {
-//   Operator_Vec operators;
+Operator_Vec ParseCreateQuery(Token_Vector &tokens, size_t &index) {
+  Operator_Vec operators;
 
-//   CreateStateMachine csm;
+  CreateStateMachine csm;
 
-//   for (auto [token, word] : tokens) {
-//     if (!csm.CheckTransition(token, word)) {
-//       throw std::runtime_error(csm.GetErrorMsg() + " But found " + word);
-//     }
-//   }
+  for (auto [token, word] : tokens) {
+    if (!csm.CheckTransition(token, word)) {
+      throw std::runtime_error(csm.GetErrorMsg() + " But found " + word);
+    }
+  }
 
-//   if (csm.EOP()) {
-//     std::cout << "\nSuccefully Parsed Create Query\n";
-//     std::cout << "Table Name: " << csm.table_name << "\n";
-//     for (size_t i = 0; i < csm.col_types.size(); ++i) {
-//       std::cout << "Col Name: " << csm.col_names[i]
-//                 << ", Col Type: " << csm.col_types[i] << "\n";
-//     }
-//     std::cout << "\n";
-//   } else {
-//     throw std::runtime_error("Failed to parse create query\n");
-//   }
+  if (!csm.EOP()) {
+    throw std::runtime_error("Failed to parse create query\n");
+  }
 
-//   return operators;
-// }
+  operators.emplace_back(std::make_unique<CreateOperator>(csm.table_name, csm.col_names, csm.col_types));
+
+  operators.emplace_back(std::make_unique<FileWriter>());
+
+  return operators;
+}
 
 // Operator_Vec ParseInsertQuery(Token_Vector &tokens, size_t &index) {
 //   Operator_Vec operators;
@@ -254,7 +251,7 @@ Operator_Vec ParseSelectQuery(Token_Vector &tokens, size_t &index) {
 //     }
 //     std::cout << "\n";
 //   } else {
-//     throw std::runtime_error("Failed to parse create query\n");
+//     throw std::runtime_error("Failed to parse insert query\n");
 //   }
 
 //   return operators;
@@ -273,7 +270,7 @@ Operator_Vec ParseInputQuery(std::string input_query) {
   if (tokens.size() != 0) {
     switch (tokens[0].first) {
     case CREATE:
-      // operators = ParseCreateQuery(tokens, index);
+      operators = ParseCreateQuery(tokens, index);
       break;
     case INSERT:
       // operators = ParseInsertQuery(tokens, index);

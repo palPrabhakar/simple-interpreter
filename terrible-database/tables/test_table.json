@@ -1,0 +1,13 @@
+{
+   "columns" : [ "col1", "col2", "col3" ],
+   "data" : 
+   {
+      "col1" : [],
+      "col2" : [],
+      "col3" : []
+   },
+   "name" : "test_table",
+   "ncols" : 3,
+   "nrows" : 0,
+   "types" : [ 0, 1, 2 ]
+}
