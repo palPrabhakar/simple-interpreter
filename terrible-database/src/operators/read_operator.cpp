@@ -14,6 +14,8 @@ ReadOperator::GetColumn<int64_t>(const Json::Value &data, const size_t size) {
   std::vector<int64_t> vec;
   vec.reserve(size);
 
+  assert(data.size() == size && "ReadOperator: Number of columns don't match given size\n");
+
   for (int i = 0; i < data.size(); ++i) {
     vec.push_back(data[i].asInt64());
   }
@@ -26,6 +28,8 @@ std::unique_ptr<BaseColumn>
 ReadOperator::GetColumn<double>(const Json::Value &data, const size_t size) {
   std::vector<double> vec;
   vec.reserve(size);
+
+  assert(data.size() == size && "ReadOperator: Number of columns don't match given size\n");
 
   for (int i = 0; i < data.size(); ++i) {
     vec.push_back(data[i].asDouble());
@@ -40,6 +44,8 @@ ReadOperator::GetColumn<std::string>(const Json::Value &data,
                                      const size_t size) {
   std::vector<std::string> vec;
   vec.reserve(size);
+
+  assert(data.size() == size && "ReadOperator: Number of columns don't match given size\n");
 
   for (int i = 0; i < data.size(); ++i) {
     vec.emplace_back(data[i].asString());
@@ -78,16 +84,16 @@ void ReadOperator::ReadTable() {
     col_types.emplace_back(static_cast<Data_Type>(types[i].asInt()));
   }
 
-  assert(tables.size() == 0 && "Vec<Table> not empty\n");
+  // assert(tables.size() == 0 && "Vec<Table> not empty\n");
 
+  auto tidx = tables.size();
   tables.emplace_back(
       std::make_unique<Table>(ncols, nrows, table_name, col_names, col_types));
-  // Table table(ncols, nrows, table_name, col_names, col_types);
 
   for (size_t i = 0; i < col_names.size(); ++i) {
     const Json::Value col_val = data["data"][col_names[i]];
     auto ptr = GetColumn(col_val, col_types[i], nrows);
-    tables[0]->SetColumn(i, std::move(ptr));
+    tables[tidx]->SetColumn(i, std::move(ptr));
   }
 }
 

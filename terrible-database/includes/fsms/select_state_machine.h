@@ -34,7 +34,9 @@ public:
   std::string table_name;
   // empty col_names => all columns
   Operator_Ptr where_op;
+  Operator_Vec join_ops;
   std::vector<std::string> col_names;
+  bool join_clause = false;
 
 private:
   // clang-format off

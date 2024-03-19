@@ -12,6 +12,7 @@ using Table_Ptr = std::unique_ptr<Table>;
 
 class Operator {
 public:
+  virtual ~Operator() = default;
   virtual void AddData(Table_Vec tables) = 0;
   virtual void Execute() = 0;
   virtual Table_Vec GetData() = 0;
@@ -21,7 +22,7 @@ class BinaryOperator : public Operator {
 public:
   void AddData(Table_Vec tables) {
     assert(tables.size() == 1 && "WriteOperator: Tables size > 1\n");
-    this->tables.emplace_back(std::move(tables[0]));
+    this->tables = std::move(tables);
   }
 
   Table_Vec GetData();

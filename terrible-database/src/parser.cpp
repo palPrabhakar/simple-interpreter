@@ -7,6 +7,7 @@
 #include "fsms/update_state_machine.h"
 #include "operators/create_operator.h"
 #include "operators/insert_operator.h"
+#include "operators/join_operator.h"
 #include "operators/project_operator.h"
 #include "operators/read_operator.h"
 #include "operators/set_operator.h"
@@ -35,6 +36,8 @@ Operator_Ptr ParseWhereClause(Token_Vector &tokens, size_t &index) {
 }
 
 Operator_Vec ParseJoinClause(Token_Vector &tokens, size_t &index) {
+  Operator_Vec operators;
+
   JoinStateMachine jsm;
 
   for (; index < tokens.size(); ++index) {
@@ -49,18 +52,24 @@ Operator_Vec ParseJoinClause(Token_Vector &tokens, size_t &index) {
 
   if (!jsm.EOP()) {
     throw std::runtime_error("Failed to parse join clause\n");
-  } else {
-    std::cout << "\n=====\n";
-    std::cout << "Successfully parse join clause\n";
-    std::cout << "left_table: " << jsm.left_table << "\n";
-    std::cout << "right_table: " << jsm.right_table << "\n";
-    std::cout << "left_column: " << jsm.left_column << "\n";
-    std::cout << "right_column: " << jsm.right_column << "\n";
-    std::cout << "operator: " << jsm.str_op << "\n";
-    std::cout << "=====\n";
   }
 
-  return Operator_Vec{};
+  auto left_path = std::format(
+      "/home/pal/workspace/terrible-softwares/terrible-database/tables/{}.json",
+      jsm.left_table);
+
+  auto right_path = std::format(
+      "/home/pal/workspace/terrible-softwares/terrible-database/tables/{}.json",
+      jsm.right_table);
+
+  // the order should be this
+  // the join operator implicity assumes index - 0 for left table
+  operators.emplace_back(std::make_unique<ReadOperator>(left_path));
+  operators.emplace_back(std::make_unique<ReadOperator>(right_path));
+  operators.emplace_back(std::make_unique<JoinOperator>(
+      jsm.left_table, jsm.right_table, jsm.left_column, jsm.right_column));
+
+  return operators;
 }
 
 BinaryOp_Ptr ParseExpression(Token_Vector &tokens, size_t &index) {
@@ -228,11 +237,15 @@ Operator_Vec ParseSelectQuery(Token_Vector &tokens, size_t &index) {
     throw std::runtime_error("Failed to parse select query\n");
   }
 
-  auto file_path = std::format(
-      "/home/pal/workspace/terrible-softwares/terrible-database/tables/{}.json",
-      ssm.table_name);
-  // Add Table Read Operator
-  operators.emplace_back(std::make_unique<ReadOperator>(file_path));
+  if (!ssm.join_clause) {
+    auto file_path = std::format("/home/pal/workspace/terrible-softwares/"
+                                 "terrible-database/tables/{}.json",
+                                 ssm.table_name);
+    operators.emplace_back(std::make_unique<ReadOperator>(file_path));
+  }
+  else {
+    operators = std::move(ssm.join_ops);
+  }
 
   // If where clause add Binary Operator
   if (ssm.where_op) {
@@ -290,9 +303,7 @@ Operator_Vec ParseInsertQuery(Token_Vector &tokens, size_t &index) {
       "/home/pal/workspace/terrible-softwares/terrible-database/tables/{}.json",
       ism.table_name);
   operators.emplace_back(std::make_unique<ReadOperator>(file_path));
-
   operators.emplace_back(std::make_unique<InsertOperator>(ism.col_values));
-
   operators.emplace_back(std::make_unique<FileWriter>());
 
   return operators;

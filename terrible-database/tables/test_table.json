@@ -1,16 +1,16 @@
 {
-   "data" :
+   "data" : 
    {
-      "col1" : [ 42, 42 ],
-      "col2" : [ 2.5, 2.5 ],
-      "col3" : [ "lol", "lol" ]
+      "col1" : [ 42 ],
+      "col2" : [ 2.5 ],
+      "col3" : [ "lol" ]
    },
-   "schema" :
+   "schema" : 
    {
       "columns" : [ "col1", "col2", "col3" ],
       "name" : "test_table",
       "ncols" : 3,
-      "nrows" : 2,
+      "nrows" : 1,
       "types" : [ 0, 1, 2 ]
    }
 }

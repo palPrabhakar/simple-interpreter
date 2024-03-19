@@ -2,6 +2,7 @@
 
 #include "state_machine.h"
 #include "tokenizer.h"
+#include <stdexcept>
 #include <unordered_set>
 
 namespace tdb {
@@ -59,5 +60,7 @@ private:
   bool check_right_paren_state();
   bool check_where_state();
   bool check_end_state();
+
+  std::string check_column_name(std::string col_name, std::string table_name);
 };
 } // namespace tdb

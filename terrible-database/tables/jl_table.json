@@ -1,0 +1,14 @@
+{
+  "schema": {
+    "name": "jl_table",
+    "ncols": 3,
+    "nrows": 4,
+    "columns": ["gid", "name", "age"],
+    "types": [0, 2, 0]
+  },
+  "data": {
+    "gid": [1, 1, 2, 3],
+    "name": ["john", "doe", "foo", "bar"],
+    "age": [33, 44, 21, 64]
+  }
+}

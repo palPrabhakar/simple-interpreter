@@ -16,7 +16,7 @@ template <typename T> class WriteOperator : public Operator {
 public:
   void AddData(Table_Vec tables) {
     assert(tables.size() == 1 && "WriteOperator: Tables size > 1\n");
-    this->tables.emplace_back(std::move(tables[0]));
+    this->tables = std::move(tables);
   }
 
   void Execute() { static_cast<T *>(this)->WriteTable(); }

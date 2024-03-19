@@ -16,6 +16,8 @@ public:
   virtual void set_value(std::size_t index, int64_t value) = 0;
   virtual void set_value(std::size_t index, double value) = 0;
   virtual void set_value(std::size_t index, std::string value) = 0;
+
+  virtual size_t size() const = 0;
 };
 
 template <typename T> class Column : public BaseColumn {
@@ -69,6 +71,10 @@ public:
     } else {
       throw std::runtime_error("Invalid type. Expected std::string\n");
     }
+  }
+
+  size_t size() const {
+    return n_rows;
   }
 
 protected:

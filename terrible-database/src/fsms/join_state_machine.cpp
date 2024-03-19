@@ -1,5 +1,7 @@
 #include "fsms/join_state_machine.h"
 #include "tokenizer.h"
+#include <iostream>
+#include <string>
 
 namespace tdb {
 bool JoinStateMachine::CheckTransition(Token token, std::string word) {
@@ -82,7 +84,7 @@ bool JoinStateMachine::check_tbl_name_state(std::string word) {
 }
 
 bool JoinStateMachine::check_join_state() {
-  if(expected_next_state.contains(join)) {
+  if (expected_next_state.contains(join)) {
     current_state = join;
     expected_next_state.clear();
     expected_next_state.insert(tbl_name);
@@ -94,7 +96,7 @@ bool JoinStateMachine::check_join_state() {
 }
 
 bool JoinStateMachine::check_on_state() {
-  if(expected_next_state.contains(on)) {
+  if (expected_next_state.contains(on)) {
     current_state = on;
     expected_next_state.clear();
     expected_next_state.insert(left_paren);
@@ -110,10 +112,10 @@ bool JoinStateMachine::check_col_name_state(std::string word) {
     expected_next_state.clear();
     if (current_state == left_paren) {
       expected_next_state.insert(op);
-      left_column = word;
+      left_column = check_column_name(word, left_table);
     } else {
       expected_next_state.insert(right_paren);
-      right_column = word;
+      right_column = check_column_name(word, right_table);
     }
     current_state = col_name;
     return true;
@@ -136,7 +138,7 @@ bool JoinStateMachine::check_op_state(Token token, std::string word) {
 }
 
 bool JoinStateMachine::check_left_paren_state() {
-  if(expected_next_state.contains(left_paren)) {
+  if (expected_next_state.contains(left_paren)) {
     current_state = left_paren;
     expected_next_state.clear();
     expected_next_state.insert(col_name);
@@ -148,7 +150,7 @@ bool JoinStateMachine::check_left_paren_state() {
 }
 
 bool JoinStateMachine::check_right_paren_state() {
-  if(expected_next_state.contains(right_paren)) {
+  if (expected_next_state.contains(right_paren)) {
     current_state = right_paren;
     expected_next_state.clear();
     return true;
@@ -156,6 +158,27 @@ bool JoinStateMachine::check_right_paren_state() {
 
   current_state = error;
   return false;
+}
+
+std::string JoinStateMachine::check_column_name(std::string col_name,
+                                                std::string table_name) {
+  std::string tname;
+  std::string cname;
+
+  if (auto pos = col_name.find("."); pos != std::string::npos) {
+    tname = col_name.substr(0, pos);
+    cname = col_name.substr(pos + 1);
+  } else {
+    throw std::runtime_error(
+        "JSM: Unable to parse join clause. Table name missing.\n");
+  }
+
+  if (tname != table_name) {
+    throw std::runtime_error("JSM: Unable to parse join clause. Table name and "
+                             "doesn't match in the column qualifier.\n");
+  }
+
+  return cname;
 }
 
 } // namespace tdb

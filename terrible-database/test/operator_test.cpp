@@ -87,3 +87,17 @@ TEST(OperatorTest, TestInsertPipeline) {
     }
   }
 }
+
+TEST(OperatorTest, TestJoinPipeline) {
+  {
+    auto operators = tdb::ParseInputQuery("select * from jl_table join jr_table on ( jl_table.gid == jr_table.id )");
+
+    EXPECT_TRUE(operators.size() == 5);
+    tdb::Table_Vec vec;
+    for (auto &op : operators) {
+      op->AddData(std::move(vec));
+      op->Execute();
+      vec = std::move(op->GetData());
+    }
+  }
+}

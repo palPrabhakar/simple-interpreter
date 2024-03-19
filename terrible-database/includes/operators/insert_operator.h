@@ -14,7 +14,7 @@ public:
 
   void AddData(Table_Vec tables) {
     assert(tables.size() == 1 && "InsertOperator: Tables size != 1\n");
-    this->tables.emplace_back(std::move(tables[0]));
+    this->tables = std::move(tables);
   }
 
   Table_Vec GetData() { return std::move(tables); }

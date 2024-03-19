@@ -14,7 +14,9 @@ class ReadOperator : public Operator {
 public:
   ReadOperator(std::string file_path) : file_name(file_path) {}
 
-  void AddData(Table_Vec tables) {}
+  void AddData(Table_Vec tables) {
+    this->tables = std::move(tables);
+  }
 
   void Execute() { ReadTable(); }
 

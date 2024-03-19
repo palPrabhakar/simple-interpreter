@@ -151,7 +151,8 @@ bool SelectStateMachine::check_join_state() {
     expected_next_state.clear();
     expected_next_state.insert(where);
     expected_next_state.insert(end);
-    auto join_op = join_cb_func();
+    join_ops = join_cb_func();
+    join_clause = true;
     return true;
   }
 
