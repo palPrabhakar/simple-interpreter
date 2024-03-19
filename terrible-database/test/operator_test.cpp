@@ -8,8 +8,7 @@
 #include <format>
 
 TEST(OperatorTest, ReadOperator) {
-  tdb::ReadOperator read_op("/home/pal/workspace/terrible-softwares/"
-                            "terrible-database/tables/simple_table.json");
+  tdb::ReadOperator read_op("simple_table");
   read_op.Execute();
 
   auto un_op =
@@ -93,6 +92,32 @@ TEST(OperatorTest, TestJoinPipeline) {
     auto operators = tdb::ParseInputQuery("select * from jl_table join jr_table on ( jl_table.gid == jr_table.id )");
 
     EXPECT_TRUE(operators.size() == 5);
+    tdb::Table_Vec vec;
+    for (auto &op : operators) {
+      op->AddData(std::move(vec));
+      op->Execute();
+      vec = std::move(op->GetData());
+    }
+  }
+}
+
+TEST(OperatorTest, TestUpdatePipeline) {
+  {
+    auto operators = tdb::ParseInputQuery("Update u1_table values name lol age 11");
+
+    EXPECT_TRUE(operators.size() == 3);
+    tdb::Table_Vec vec;
+    for (auto &op : operators) {
+      op->AddData(std::move(vec));
+      op->Execute();
+      vec = std::move(op->GetData());
+    }
+  }
+
+  {
+    auto operators = tdb::ParseInputQuery("Update u2_table values name lol age 11 where ( age > 40 )");
+
+    EXPECT_TRUE(operators.size() == 3);
     tdb::Table_Vec vec;
     for (auto &op : operators) {
       op->AddData(std::move(vec));

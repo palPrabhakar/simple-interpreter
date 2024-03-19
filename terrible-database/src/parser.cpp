@@ -8,10 +8,12 @@
 #include "operators/create_operator.h"
 #include "operators/insert_operator.h"
 #include "operators/join_operator.h"
+#include "operators/operator.h"
 #include "operators/project_operator.h"
 #include "operators/read_operator.h"
 #include "operators/set_operator.h"
 #include "operators/write_operator.h"
+#include "operators/update_operator.h"
 #include "tokenizer.h"
 #include <cassert>
 #include <format>
@@ -54,18 +56,10 @@ Operator_Vec ParseJoinClause(Token_Vector &tokens, size_t &index) {
     throw std::runtime_error("Failed to parse join clause\n");
   }
 
-  auto left_path = std::format(
-      "/home/pal/workspace/terrible-softwares/terrible-database/tables/{}.json",
-      jsm.left_table);
-
-  auto right_path = std::format(
-      "/home/pal/workspace/terrible-softwares/terrible-database/tables/{}.json",
-      jsm.right_table);
-
   // the order should be this
   // the join operator implicity assumes index - 0 for left table
-  operators.emplace_back(std::make_unique<ReadOperator>(left_path));
-  operators.emplace_back(std::make_unique<ReadOperator>(right_path));
+  operators.emplace_back(std::make_unique<ReadOperator>(jsm.left_table));
+  operators.emplace_back(std::make_unique<ReadOperator>(jsm.right_table));
   operators.emplace_back(std::make_unique<JoinOperator>(
       jsm.left_table, jsm.right_table, jsm.left_column, jsm.right_column));
 
@@ -163,46 +157,43 @@ BinaryOp_Ptr ParseLogicalOP(Token_Vector &tokens, size_t &index) {
   return output;
 }
 
-// Operator_Vec ParseUpdateQuery(Token_Vector &tokens, size_t &index) {
-//   Operator_Vec operators;
+Operator_Vec ParseUpdateQuery(Token_Vector &tokens, size_t &index) {
+  Operator_Vec operators;
 
-//   UpdateStateMachine usm;
-//   usm.RegisterCallBack([&tokens, &index]() {
-//     auto operations = ParseWhereClause(tokens, index);
-//     --index;
-//     return operations;
-//   });
+  UpdateStateMachine usm;
+  usm.RegisterCallBack([&tokens, &index]() {
+    auto operations = ParseWhereClause(tokens, index);
+    --index;
+    return operations;
+  });
 
-//   assert(index < tokens.size() && "ParseUpdateQuery: Index out of range\n");
+  assert(index < tokens.size() && "ParseUpdateQuery: Index out of range\n");
 
-//   for (; index < tokens.size(); ++index) {
-//     if (!usm.CheckTransition(tokens[index].first, tokens[index].second)) {
-//       if (usm.CheckErrorState()) {
-//         throw std::runtime_error(usm.GetErrorMsg() + " But found " +
-//                                  tokens[index].second);
-//       }
-//       break;
-//     }
-//   }
+  for (; index < tokens.size(); ++index) {
+    if (!usm.CheckTransition(tokens[index].first, tokens[index].second)) {
+      if (usm.CheckErrorState()) {
+        throw std::runtime_error(usm.GetErrorMsg() + " But found " +
+                                 tokens[index].second);
+      }
+      break;
+    }
+  }
 
-//   if (usm.EOP()) {
-//     std::cout << "\nSuccefully Parsed Update Query\n";
-//     std::cout << "Table Name: " << usm.table_name << "\n";
-//     for (size_t i = 0; i < usm.col_names.size(); ++i) {
-//       std::cout << "Col Name: " << usm.col_names[i]
-//                 << ", Col Value: " << usm.col_values[i] << "\n";
-//     }
-//     std::cout << "Where clause op: \n";
-//     for (auto op : usm.where_clause) {
-//       std::cout << op << "\n";
-//     }
-//     std::cout << "\n";
-//   } else {
-//     throw std::runtime_error("Failed to parse update query\n");
-//   }
+  if (!usm.EOP()) {
+    throw std::runtime_error("Failed to parse update query\n");
+  }
 
-//   return operators;
-// }
+  operators.emplace_back(std::make_unique<ReadOperator>(usm.table_name));
+
+  // TODO:
+  // Update Op
+  BinaryOp_Ptr op(static_cast<BinaryOperator *>(usm.where_op.release()));
+  operators.emplace_back(std::make_unique<UpdateOperator>(usm.col_names, usm.col_values, std::move(op)));
+
+  operators.emplace_back(std::make_unique<FileWriter>());
+
+  return operators;
+}
 
 Operator_Vec ParseSelectQuery(Token_Vector &tokens, size_t &index) {
   Operator_Vec operators;
@@ -238,12 +229,8 @@ Operator_Vec ParseSelectQuery(Token_Vector &tokens, size_t &index) {
   }
 
   if (!ssm.join_clause) {
-    auto file_path = std::format("/home/pal/workspace/terrible-softwares/"
-                                 "terrible-database/tables/{}.json",
-                                 ssm.table_name);
-    operators.emplace_back(std::make_unique<ReadOperator>(file_path));
-  }
-  else {
+    operators.emplace_back(std::make_unique<ReadOperator>(ssm.table_name));
+  } else {
     operators = std::move(ssm.join_ops);
   }
 
@@ -299,10 +286,7 @@ Operator_Vec ParseInsertQuery(Token_Vector &tokens, size_t &index) {
     throw std::runtime_error("Failed to parse insert query\n");
   }
 
-  auto file_path = std::format(
-      "/home/pal/workspace/terrible-softwares/terrible-database/tables/{}.json",
-      ism.table_name);
-  operators.emplace_back(std::make_unique<ReadOperator>(file_path));
+  operators.emplace_back(std::make_unique<ReadOperator>(ism.table_name));
   operators.emplace_back(std::make_unique<InsertOperator>(ism.col_values));
   operators.emplace_back(std::make_unique<FileWriter>());
 
@@ -328,7 +312,7 @@ Operator_Vec ParseInputQuery(std::string input_query) {
       operators = ParseInsertQuery(tokens, index);
       break;
     case UPDATE:
-      // operators = ParseUpdateQuery(tokens, index);
+      operators = ParseUpdateQuery(tokens, index);
       break;
     case SELECT:
       return ParseSelectQuery(tokens, index);

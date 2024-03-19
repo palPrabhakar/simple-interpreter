@@ -298,59 +298,56 @@ TEST(ParserTest, WhereClause) {
       std::runtime_error);
 }
 
-// TEST(ParserTest, UpdateQueries) {
-//   EXPECT_NO_THROW(tdb::ParseInputQuery(
-//       "Update random_table values col1 100 col2 200 where ( col1 < 100 )"));
+TEST(ParserTest, UpdateQueries) {
+  EXPECT_NO_THROW(tdb::ParseInputQuery(
+      "Update random_table values col1 100 col2 200 where ( col1 < 100 )"));
 
-//   EXPECT_NO_THROW(
-//       tdb::ParseInputQuery("Update random_table values col1 100 col2 200"));
+  EXPECT_NO_THROW(
+      tdb::ParseInputQuery("Update random_table values col1 100 col2 200"));
 
-//   EXPECT_NO_THROW(
-//       tdb::ParseInputQuery("Update random_table values col1 100 col2 200
-//       where "
-//                            "( ( col1 < 100 ) and ( col2 != lol ) )"));
+  EXPECT_NO_THROW(
+      tdb::ParseInputQuery("Update random_table values col1 100 col2 200 where "
+                           "( ( col1 < 100 ) and ( col2 != lol ) )"));
 
-//   EXPECT_THROW(
-//       {
-//         try {
-//           tdb::ParseInputQuery("Update random_table col1 100");
-//         } catch (std::exception &err) {
-//           EXPECT_TRUE(
-//               std::string(err.what()).find("Expected keyword values.") !=
-//               std::string::npos);
-//           throw;
-//         }
-//       },
-//       std::runtime_error);
+  EXPECT_THROW(
+      {
+        try {
+          tdb::ParseInputQuery("Update random_table col1 100");
+        } catch (std::exception &err) {
+          EXPECT_TRUE(
+              std::string(err.what()).find("Expected keyword values.") !=
+              std::string::npos);
+          throw;
+        }
+      },
+      std::runtime_error);
 
-//   EXPECT_THROW(
-//       {
-//         try {
-//           tdb::ParseInputQuery(
-//               "Update random_table values col1 where ( col1 > 100 )");
-//         } catch (std::exception &err) {
-//           EXPECT_TRUE(std::string(err.what()).find("Expected column value.")
-//           !=
-//                       std::string::npos);
-//           throw;
-//         }
-//       },
-//       std::runtime_error);
+  EXPECT_THROW(
+      {
+        try {
+          tdb::ParseInputQuery(
+              "Update random_table values col1 where ( col1 > 100 )");
+        } catch (std::exception &err) {
+          EXPECT_TRUE(std::string(err.what()).find("Expected column value.") !=
+                      std::string::npos);
+          throw;
+        }
+      },
+      std::runtime_error);
 
-//   EXPECT_THROW(
-//       {
-//         try {
-//           tdb::ParseInputQuery(
-//               "Update random_table values where ( col1 > 100 )");
-//         } catch (std::exception &err) {
-//           EXPECT_TRUE(std::string(err.what()).find("Expected column name.")
-//           !=
-//                       std::string::npos);
-//           throw;
-//         }
-//       },
-//       std::runtime_error);
-// }
+  EXPECT_THROW(
+      {
+        try {
+          tdb::ParseInputQuery(
+              "Update random_table values where ( col1 > 100 )");
+        } catch (std::exception &err) {
+          EXPECT_TRUE(std::string(err.what()).find("Expected column name.") !=
+                      std::string::npos);
+          throw;
+        }
+      },
+      std::runtime_error);
+}
 
 TEST(ParserTest, SelectQuery) {
   EXPECT_NO_THROW(tdb::ParseInputQuery("select col1 col2 from some_table"));

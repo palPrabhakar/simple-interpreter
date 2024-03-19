@@ -2,21 +2,24 @@
 
 #include "columns.h"
 #include "data_types.h"
+#include "operator.h"
 #include <algorithm>
+#include <format>
 #include <json/value.h>
 #include <memory>
-#include "operator.h"
 #include <string>
 #include <vector>
 
 namespace tdb {
 class ReadOperator : public Operator {
 public:
-  ReadOperator(std::string file_path) : file_name(file_path) {}
-
-  void AddData(Table_Vec tables) {
-    this->tables = std::move(tables);
+  ReadOperator(std::string fname) {
+    file_name = std::format("/home/pal/workspace/terrible-softwares/"
+                            "terrible-database/tables/{}.json",
+                            fname);
   }
+
+  void AddData(Table_Vec tables) { this->tables = std::move(tables); }
 
   void Execute() { ReadTable(); }
 

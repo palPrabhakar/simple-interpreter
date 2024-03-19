@@ -1,0 +1,15 @@
+{
+   "data" : 
+   {
+      "age" : [ 11, 11, 11, 11 ],
+      "name" : [ "lol", "lol", "lol", "lol" ]
+   },
+   "schema" : 
+   {
+      "columns" : [ "name", "age" ],
+      "name" : "u1_table",
+      "ncols" : 2,
+      "nrows" : 4,
+      "types" : [ 2, 0 ]
+   }
+}
