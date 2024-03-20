@@ -14,14 +14,10 @@ class FilterOperator : public BinaryOperator {
       : col_name(name), value(val) {}
 
   void Execute() {
-    auto col_idx = tables[0]->GetColumnIndex(col_name);
-    auto type = tables[0]->GetColumnType(col_idx);
     FilterColumns(tables[0].get());
   }
 
   std::vector<size_t> GetArgResults(const Table *ptr) {
-    auto col_idx = ptr->GetColumnIndex(col_name);
-    type = ptr->GetColumnType(col_idx);
     FilterColumns(ptr);
     return std::move(arg_results);
   }

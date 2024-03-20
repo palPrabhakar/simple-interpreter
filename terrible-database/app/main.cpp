@@ -13,7 +13,7 @@ int main() {
   // for (auto &op : operators) {
   //   op->AddData(std::move(vec));
   //   op->Execute();
-  //   vec = std::move(op->GetData());
+  //   vec = op->GetData();
   // }
 
   // auto operators = tdb::ParseInputQuery("Update u2_table values name lol age
@@ -23,7 +23,7 @@ int main() {
   // for (auto &op : operators) {
   //   op->AddData(std::move(vec));
   //   op->Execute();
-  //   vec = std::move(op->GetData());
+  //   vec = op->GetData();
   // }
 
   auto operators =
@@ -35,7 +35,7 @@ int main() {
   for (auto &op : operators) {
     op->AddData(std::move(vec));
     op->Execute();
-    vec = std::move(op->GetData());
+    vec = op->GetData();
   }
 
   return 0;

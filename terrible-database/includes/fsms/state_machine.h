@@ -13,6 +13,7 @@ using Operator_Vec = std::vector<std::unique_ptr<Operator>>;
 
 class StateMachine {
  public:
+  virtual ~StateMachine() = default;
   virtual bool CheckTransition(Token token, std::string word) = 0;
   virtual std::string GetErrorMsg() = 0;
   virtual bool EOP() = 0;

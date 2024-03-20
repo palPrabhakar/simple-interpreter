@@ -108,7 +108,7 @@ void ReadOperator::ReadTable() {
   }
 
   for (size_t i = 0; i < col_names.size(); ++i) {
-    tables[tidx]->SetColumn(i, std::move(tasks[i].get()));
+    tables[tidx]->SetColumn(i, tasks[i].get());
   }
 }
 

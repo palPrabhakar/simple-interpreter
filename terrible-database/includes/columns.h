@@ -9,6 +9,8 @@
 namespace tdb {
 class BaseColumn {
  public:
+  virtual ~BaseColumn() = default;
+
   virtual void get_value(std::size_t index, int64_t &value) = 0;
   virtual void get_value(std::size_t index, double &value) = 0;
   virtual void get_value(std::size_t index, std::string &value) = 0;

@@ -21,6 +21,8 @@ class Operator {
 
 class BinaryOperator : public Operator {
  public:
+  virtual ~BinaryOperator() = default;
+
   void AddData(Table_Vec tables) {
     assert(tables.size() == 1 && "WriteOperator: Tables size > 1\n");
     this->tables = std::move(tables);

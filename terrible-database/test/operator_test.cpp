@@ -45,7 +45,7 @@ TEST(OperatorTest, TestPipeline) {
     for (auto &op : operators) {
       op->AddData(std::move(vec));
       op->Execute();
-      vec = std::move(op->GetData());
+      vec = op->GetData();
     }
   }
 
@@ -59,7 +59,7 @@ TEST(OperatorTest, TestPipeline) {
     for (auto &op : operators) {
       op->AddData(std::move(vec));
       op->Execute();
-      vec = std::move(op->GetData());
+      vec = op->GetData();
     }
   }
 }
@@ -74,7 +74,7 @@ TEST(OperatorTest, TestCreatePipeline) {
     for (auto &op : operators) {
       op->AddData(std::move(vec));
       op->Execute();
-      vec = std::move(op->GetData());
+      vec = op->GetData();
     }
   }
 }
@@ -89,7 +89,7 @@ TEST(OperatorTest, TestInsertPipeline) {
     for (auto &op : operators) {
       op->AddData(std::move(vec));
       op->Execute();
-      vec = std::move(op->GetData());
+      vec = op->GetData();
     }
   }
 }
@@ -105,7 +105,7 @@ TEST(OperatorTest, TestJoinPipeline) {
     for (auto &op : operators) {
       op->AddData(std::move(vec));
       op->Execute();
-      vec = std::move(op->GetData());
+      vec = op->GetData();
     }
   }
 
@@ -120,7 +120,7 @@ TEST(OperatorTest, TestJoinPipeline) {
     for (auto &op : operators) {
       op->AddData(std::move(vec));
       op->Execute();
-      vec = std::move(op->GetData());
+      vec = op->GetData();
     }
   }
 }
@@ -135,7 +135,7 @@ TEST(OperatorTest, TestUpdatePipeline) {
     for (auto &op : operators) {
       op->AddData(std::move(vec));
       op->Execute();
-      vec = std::move(op->GetData());
+      vec = op->GetData();
     }
   }
 
@@ -148,7 +148,7 @@ TEST(OperatorTest, TestUpdatePipeline) {
     for (auto &op : operators) {
       op->AddData(std::move(vec));
       op->Execute();
-      vec = std::move(op->GetData());
+      vec = op->GetData();
     }
   }
 }
