@@ -1,9 +1,11 @@
-#include "columns.h"
-#include "data_types.h"
 #include "operators/operator.h"
-#include "table.h"
+
 #include <cassert>
 #include <stdexcept>
+
+#include "columns.h"
+#include "data_types.h"
+#include "table.h"
 
 namespace tdb {
 Table_Vec BinaryOperator::GetData() {
@@ -34,15 +36,15 @@ Table_Vec BinaryOperator::GetData() {
 std::unique_ptr<BaseColumn> BinaryOperator::GetColumn(size_t idx,
                                                       Data_Type type) {
   switch (type) {
-  case DT_INT:
-    return GetColumn<sINT::type, Int64Column>(idx);
-  case DT_DOUBLE:
-    return GetColumn<sDOUBLE::type, DoubleColumn>(idx);
-  case DT_STRING:
-    return GetColumn<sSTRING::type, StringColumn>(idx);
-  default:
-    throw std::runtime_error("BinaryOperator: Invalid column type\n");
+    case DT_INT:
+      return GetColumn<sINT::type, Int64Column>(idx);
+    case DT_DOUBLE:
+      return GetColumn<sDOUBLE::type, DoubleColumn>(idx);
+    case DT_STRING:
+      return GetColumn<sSTRING::type, StringColumn>(idx);
+    default:
+      throw std::runtime_error("BinaryOperator: Invalid column type\n");
   }
 }
 
-} // namespace tdb
+}  // namespace tdb

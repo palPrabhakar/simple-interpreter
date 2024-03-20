@@ -1,20 +1,23 @@
 #include "operators/join_operator.h"
-#include "data_types.h"
-#include "operators/operator.h"
+
 #include <format>
 
+#include "data_types.h"
+#include "operators/operator.h"
+
 namespace tdb {
-std::vector<std::pair<size_t, size_t>>
-ProcessTables(BaseColumn *left, BaseColumn *right, Data_Type type) {
+std::vector<std::pair<size_t, size_t>> ProcessTables(BaseColumn *left,
+                                                     BaseColumn *right,
+                                                     Data_Type type) {
   switch (type) {
-  case DT_INT:
-    return ProcessTables<sINT::type, Int64Column>(left, right);
-  case DT_DOUBLE:
-    return ProcessTables<sDOUBLE::type, DoubleColumn>(left, right);
-  case DT_STRING:
-    return ProcessTables<sSTRING::type, StringColumn>(left, right);
-  default:
-    throw std::runtime_error("JoinOperator: Invalid column type\n");
+    case DT_INT:
+      return ProcessTables<sINT::type, Int64Column>(left, right);
+    case DT_DOUBLE:
+      return ProcessTables<sDOUBLE::type, DoubleColumn>(left, right);
+    case DT_STRING:
+      return ProcessTables<sSTRING::type, StringColumn>(left, right);
+    default:
+      throw std::runtime_error("JoinOperator: Invalid column type\n");
   }
 }
 
@@ -64,16 +67,16 @@ Table_Vec JoinOperator::GetData() {
   output_tables.emplace_back(
       std::make_unique<Table>(ncols, nrows, table_name, col_names, col_types));
 
-  for(auto i = 0; i < lcols; ++i) {
+  for (auto i = 0; i < lcols; ++i) {
     auto *col = ltable->GetColumn(i);
     auto type = ltable->GetColumnType(i);
     output_tables[0]->SetColumn(i, GetColumn<true>(col, type));
   }
 
-  for(auto i = 0; i < rcols; ++i) {
+  for (auto i = 0; i < rcols; ++i) {
     auto *col = rtable->GetColumn(i);
     auto type = rtable->GetColumnType(i);
-    output_tables[0]->SetColumn(i+lcols, GetColumn<false>(col, type));
+    output_tables[0]->SetColumn(i + lcols, GetColumn<false>(col, type));
   }
 
   return std::move(output_tables);
@@ -83,15 +86,15 @@ template <bool left>
 std::unique_ptr<BaseColumn> JoinOperator::GetColumn(BaseColumn *column,
                                                     Data_Type type) {
   switch (type) {
-  case DT_INT:
-    return GetColumn<sINT::type, Int64Column, left>(column);
-  case DT_DOUBLE:
-    return GetColumn<sDOUBLE::type, DoubleColumn, left>(column);
-  case DT_STRING:
-    return GetColumn<sSTRING::type, StringColumn, left>(column);
-  default:
-    throw std::runtime_error("BinaryOperator: Invalid column type\n");
+    case DT_INT:
+      return GetColumn<sINT::type, Int64Column, left>(column);
+    case DT_DOUBLE:
+      return GetColumn<sDOUBLE::type, DoubleColumn, left>(column);
+    case DT_STRING:
+      return GetColumn<sSTRING::type, StringColumn, left>(column);
+    default:
+      throw std::runtime_error("BinaryOperator: Invalid column type\n");
   }
 }
 
-} // namespace tdb
+}  // namespace tdb

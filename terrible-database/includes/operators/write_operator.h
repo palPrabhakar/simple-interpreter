@@ -1,19 +1,22 @@
 #pragma once
 
-#include "columns.h"
-#include "data_types.h"
-#include "operator.h"
-#include "table.h"
-#include "json/json.h"
 #include <json/value.h>
+
 #include <memory>
 #include <stdexcept>
 #include <vector>
 
+#include "columns.h"
+#include "data_types.h"
+#include "json/json.h"
+#include "operator.h"
+#include "table.h"
+
 namespace tdb {
 
-template <typename T> class WriteOperator : public Operator {
-public:
+template <typename T>
+class WriteOperator : public Operator {
+ public:
   void AddData(Table_Vec tables) {
     assert(tables.size() == 1 && "WriteOperator: Tables size > 1\n");
     this->tables = std::move(tables);
@@ -23,21 +26,22 @@ public:
 
   Table_Vec GetData() { return std::move(tables); }
 
-protected:
+ protected:
   Table_Vec tables;
 };
 
 class StdOutWriter : public WriteOperator<StdOutWriter> {
-public:
+ public:
   void WriteTable();
 };
 
 class FileWriter : public WriteOperator<FileWriter> {
-public:
+ public:
   void WriteTable();
 
-private:
-  template <typename V> Json::Value GetColumn(size_t col_idx) {
+ private:
+  template <typename V>
+  Json::Value GetColumn(size_t col_idx) {
     Json::Value column(Json::arrayValue);
     auto row_size = tables[0]->GetRowSize();
     auto col_ptr = static_cast<V *>(tables[0]->GetColumn(col_idx));
@@ -48,7 +52,7 @@ private:
   }
 
   Json::Value GetColumn(size_t col_idx, Data_Type type) {
-    switch(type) {
+    switch (type) {
       case DT_INT:
         return GetColumn<Int64Column>(col_idx);
       case DT_DOUBLE:
@@ -57,7 +61,7 @@ private:
         return GetColumn<StringColumn>(col_idx);
       default:
         throw std::runtime_error("FileWriter: Invalid type\n");
-   }
+    }
   }
 };
-} // namespace tdb
+}  // namespace tdb

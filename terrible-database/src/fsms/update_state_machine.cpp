@@ -3,23 +3,23 @@
 namespace tdb {
 bool UpdateStateMachine::CheckTransition(Token token, std::string word) {
   switch (token) {
-  case UPDATE:
-    return check_update_state();
-  case TEXT:
-    if (current_state == update) {
-      return check_tbl_name_state(word);
-    } else {
-      return check_col_name_state(word) || check_col_val_state(word);
-    }
-  case VALUES:
-    return check_values_state();
-  case WHERE:
-    return check_where_state();
-  case END:
-    return check_end_state();
-  default:
-    current_state = undefined;
-    return false;
+    case UPDATE:
+      return check_update_state();
+    case TEXT:
+      if (current_state == update) {
+        return check_tbl_name_state(word);
+      } else {
+        return check_col_name_state(word) || check_col_val_state(word);
+      }
+    case VALUES:
+      return check_values_state();
+    case WHERE:
+      return check_where_state();
+    case END:
+      return check_end_state();
+    default:
+      current_state = undefined;
+      return false;
   }
 }
 
@@ -28,28 +28,28 @@ std::string UpdateStateMachine::GetErrorMsg() {
     err_msg = "Failed to parse update query.";
     for (auto val : expected_next_state) {
       switch (val) {
-      case update:
-        err_msg += " Expected keyword update.";
-        break;
-      case tbl_name:
-        err_msg += " Expected table name.";
-        break;
-      case values:
-        err_msg += " Expected keyword values.";
-        break;
-      case column_name:
-        err_msg += " Expected column name.";
-        break;
-      case where:
-        err_msg += " Expected keyword where.";
-        break;
-      case column_value:
-        err_msg += " Expected column value.";
-        break;
-      case end:
-        err_msg += " Expected endline character.";
-      default:
-        break;
+        case update:
+          err_msg += " Expected keyword update.";
+          break;
+        case tbl_name:
+          err_msg += " Expected table name.";
+          break;
+        case values:
+          err_msg += " Expected keyword values.";
+          break;
+        case column_name:
+          err_msg += " Expected column name.";
+          break;
+        case where:
+          err_msg += " Expected keyword where.";
+          break;
+        case column_value:
+          err_msg += " Expected column value.";
+          break;
+        case end:
+          err_msg += " Expected endline character.";
+        default:
+          break;
       }
     }
   }
@@ -146,4 +146,4 @@ bool UpdateStateMachine::check_end_state() {
   return false;
 }
 
-} // namespace tdb
+}  // namespace tdb

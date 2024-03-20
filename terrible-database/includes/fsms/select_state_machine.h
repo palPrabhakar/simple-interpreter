@@ -1,15 +1,16 @@
 #pragma once
 
-#include "state_machine.h"
-#include "tokenizer.h"
 #include <functional>
 #include <string>
 #include <unordered_set>
 #include <vector>
 
+#include "state_machine.h"
+#include "tokenizer.h"
+
 namespace tdb {
 class SelectStateMachine : StateMachine {
-public:
+ public:
   SelectStateMachine() {
     current_state = begin;
     expected_next_state.insert(select);
@@ -38,7 +39,7 @@ public:
   std::vector<std::string> col_names;
   bool join_clause = false;
 
-private:
+ private:
   // clang-format off
   enum State {
     begin,
@@ -71,5 +72,4 @@ private:
   bool check_end_state();
   bool check_join_state();
 };
-} // namespace tdb
-
+}  // namespace tdb

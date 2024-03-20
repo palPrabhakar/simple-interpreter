@@ -1,5 +1,7 @@
 #include "operators/project_operator.h"
+
 #include <curses.h>
+
 #include <memory>
 
 namespace tdb {
@@ -18,7 +20,7 @@ void ProjectOperator::ProcessTable() {
     }
   } else {
     n_cols = input_tables[0]->GetColumnSize();
-    for(auto i = 0; i < n_cols; ++i) {
+    for (auto i = 0; i < n_cols; ++i) {
       column_names.emplace_back(input_tables[0]->GetColumnName(i));
       col_idxs.push_back(i);
       col_types.push_back(input_tables[0]->GetColumnType(i));
@@ -34,4 +36,4 @@ void ProjectOperator::ProcessTable() {
     output_tables[0]->SetColumn(col_idx++, std::move(ptr));
   }
 }
-} // namespace tdb
+}  // namespace tdb

@@ -1,6 +1,7 @@
 #include "operators/update_operator.h"
-#include <numeric>
+
 #include <iostream>
+#include <numeric>
 
 namespace tdb {
 void UpdateOperator::Execute() {
@@ -18,4 +19,4 @@ void UpdateOperator::Execute() {
     UpdateColumn(col_idx, args, col_type, column_values[i]);
   }
 }
-} // namespace tdb
+}  // namespace tdb

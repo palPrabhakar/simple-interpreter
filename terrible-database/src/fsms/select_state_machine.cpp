@@ -1,30 +1,31 @@
 #include "fsms/select_state_machine.h"
+
 #include <cmath>
 
 namespace tdb {
 bool SelectStateMachine::CheckTransition(Token token, std::string word) {
   switch (token) {
-  case SELECT:
-    return check_select_state();
-  case FROM:
-    return check_from_state();
-  case STAR:
-    return check_star_state();
-  case TEXT:
-    if (current_state == from) {
-      return check_tbl_name_state(word);
-    } else {
-      return check_col_name_state(word);
-    }
-  case WHERE:
-    return check_where_state();
-  case JOIN:
-    return check_join_state();
-  case END:
-    return check_end_state();
-  default:
-    current_state = undefined;
-    return false;
+    case SELECT:
+      return check_select_state();
+    case FROM:
+      return check_from_state();
+    case STAR:
+      return check_star_state();
+    case TEXT:
+      if (current_state == from) {
+        return check_tbl_name_state(word);
+      } else {
+        return check_col_name_state(word);
+      }
+    case WHERE:
+      return check_where_state();
+    case JOIN:
+      return check_join_state();
+    case END:
+      return check_end_state();
+    default:
+      current_state = undefined;
+      return false;
   }
 }
 
@@ -33,31 +34,31 @@ std::string SelectStateMachine::GetErrorMsg() {
     err_msg = "Failed to parse select query.";
     for (auto val : expected_next_state) {
       switch (val) {
-      case select:
-        err_msg += " Expected keyword select.";
-        break;
-      case tbl_name:
-        err_msg += " Expected table name.";
-        break;
-      case star:
-        err_msg += " Expected keyword star.";
-        break;
-      case column_name:
-        err_msg += " Expected column name.";
-        break;
-      case where:
-        err_msg += " Expected keyword where.";
-        break;
-      case from:
-        err_msg += " Expected keyword from.";
-        break;
-      case join:
-        err_msg += " Expected keyword join.";
-        break;
-      case end:
-        err_msg += " Expected endline character.";
-      default:
-        break;
+        case select:
+          err_msg += " Expected keyword select.";
+          break;
+        case tbl_name:
+          err_msg += " Expected table name.";
+          break;
+        case star:
+          err_msg += " Expected keyword star.";
+          break;
+        case column_name:
+          err_msg += " Expected column name.";
+          break;
+        case where:
+          err_msg += " Expected keyword where.";
+          break;
+        case from:
+          err_msg += " Expected keyword from.";
+          break;
+        case join:
+          err_msg += " Expected keyword join.";
+          break;
+        case end:
+          err_msg += " Expected endline character.";
+        default:
+          break;
       }
     }
   }
@@ -79,7 +80,7 @@ bool SelectStateMachine::check_select_state() {
 }
 
 bool SelectStateMachine::check_star_state() {
-  if(expected_next_state.contains(star)) {
+  if (expected_next_state.contains(star)) {
     expected_next_state.clear();
     expected_next_state.insert(from);
     current_state = star;
@@ -91,7 +92,7 @@ bool SelectStateMachine::check_star_state() {
 }
 
 bool SelectStateMachine::check_from_state() {
-  if(expected_next_state.contains(from)) {
+  if (expected_next_state.contains(from)) {
     expected_next_state.clear();
     expected_next_state.insert(tbl_name);
     current_state = from;
@@ -101,7 +102,6 @@ bool SelectStateMachine::check_from_state() {
   current_state = error;
   return false;
 }
-
 
 bool SelectStateMachine::check_tbl_name_state(std::string word) {
   if (expected_next_state.contains(tbl_name)) {
@@ -171,4 +171,4 @@ bool SelectStateMachine::check_end_state() {
   return false;
 }
 
-} // namespace tdb
+}  // namespace tdb

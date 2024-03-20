@@ -1,4 +1,11 @@
 #include "parser.h"
+
+#include <cassert>
+#include <format>
+#include <iostream>
+#include <memory>
+#include <stdexcept>
+
 #include "fsms/create_state_machine.h"
 #include "fsms/expr_state_machine.h"
 #include "fsms/insert_state_machine.h"
@@ -12,14 +19,9 @@
 #include "operators/project_operator.h"
 #include "operators/read_operator.h"
 #include "operators/set_operator.h"
-#include "operators/write_operator.h"
 #include "operators/update_operator.h"
+#include "operators/write_operator.h"
 #include "tokenizer.h"
-#include <cassert>
-#include <format>
-#include <iostream>
-#include <memory>
-#include <stdexcept>
 
 namespace tdb {
 
@@ -29,9 +31,10 @@ Operator_Ptr ParseWhereClause(Token_Vector &tokens, size_t &index) {
   assert(index < tokens.size() && "ParseWhereClause: Index out of range");
 
   if (tokens[index].first != END) {
-    std::runtime_error("Failed to parse where clause. Expected end of line "
-                       "character. But found " +
-                       tokens[index].second);
+    std::runtime_error(
+        "Failed to parse where clause. Expected end of line "
+        "character. But found " +
+        tokens[index].second);
   }
 
   return operations;
@@ -107,9 +110,10 @@ BinaryOp_Ptr ParseLogicalOP(Token_Vector &tokens, size_t &index) {
   if (tokens[index + 1].first == LEFT_PAREN) {
     left = ParseLogicalOP(tokens, ++index);
   } else {
-    throw std::runtime_error("Failed to parse where clause. Expected left "
-                             "parenthesis. But found " +
-                             tokens[index + 1].second);
+    throw std::runtime_error(
+        "Failed to parse where clause. Expected left "
+        "parenthesis. But found " +
+        tokens[index + 1].second);
   }
 
   assert(index < tokens.size() && "ParseLogicalOP: Index out of range");
@@ -118,9 +122,10 @@ BinaryOp_Ptr ParseLogicalOP(Token_Vector &tokens, size_t &index) {
     op_token = tokens[index].first;
     str_op = tokens[index].second;
   } else {
-    throw std::runtime_error("Failed to parse where clause. Expected AND or OR "
-                             "operator. But found " +
-                             tokens[index].second);
+    throw std::runtime_error(
+        "Failed to parse where clause. Expected AND or OR "
+        "operator. But found " +
+        tokens[index].second);
   }
 
   assert(index + 1 < tokens.size() && "ParseLogicalOP: Index out of range");
@@ -128,9 +133,10 @@ BinaryOp_Ptr ParseLogicalOP(Token_Vector &tokens, size_t &index) {
   if (tokens[index + 1].first == LEFT_PAREN) {
     right = ParseLogicalOP(tokens, ++index);
   } else {
-    throw std::runtime_error("Failed to parse where clause. Expected left "
-                             "parenthesis. But found " +
-                             tokens[index + 1].second);
+    throw std::runtime_error(
+        "Failed to parse where clause. Expected left "
+        "parenthesis. But found " +
+        tokens[index + 1].second);
   }
 
   assert(index < tokens.size() && "ParseLogicalOP: Index out of range");
@@ -143,15 +149,16 @@ BinaryOp_Ptr ParseLogicalOP(Token_Vector &tokens, size_t &index) {
   ++index;
 
   switch (op_token) {
-  case AND:
-    output = std::make_unique<IntersectionOperator>(std::move(left),
-                                                    std::move(right));
-    break;
-  case OR:
-    output = std::make_unique<UnionOperator>(std::move(left), std::move(right));
-    break;
-  default:
-    break;
+    case AND:
+      output = std::make_unique<IntersectionOperator>(std::move(left),
+                                                      std::move(right));
+      break;
+    case OR:
+      output =
+          std::make_unique<UnionOperator>(std::move(left), std::move(right));
+      break;
+    default:
+      break;
   }
 
   return output;
@@ -188,7 +195,8 @@ Operator_Vec ParseUpdateQuery(Token_Vector &tokens, size_t &index) {
   // TODO:
   // Update Op
   BinaryOp_Ptr op(static_cast<BinaryOperator *>(usm.where_op.release()));
-  operators.emplace_back(std::make_unique<UpdateOperator>(usm.col_names, usm.col_values, std::move(op)));
+  operators.emplace_back(std::make_unique<UpdateOperator>(
+      usm.col_names, usm.col_values, std::move(op)));
 
   operators.emplace_back(std::make_unique<FileWriter>());
 
@@ -307,22 +315,22 @@ Operator_Vec ParseInputQuery(std::string input_query) {
 
   if (tokens.size() != 0) {
     switch (tokens[0].first) {
-    case CREATE:
-      operators = ParseCreateQuery(tokens, index);
-      break;
-    case INSERT:
-      operators = ParseInsertQuery(tokens, index);
-      break;
-    case UPDATE:
-      operators = ParseUpdateQuery(tokens, index);
-      break;
-    case SELECT:
-      return ParseSelectQuery(tokens, index);
-    default:
-      throw std::runtime_error("invalid query");
+      case CREATE:
+        operators = ParseCreateQuery(tokens, index);
+        break;
+      case INSERT:
+        operators = ParseInsertQuery(tokens, index);
+        break;
+      case UPDATE:
+        operators = ParseUpdateQuery(tokens, index);
+        break;
+      case SELECT:
+        return ParseSelectQuery(tokens, index);
+      default:
+        throw std::runtime_error("invalid query");
     }
   }
 
   return operators;
 }
-} // namespace tdb
+}  // namespace tdb

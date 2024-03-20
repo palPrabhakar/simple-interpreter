@@ -1,21 +1,23 @@
 #pragma once
 
-#include "columns.h"
-#include "data_types.h"
-#include "operator.h"
 #include <functional>
+#include <iostream>
 #include <memory>
 #include <unordered_map>
 #include <vector>
 
-#include <iostream>
+#include "columns.h"
+#include "data_types.h"
+#include "operator.h"
 
 namespace tdb {
 // Join on Equality
 class JoinOperator : public Operator {
-public:
+ public:
   JoinOperator(std::string lt, std::string rt, std::string lc, std::string rc)
-      : left_tbl_name(lt), right_tbl_name(rt), left_col_name(lc),
+      : left_tbl_name(lt),
+        right_tbl_name(rt),
+        left_col_name(lc),
         right_col_name(rc) {}
 
   void AddData(Table_Vec tables) {
@@ -27,7 +29,7 @@ public:
 
   void Execute();
 
-private:
+ private:
   Table_Vec input_tables;
   Table_Vec output_tables;
   std::string left_tbl_name, right_tbl_name;
@@ -35,17 +37,17 @@ private:
   std::vector<std::pair<size_t, size_t>> idxs;
   // Token op_token;
 
-  template<bool left>
+  template <bool left>
   std::unique_ptr<BaseColumn> GetColumn(BaseColumn *column, Data_Type type);
 
-  template<typename T, typename V, bool left>
+  template <typename T, typename V, bool left>
   std::unique_ptr<BaseColumn> GetColumn(BaseColumn *column) {
     std::vector<T> vec;
     vec.reserve(idxs.size());
 
     V *pcol = static_cast<V *>(column);
 
-    for(auto [l, r]: idxs) {
+    for (auto [l, r] : idxs) {
       if constexpr (left) {
         vec.push_back((*pcol)[l]);
       } else {
@@ -57,8 +59,9 @@ private:
   }
 };
 
-template <typename T, typename V> class HashColumn {
-public:
+template <typename T, typename V>
+class HashColumn {
+ public:
   HashColumn(BaseColumn *column) { ptr = static_cast<V *>(column); }
 
   void Process() {
@@ -70,7 +73,7 @@ public:
 
   std::vector<size_t> Probe(T val) { return hash_map[val]; }
 
-private:
+ private:
   V *ptr;
 
   std::unordered_map<T, std::vector<size_t>> hash_map;
@@ -87,9 +90,9 @@ std::vector<std::pair<size_t, size_t>> ProcessTables(BaseColumn *left,
   auto hasher = HashColumn<T, V>(right);
   hasher.Process();
 
-  for(auto i = 0; i < nrows; ++i) {
+  for (auto i = 0; i < nrows; ++i) {
     auto idxs = hasher.Probe((*lptr)[i]);
-    for(auto idx : idxs) {
+    for (auto idx : idxs) {
       output.emplace_back(i, idx);
     }
   }
@@ -97,7 +100,8 @@ std::vector<std::pair<size_t, size_t>> ProcessTables(BaseColumn *left,
   return output;
 }
 
-std::vector<std::pair<size_t, size_t>>
-ProcessTables(BaseColumn *left, BaseColumn *right, Data_Type type);
+std::vector<std::pair<size_t, size_t>> ProcessTables(BaseColumn *left,
+                                                     BaseColumn *right,
+                                                     Data_Type type);
 
-} // namespace tdb
+}  // namespace tdb

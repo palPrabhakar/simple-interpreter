@@ -27,4 +27,4 @@ struct sSTRING {
 template<typename T>
 Data_Type get_tdb_type();
 // clang-format on
-} // namespace tdb
+}  // namespace tdb

@@ -1,12 +1,13 @@
 #pragma once
 
+#include <memory>
+
 #include "data_types.h"
 #include "operator.h"
-#include <memory>
 
 namespace tdb {
 class CreateOperator : public Operator {
-public:
+ public:
   CreateOperator(std::string tbl_name, std::vector<std::string> col_name,
                  std::vector<Data_Type> col_type)
       : table_name(tbl_name), column_names(col_name), column_types(col_type) {}
@@ -23,10 +24,10 @@ public:
         column_names.size(), 0, table_name, column_names, column_types));
   }
 
-private:
+ private:
   Table_Vec tables;
   std::string table_name;
   std::vector<std::string> column_names;
   std::vector<Data_Type> column_types;
 };
-} // namespace tdb
+}  // namespace tdb

@@ -1,17 +1,18 @@
 #pragma once
 
-#include "parser.h"
-#include "state_machine.h"
-#include "tokenizer.h"
 #include <functional>
 #include <string>
 #include <unordered_set>
 #include <vector>
 
+#include "parser.h"
+#include "state_machine.h"
+#include "tokenizer.h"
+
 namespace tdb {
 
 class UpdateStateMachine : StateMachine {
-public:
+ public:
   UpdateStateMachine() {
     current_state = begin;
     expected_next_state.insert(update);
@@ -34,7 +35,7 @@ public:
   std::vector<std::string> col_values;
   Operator_Ptr where_op;
 
-private:
+ private:
   // clang-format off
   enum State {
     begin,
@@ -63,4 +64,4 @@ private:
   bool check_where_state();
   bool check_end_state();
 };
-} // namespace tdb
+}  // namespace tdb

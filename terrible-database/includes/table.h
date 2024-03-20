@@ -1,22 +1,27 @@
 #pragma once
 
-#include "columns.h"
-#include "data_types.h"
 #include <algorithm>
 #include <cassert>
 #include <memory>
 #include <stdexcept>
 #include <vector>
 
+#include "columns.h"
+#include "data_types.h"
+
 namespace tdb {
 class Table {
   // Table class cannot be copied
   // Since unique_ptr cannot be copied
-public:
+ public:
   Table(size_t n_cols, size_t n_rows, std::string table_name,
         std::vector<std::string> col_names, std::vector<Data_Type> type_col)
-      : n_cols(n_cols), n_rows(n_rows), table_name(table_name),
-        column_names(col_names), type_col(type_col), columns(n_cols) {}
+      : n_cols(n_cols),
+        n_rows(n_rows),
+        table_name(table_name),
+        column_names(col_names),
+        type_col(type_col),
+        columns(n_cols) {}
 
   size_t GetColumnSize() { return n_cols; }
   size_t GetRowSize() { return n_rows; }
@@ -24,7 +29,8 @@ public:
   void SetRowSize(size_t size) { n_rows = size; }
   void SetColumnSize(size_t size) { n_cols = size; }
 
-  template <typename T> T GetValue(size_t col, size_t row) {
+  template <typename T>
+  T GetValue(size_t col, size_t row) {
     assert(col < n_cols && "Column index out of bounds");
     assert(row < n_rows && "Row index out of bounds");
 
@@ -76,7 +82,7 @@ public:
     return type_col[col];
   }
 
-private:
+ private:
   size_t n_cols;
   size_t n_rows;
   std::string table_name;
@@ -84,4 +90,4 @@ private:
   std::vector<Data_Type> type_col;
   std::vector<std::unique_ptr<BaseColumn>> columns;
 };
-} // namespace tdb
+}  // namespace tdb

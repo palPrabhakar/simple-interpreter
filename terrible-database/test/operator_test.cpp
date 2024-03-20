@@ -1,19 +1,22 @@
+#include <format>
+
+#include "gtest/gtest.h"
 #include "operators/filter_operator.h"
 #include "operators/project_operator.h"
 #include "operators/read_operator.h"
 #include "operators/set_operator.h"
 #include "operators/write_operator.h"
 #include "parser.h"
-#include "gtest/gtest.h"
-#include <format>
 
 TEST(OperatorTest, ReadOperator) {
   tdb::ReadOperator read_op("large_table");
   read_op.Execute();
 
   // auto un_op =
-  //     tdb::UnionOperator(std::make_unique<tdb::GreaterThanFilter>("age", "40"),
-  //                        std::make_unique<tdb::EqualityFilter>("name", "John"));
+  //     tdb::UnionOperator(std::make_unique<tdb::GreaterThanFilter>("age",
+  //     "40"),
+  //                        std::make_unique<tdb::EqualityFilter>("name",
+  //                        "John"));
   // un_op.AddData(read_op.GetData());
   // un_op.Execute();
 
@@ -45,8 +48,9 @@ TEST(OperatorTest, TestPipeline) {
   }
 
   {
-    auto operators = tdb::ParseInputQuery("Select * from simple_table Where ( "
-                                          "( name == john ) OR ( age > 40 ) )");
+    auto operators = tdb::ParseInputQuery(
+        "Select * from simple_table Where ( "
+        "( name == john ) OR ( age > 40 ) )");
 
     EXPECT_TRUE(operators.size() == 4);
     tdb::Table_Vec vec;
@@ -90,9 +94,9 @@ TEST(OperatorTest, TestInsertPipeline) {
 
 TEST(OperatorTest, TestJoinPipeline) {
   {
-    auto operators =
-        tdb::ParseInputQuery("select * from jl_table join jr_table on ( "
-                             "jl_table.gid == jr_table.id )");
+    auto operators = tdb::ParseInputQuery(
+        "select * from jl_table join jr_table on ( "
+        "jl_table.gid == jr_table.id )");
 
     EXPECT_TRUE(operators.size() == 5);
     tdb::Table_Vec vec;
@@ -104,9 +108,10 @@ TEST(OperatorTest, TestJoinPipeline) {
   }
 
   {
-    auto operators =
-        tdb::ParseInputQuery("select * from jl_table join jr_table on ( "
-                             "jl_table.gid == jr_table.id ) where ( ( jl_table.age > 40 ) and ( jr_table.id == 1 ) )");
+    auto operators = tdb::ParseInputQuery(
+        "select * from jl_table join jr_table on ( "
+        "jl_table.gid == jr_table.id ) where ( ( jl_table.age > 40 ) and ( "
+        "jr_table.id == 1 ) )");
 
     EXPECT_TRUE(operators.size() == 6);
     tdb::Table_Vec vec;

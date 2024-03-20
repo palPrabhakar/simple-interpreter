@@ -1,16 +1,17 @@
 #pragma once
 
-#include "columns.h"
-#include "data_types.h"
-#include "operator.h"
-#include "parser.h"
 #include <algorithm>
 #include <memory>
 #include <utility>
 
+#include "columns.h"
+#include "data_types.h"
+#include "operator.h"
+#include "parser.h"
+
 namespace tdb {
 class UpdateOperator : public Operator {
-public:
+ public:
   UpdateOperator(std::vector<std::string> cnames,
                  std::vector<std::string> cvals, BinaryOp_Ptr ptr = nullptr)
       : op(std::move(ptr)), column_names(cnames), column_values(cvals) {}
@@ -24,7 +25,7 @@ public:
 
   void Execute();
 
-private:
+ private:
   Table_Vec tables;
   BinaryOp_Ptr op;
   std::vector<std::string> column_names;
@@ -42,19 +43,19 @@ private:
   void UpdateColumn(size_t col_idx, std::vector<size_t> row_idx, Data_Type type,
                     std::string val) {
     switch (type) {
-    case DT_INT:
-      UpdateColumn<sINT::type, Int64Column>(col_idx, row_idx, std::stol(val));
-      break;
-    case DT_DOUBLE:
-      UpdateColumn<sDOUBLE::type, DoubleColumn>(col_idx, row_idx,
-                                                std::stod(val));
-      break;
-    case DT_STRING:
-      UpdateColumn<sSTRING::type, StringColumn>(col_idx, row_idx, val);
-      break;
-    default:
-      throw std::runtime_error("UpdateOperator: Invalid type\n");
+      case DT_INT:
+        UpdateColumn<sINT::type, Int64Column>(col_idx, row_idx, std::stol(val));
+        break;
+      case DT_DOUBLE:
+        UpdateColumn<sDOUBLE::type, DoubleColumn>(col_idx, row_idx,
+                                                  std::stod(val));
+        break;
+      case DT_STRING:
+        UpdateColumn<sSTRING::type, StringColumn>(col_idx, row_idx, val);
+        break;
+      default:
+        throw std::runtime_error("UpdateOperator: Invalid type\n");
     }
   }
 };
-} // namespace tdb
+}  // namespace tdb

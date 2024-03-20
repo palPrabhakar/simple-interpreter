@@ -1,12 +1,13 @@
 #pragma once
 
-#include "operator.h"
 #include <string>
 #include <vector>
 
+#include "operator.h"
+
 namespace tdb {
 class ProjectOperator : public Operator {
-public:
+ public:
   ProjectOperator(std::vector<std::string> col_names)
       : column_names(col_names) {}
 
@@ -15,17 +16,15 @@ public:
     input_tables = std::move(tables);
   }
 
-  void Execute() {
-    ProcessTable();
-  }
+  void Execute() { ProcessTable(); }
 
   Table_Vec GetData() { return std::move(output_tables); }
 
-private:
+ private:
   std::vector<std::string> column_names;
   Table_Vec input_tables;
   Table_Vec output_tables;
 
   void ProcessTable();
 };
-} // namespace tdb
+}  // namespace tdb

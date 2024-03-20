@@ -1,14 +1,14 @@
 #pragma once
 
-#include "operator.h"
 #include <algorithm>
+#include <iostream>
 #include <iterator>
 
-#include <iostream>
+#include "operator.h"
 
 namespace tdb {
 class UnionOperator : public BinaryOperator {
-public:
+ public:
   UnionOperator(std::unique_ptr<BinaryOperator> &&lhs,
                 std::unique_ptr<BinaryOperator> &&rhs)
       : lhs(std::move(lhs)), rhs(std::move(rhs)) {}
@@ -20,7 +20,7 @@ public:
     return std::move(arg_results);
   }
 
-private:
+ private:
   std::unique_ptr<BinaryOperator> lhs;
   std::unique_ptr<BinaryOperator> rhs;
 
@@ -34,7 +34,7 @@ private:
 };
 
 class IntersectionOperator : public BinaryOperator {
-public:
+ public:
   IntersectionOperator(std::unique_ptr<BinaryOperator> &&lhs,
                        std::unique_ptr<BinaryOperator> &&rhs)
       : lhs(std::move(lhs)), rhs(std::move(rhs)) {}
@@ -46,7 +46,7 @@ public:
     return std::move(arg_results);
   }
 
-private:
+ private:
   std::unique_ptr<BinaryOperator> lhs;
   std::unique_ptr<BinaryOperator> rhs;
 
@@ -59,4 +59,4 @@ private:
   }
 };
 
-} // namespace tdb
+}  // namespace tdb

@@ -1,9 +1,11 @@
-#include "tokenizer.h"
-#include "gtest/gtest.h"
+#include <parser.h>
+
 #include <exception>
 #include <iostream>
-#include <parser.h>
 #include <stdexcept>
+
+#include "gtest/gtest.h"
+#include "tokenizer.h"
 
 TEST(ParserTest, CreateQueries) {
   EXPECT_NO_THROW(tdb::ParseInputQuery(
@@ -223,9 +225,9 @@ TEST(ParserTest, WhereClause) {
   index = 0;
   EXPECT_NO_THROW(tdb::ParseWhereClause(tokens, index));
 
-  tokens =
-      tdb::ReadInputQuery("where ( ( ( col1 == 100 ) and ( col2 == lol ) ) or "
-                          "( ( col3 != 50 ) and ( col4 > 11 ) ) )");
+  tokens = tdb::ReadInputQuery(
+      "where ( ( ( col1 == 100 ) and ( col2 == lol ) ) or "
+      "( ( col3 != 50 ) and ( col4 > 11 ) ) )");
   index = 0;
   EXPECT_NO_THROW(tdb::ParseWhereClause(tokens, index));
 

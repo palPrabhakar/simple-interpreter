@@ -1,14 +1,15 @@
 #pragma once
 
-#include "state_machine.h"
-#include "tokenizer.h"
 #include <string>
 #include <unordered_set>
 #include <vector>
 
+#include "state_machine.h"
+#include "tokenizer.h"
+
 namespace tdb {
 class ExprStateMachine : StateMachine {
-public:
+ public:
   ExprStateMachine() {
     current_state = begin;
     expected_next_state.insert(left_paren);
@@ -30,7 +31,7 @@ public:
 
   BinaryOp_Ptr GetOperator();
 
-private:
+ private:
   enum State {
     begin,
     col_name,
@@ -53,4 +54,4 @@ private:
   bool check_left_paren_state();
   bool check_right_paren_state();
 };
-} // namespace tdb
+}  // namespace tdb

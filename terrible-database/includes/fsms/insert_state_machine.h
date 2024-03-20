@@ -1,14 +1,15 @@
 #pragma once
 
-#include "state_machine.h"
-#include "tokenizer.h"
 #include <string>
 #include <unordered_set>
 #include <vector>
 
+#include "state_machine.h"
+#include "tokenizer.h"
+
 namespace tdb {
 class InsertStateMachine : StateMachine {
-public:
+ public:
   InsertStateMachine() {
     current_state = begin;
     expected_next_state.insert(insert);
@@ -26,7 +27,7 @@ public:
   std::string table_name;
   std::vector<std::string> col_values;
 
-private:
+ private:
   // clang-format off
   enum State {
     begin,
@@ -50,4 +51,4 @@ private:
   bool check_col_val_state(std::string word);
   bool check_end_state();
 };
-} // namespace tdb
+}  // namespace tdb

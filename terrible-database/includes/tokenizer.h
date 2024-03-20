@@ -67,6 +67,6 @@ const std::unordered_map<std::string, Token> token_lookup = {
 };
 // clang-format on
 
-std::vector<std::pair<Token, std::string>>
-ReadInputQuery(std::string input_query);
-} // namespace tdb
+std::vector<std::pair<Token, std::string>> ReadInputQuery(
+    std::string input_query);
+}  // namespace tdb

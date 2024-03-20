@@ -1,10 +1,11 @@
 #pragma once
 
-#include "tokenizer.h"
+#include <memory>
 #include <string>
 #include <vector>
+
 #include "operators/operator.h"
-#include <memory>
+#include "tokenizer.h"
 
 namespace tdb {
 
@@ -24,4 +25,4 @@ Operator_Vec ParseUpdateQuery(Token_Vector &tokens, size_t &index);
 Operator_Vec ParseSelectQuery(Token_Vector &tokens, size_t &index);
 Operator_Vec ParseJoinClause(Token_Vector &tokens, size_t &index);
 
-} // namespace tdb
+}  // namespace tdb

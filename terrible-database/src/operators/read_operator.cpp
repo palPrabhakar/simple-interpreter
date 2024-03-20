@@ -1,12 +1,14 @@
 #include "operators/read_operator.h"
-#include "data_types.h"
-#include "json/json.h"
+
 #include <cstdint>
 #include <fstream>
 #include <future>
 #include <iostream>
 #include <memory>
 #include <stdexcept>
+
+#include "data_types.h"
+#include "json/json.h"
 
 namespace tdb {
 
@@ -117,14 +119,14 @@ std::unique_ptr<BaseColumn> GetColumnValues(const Json::Value &data,
                                             const Data_Type type,
                                             const size_t size) {
   switch (type) {
-  case DT_INT:
-    return GetColumn<int64_t>(data, size);
-  case DT_DOUBLE:
-    return GetColumn<double>(data, size);
-  case DT_STRING:
-    return GetColumn<std::string>(data, size);
-  default:
-    throw std::runtime_error("Invalid Type\n");
+    case DT_INT:
+      return GetColumn<int64_t>(data, size);
+    case DT_DOUBLE:
+      return GetColumn<double>(data, size);
+    case DT_STRING:
+      return GetColumn<std::string>(data, size);
+    default:
+      throw std::runtime_error("Invalid Type\n");
   }
 }
-} // namespace tdb
+}  // namespace tdb

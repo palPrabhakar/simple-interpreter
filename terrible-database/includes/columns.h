@@ -8,7 +8,7 @@
 
 namespace tdb {
 class BaseColumn {
-public:
+ public:
   virtual void get_value(std::size_t index, int64_t &value) = 0;
   virtual void get_value(std::size_t index, double &value) = 0;
   virtual void get_value(std::size_t index, std::string &value) = 0;
@@ -20,8 +20,9 @@ public:
   virtual size_t size() const = 0;
 };
 
-template <typename T> class Column : public BaseColumn {
-public:
+template <typename T>
+class Column : public BaseColumn {
+ public:
   Column(size_t nsize) : vec(nsize), n_rows(nsize) {}
   Column(size_t nsize, std::vector<T> &&values) : vec(values), n_rows(nsize) {}
 
@@ -73,17 +74,15 @@ public:
     }
   }
 
-  size_t size() const {
-    return n_rows;
-  }
+  size_t size() const { return n_rows; }
 
-protected:
+ protected:
   std::vector<T> vec;
   size_t n_rows;
 };
 
 class Int64Column : public Column<int64_t> {
-public:
+ public:
   Int64Column(size_t nsize) : Column<int64_t>(nsize) {}
   Int64Column(size_t nsize, std::vector<int64_t> &&values)
       : Column<int64_t>(nsize, std::move(values)) {}
@@ -99,7 +98,7 @@ public:
 };
 
 class DoubleColumn : public Column<double> {
-public:
+ public:
   DoubleColumn(size_t nsize) : Column<double>(nsize) {}
   DoubleColumn(size_t nsize, std::vector<double> &&values)
       : Column<double>(nsize, std::move(values)) {}
@@ -115,7 +114,7 @@ public:
 };
 
 class StringColumn : public Column<std::string> {
-public:
+ public:
   StringColumn(size_t nsize) : Column<std::string>(nsize) {}
   StringColumn(size_t nsize, std::vector<std::string> &&values)
       : Column<std::string>(nsize, std::move(values)) {}
@@ -130,4 +129,4 @@ public:
   }
 };
 
-} // namespace tdb
+}  // namespace tdb

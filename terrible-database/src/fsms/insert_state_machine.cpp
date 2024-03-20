@@ -3,21 +3,21 @@
 namespace tdb {
 bool InsertStateMachine::CheckTransition(Token token, std::string word) {
   switch (token) {
-  case INSERT:
-    return check_insert_state();
-  case TEXT:
-    if (current_state == insert) {
-      return check_tbl_name_state(word);
-    } else {
-      return check_col_val_state(word);
-    }
-  case VALUES:
-    return check_values_state();
-  case END:
-    return check_end_state();
-  default:
-    current_state = undefined;
-    return false;
+    case INSERT:
+      return check_insert_state();
+    case TEXT:
+      if (current_state == insert) {
+        return check_tbl_name_state(word);
+      } else {
+        return check_col_val_state(word);
+      }
+    case VALUES:
+      return check_values_state();
+    case END:
+      return check_end_state();
+    default:
+      current_state = undefined;
+      return false;
   }
 }
 
@@ -26,22 +26,22 @@ std::string InsertStateMachine::GetErrorMsg() {
     err_msg = "Failed to parse create query.";
     for (auto val : expected_next_state) {
       switch (val) {
-      case insert:
-        err_msg += " Expected keyword create.";
-        break;
-      case tbl_name:
-        err_msg += " Expected table name.";
-        break;
-      case values:
-        err_msg += " Expected keyword values.";
-        break;
-      case col_value:
-        err_msg += " Expected column values.";
-        break;
-      case end:
-        err_msg += " Expected endline character.";
-      default:
-        break;
+        case insert:
+          err_msg += " Expected keyword create.";
+          break;
+        case tbl_name:
+          err_msg += " Expected table name.";
+          break;
+        case values:
+          err_msg += " Expected keyword values.";
+          break;
+        case col_value:
+          err_msg += " Expected column values.";
+          break;
+        case end:
+          err_msg += " Expected endline character.";
+        default:
+          break;
       }
     }
   }
@@ -113,4 +113,4 @@ bool InsertStateMachine::check_end_state() {
   return false;
 }
 
-} // namespace tdb
+}  // namespace tdb

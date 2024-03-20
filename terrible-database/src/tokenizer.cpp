@@ -1,12 +1,13 @@
 #include "tokenizer.h"
+
 #include <algorithm>
 #include <cctype>
 #include <iostream>
 
 namespace tdb {
 // Every token needs to separated by whitespace
-std::vector<std::pair<Token, std::string>>
-ReadInputQuery(std::string input_query) {
+std::vector<std::pair<Token, std::string>> ReadInputQuery(
+    std::string input_query) {
   std::transform(input_query.cbegin(), input_query.cend(), input_query.begin(),
                  [](unsigned char x) { return std::tolower(x); });
   std::stringstream query_stream(input_query);
@@ -27,4 +28,4 @@ ReadInputQuery(std::string input_query) {
   return tokens;
 }
 
-} // namespace tdb
+}  // namespace tdb

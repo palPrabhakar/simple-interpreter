@@ -1,10 +1,13 @@
 #include "operators/write_operator.h"
-#include "json/json.h"
+
+#include <json/value.h>
+
 #include <format>
 #include <fstream>
 #include <iostream>
-#include <json/value.h>
 #include <sstream>
+
+#include "json/json.h"
 
 namespace tdb {
 void StdOutWriter::WriteTable() {
@@ -26,17 +29,17 @@ void StdOutWriter::WriteTable() {
   for (size_t i = 0; i < nrows; ++i) {
     for (size_t j = 0; j < ncols; ++j) {
       switch (tables[0]->GetColumnType(j)) {
-      case DT_INT:
-        std::cout << tables[0]->GetValue<sINT::type>(j, i) << "\t";
-        break;
-      case DT_DOUBLE:
-        std::cout << tables[0]->GetValue<sDOUBLE::type>(j, i) << "\t";
-        break;
-      case DT_STRING:
-        std::cout << tables[0]->GetValue<sSTRING::type>(j, i) << "\t";
-        break;
-      default:
-        break;
+        case DT_INT:
+          std::cout << tables[0]->GetValue<sINT::type>(j, i) << "\t";
+          break;
+        case DT_DOUBLE:
+          std::cout << tables[0]->GetValue<sDOUBLE::type>(j, i) << "\t";
+          break;
+        case DT_STRING:
+          std::cout << tables[0]->GetValue<sSTRING::type>(j, i) << "\t";
+          break;
+        default:
+          break;
       }
     }
     std::cout << "\n";
@@ -85,4 +88,4 @@ void FileWriter::WriteTable() {
   writer->write(obj, &ofs);
 }
 
-} // namespace tdb
+}  // namespace tdb

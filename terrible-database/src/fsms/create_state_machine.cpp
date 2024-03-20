@@ -4,27 +4,27 @@ namespace tdb {
 
 bool CreateStateMachine::CheckTransition(Token token, std::string word) {
   switch (token) {
-  case CREATE:
-    return check_create_state();
-  case TEXT:
-    if (current_state == create) {
-      return check_tbl_name_state(word);
-    } else {
-      return check_col_name_state(word);
-    }
-  case WITH:
-    return check_with_state();
-  case TYPE_INT:
-    return check_col_type_state(DT_INT);
-  case TYPE_DOUBLE:
-    return check_col_type_state(DT_DOUBLE);
-  case TYPE_STRING:
-    return check_col_type_state(DT_STRING);
-  case END:
-    return check_end_state();
-  default:
-    current_state = undefined;
-    return false;
+    case CREATE:
+      return check_create_state();
+    case TEXT:
+      if (current_state == create) {
+        return check_tbl_name_state(word);
+      } else {
+        return check_col_name_state(word);
+      }
+    case WITH:
+      return check_with_state();
+    case TYPE_INT:
+      return check_col_type_state(DT_INT);
+    case TYPE_DOUBLE:
+      return check_col_type_state(DT_DOUBLE);
+    case TYPE_STRING:
+      return check_col_type_state(DT_STRING);
+    case END:
+      return check_end_state();
+    default:
+      current_state = undefined;
+      return false;
   }
 }
 
@@ -33,25 +33,25 @@ std::string CreateStateMachine::GetErrorMsg() {
     err_msg = "Failed to parse create query.";
     for (auto val : expected_next_state) {
       switch (val) {
-      case create:
-        err_msg += " Expected keyword create.";
-        break;
-      case tbl_name:
-        err_msg += " Expected table name.";
-        break;
-      case with:
-        err_msg += " Expected keyword with.";
-        break;
-      case col_name:
-        err_msg += " Expected column name.";
-        break;
-      case col_type:
-        err_msg += " Expected column type.";
-        break;
-      case end:
-        err_msg += " Expected endline character.";
-      default:
-        break;
+        case create:
+          err_msg += " Expected keyword create.";
+          break;
+        case tbl_name:
+          err_msg += " Expected table name.";
+          break;
+        case with:
+          err_msg += " Expected keyword with.";
+          break;
+        case col_name:
+          err_msg += " Expected column name.";
+          break;
+        case col_type:
+          err_msg += " Expected column type.";
+          break;
+        case end:
+          err_msg += " Expected endline character.";
+        default:
+          break;
       }
     }
   }
@@ -137,4 +137,4 @@ bool CreateStateMachine::check_end_state() {
   return false;
 }
 
-} // namespace tdb
+}  // namespace tdb

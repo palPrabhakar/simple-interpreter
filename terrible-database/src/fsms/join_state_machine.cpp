@@ -1,34 +1,35 @@
 #include "fsms/join_state_machine.h"
-#include "tokenizer.h"
+
 #include <iostream>
 #include <string>
+
+#include "tokenizer.h"
 
 namespace tdb {
 bool JoinStateMachine::CheckTransition(Token token, std::string word) {
   // end of parsing
-  if (current_state == right_paren)
-    return false;
+  if (current_state == right_paren) return false;
 
   switch (token) {
-  case JOIN:
-    return check_join_state();
-  case ON:
-    return check_on_state();
-  case LEFT_PAREN:
-    return check_left_paren_state();
-  case RIGHT_PAREN:
-    return check_right_paren_state();
-  case TEXT:
-    if (current_state == begin || current_state == join) {
-      return check_tbl_name_state(word);
-    } else {
-      return check_col_name_state(word);
-    }
-  case OP_EQ:
-    return check_op_state(token, word);
-  default:
-    current_state = undefined;
-    return false;
+    case JOIN:
+      return check_join_state();
+    case ON:
+      return check_on_state();
+    case LEFT_PAREN:
+      return check_left_paren_state();
+    case RIGHT_PAREN:
+      return check_right_paren_state();
+    case TEXT:
+      if (current_state == begin || current_state == join) {
+        return check_tbl_name_state(word);
+      } else {
+        return check_col_name_state(word);
+      }
+    case OP_EQ:
+      return check_op_state(token, word);
+    default:
+      current_state = undefined;
+      return false;
   }
 }
 
@@ -37,29 +38,29 @@ std::string JoinStateMachine::GetErrorMsg() {
     err_msg = "Failed to parse join clause.";
     for (auto val : expected_next_state) {
       switch (val) {
-      case tbl_name:
-        err_msg += " Expected table name.";
-        break;
-      case col_name:
-        err_msg += " Expected column name.";
-        break;
-      case op:
-        err_msg += " Expected a binary operator.";
-        break;
-      case join:
-        err_msg += " Expected keyword join.";
-        break;
-      case on:
-        err_msg += " Expected keyword on.";
-        break;
-      case right_paren:
-        err_msg += " Expected right parenthesis.";
-        break;
-      case left_paren:
-        err_msg += " Expected left parenthesis.";
-        break;
-      default:
-        break;
+        case tbl_name:
+          err_msg += " Expected table name.";
+          break;
+        case col_name:
+          err_msg += " Expected column name.";
+          break;
+        case op:
+          err_msg += " Expected a binary operator.";
+          break;
+        case join:
+          err_msg += " Expected keyword join.";
+          break;
+        case on:
+          err_msg += " Expected keyword on.";
+          break;
+        case right_paren:
+          err_msg += " Expected right parenthesis.";
+          break;
+        case left_paren:
+          err_msg += " Expected left parenthesis.";
+          break;
+        default:
+          break;
       }
     }
   }
@@ -174,11 +175,12 @@ std::string JoinStateMachine::check_column_name(std::string col_name,
   }
 
   if (tname != table_name) {
-    throw std::runtime_error("JSM: Unable to parse join clause. Table name and "
-                             "doesn't match in the column qualifier.\n");
+    throw std::runtime_error(
+        "JSM: Unable to parse join clause. Table name and "
+        "doesn't match in the column qualifier.\n");
   }
 
   return cname;
 }
 
-} // namespace tdb
+}  // namespace tdb

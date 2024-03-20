@@ -1,13 +1,14 @@
 #pragma once
 
-#include "state_machine.h"
-#include "tokenizer.h"
 #include <stdexcept>
 #include <unordered_set>
 
+#include "state_machine.h"
+#include "tokenizer.h"
+
 namespace tdb {
 class JoinStateMachine : StateMachine {
-public:
+ public:
   JoinStateMachine() {
     current_state = begin;
     expected_next_state.insert(tbl_name);
@@ -32,7 +33,7 @@ public:
 
   // BinaryOp_Ptr GetOperator();
 
-private:
+ private:
   enum State {
     begin,
     tbl_name,
@@ -63,4 +64,4 @@ private:
 
   std::string check_column_name(std::string col_name, std::string table_name);
 };
-} // namespace tdb
+}  // namespace tdb
