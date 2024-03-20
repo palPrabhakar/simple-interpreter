@@ -16,10 +16,10 @@ class FilterOperator : public BinaryOperator {
   void Execute() {
     auto col_idx = tables[0]->GetColumnIndex(col_name);
     auto type = tables[0]->GetColumnType(col_idx);
-    FilterColumns(tables[0]);
+    FilterColumns(tables[0].get());
   }
 
-  std::vector<size_t> GetArgResults(Table_Ptr &ptr) {
+  std::vector<size_t> GetArgResults(const Table *ptr) {
     auto col_idx = ptr->GetColumnIndex(col_name);
     type = ptr->GetColumnType(col_idx);
     FilterColumns(ptr);
@@ -31,7 +31,7 @@ class FilterOperator : public BinaryOperator {
   std::string value;
   Data_Type type;
 
-  void FilterColumns(Table_Ptr &ptr) {
+  void FilterColumns(const Table *ptr) {
     auto col_idx = ptr->GetColumnIndex(this->col_name);
     auto *col = ptr->GetColumn(col_idx);
     auto row_size = ptr->GetRowSize();

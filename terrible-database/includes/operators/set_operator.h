@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <future>
 #include <iostream>
 #include <iterator>
 
@@ -13,9 +14,9 @@ class UnionOperator : public BinaryOperator {
                 std::unique_ptr<BinaryOperator> &&rhs)
       : lhs(std::move(lhs)), rhs(std::move(rhs)) {}
 
-  void Execute() { DoUnion(tables[0]); }
+  void Execute() { DoUnion(tables[0].get()); }
 
-  std::vector<size_t> GetArgResults(Table_Ptr &ptr) {
+  std::vector<size_t> GetArgResults(const Table *ptr) {
     DoUnion(ptr);
     return std::move(arg_results);
   }
@@ -24,9 +25,18 @@ class UnionOperator : public BinaryOperator {
   std::unique_ptr<BinaryOperator> lhs;
   std::unique_ptr<BinaryOperator> rhs;
 
-  void DoUnion(Table_Ptr &ptr) {
-    auto left = lhs->GetArgResults(tables[0]);
-    auto right = rhs->GetArgResults(tables[0]);
+  void DoUnion(const Table *ptr) {
+    auto ltask =
+        std::async(std::launch::async, &BinaryOperator::GetArgResults,
+                   lhs.get(), ptr);
+
+    auto rtask =
+        std::async(std::launch::async, &BinaryOperator::GetArgResults, rhs.get(), ptr);
+
+    ltask.wait();
+    rtask.wait();
+    auto left = ltask.get();
+    auto right = rtask.get();
 
     std::set_union(left.begin(), left.end(), right.begin(), right.end(),
                    std::back_inserter(arg_results));
@@ -39,9 +49,9 @@ class IntersectionOperator : public BinaryOperator {
                        std::unique_ptr<BinaryOperator> &&rhs)
       : lhs(std::move(lhs)), rhs(std::move(rhs)) {}
 
-  void Execute() { DoIntersection(tables[0]); }
+  void Execute() { DoIntersection(tables[0].get()); }
 
-  std::vector<size_t> GetArgResults(Table_Ptr &ptr) {
+  std::vector<size_t> GetArgResults(const Table *ptr) {
     DoIntersection(ptr);
     return std::move(arg_results);
   }
@@ -50,9 +60,18 @@ class IntersectionOperator : public BinaryOperator {
   std::unique_ptr<BinaryOperator> lhs;
   std::unique_ptr<BinaryOperator> rhs;
 
-  void DoIntersection(Table_Ptr &ptr) {
-    auto left = lhs->GetArgResults(tables[0]);
-    auto right = rhs->GetArgResults(tables[0]);
+  void DoIntersection(const Table *ptr) {
+    auto ltask =
+        std::async(std::launch::async, &BinaryOperator::GetArgResults,
+                   lhs.get(), ptr);
+
+    auto rtask =
+        std::async(std::launch::async, &BinaryOperator::GetArgResults, rhs.get(), ptr);
+
+    ltask.wait();
+    rtask.wait();
+    auto left = ltask.get();
+    auto right = rtask.get();
 
     std::set_intersection(left.begin(), left.end(), right.begin(), right.end(),
                           std::back_inserter(arg_results));

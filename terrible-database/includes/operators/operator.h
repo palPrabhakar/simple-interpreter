@@ -29,7 +29,7 @@ class BinaryOperator : public Operator {
   Table_Vec GetData();
 
   virtual void Execute() = 0;
-  virtual std::vector<size_t> GetArgResults(Table_Ptr &ptr) = 0;
+  virtual std::vector<size_t> GetArgResults(const Table *ptr) = 0;
 
  protected:
   Table_Vec tables;

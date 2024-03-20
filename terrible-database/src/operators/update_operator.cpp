@@ -6,7 +6,7 @@
 namespace tdb {
 void UpdateOperator::Execute() {
   if (op) {
-    args = op->GetArgResults(tables[0]);
+    args = op->GetArgResults(tables[0].get());
   } else {
     std::vector<size_t> v(tables[0]->GetRowSize());
     std::iota(v.begin(), v.end(), 0);

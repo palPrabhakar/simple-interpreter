@@ -23,8 +23,8 @@ class Table {
         type_col(type_col),
         columns(n_cols) {}
 
-  size_t GetColumnSize() { return n_cols; }
-  size_t GetRowSize() { return n_rows; }
+  size_t GetColumnSize() const { return n_cols; }
+  size_t GetRowSize() const { return n_rows; }
 
   void SetRowSize(size_t size) { n_rows = size; }
   void SetColumnSize(size_t size) { n_cols = size; }
@@ -47,7 +47,7 @@ class Table {
     columns[col]->set_value(row, val);
   }
 
-  BaseColumn *GetColumn(size_t col) { return columns[col].get(); }
+  BaseColumn *GetColumn(size_t col) const { return columns[col].get(); }
 
   std::unique_ptr<BaseColumn> ReleaseColumn(size_t col) {
     // ReleaseColumn leaves the table in indeterminate state
@@ -61,14 +61,14 @@ class Table {
     columns[col] = std::move(column);
   }
 
-  std::string GetTableName() { return table_name; }
+  std::string GetTableName() const { return table_name; }
 
-  std::string GetColumnName(size_t col) {
+  std::string GetColumnName(size_t col) const  {
     assert(col < n_cols && "Column index out of bounds");
     return column_names[col];
   }
 
-  size_t GetColumnIndex(std::string col_name) {
+  size_t GetColumnIndex(std::string col_name) const {
     if (auto it = std::find(column_names.begin(), column_names.end(), col_name);
         it != column_names.end()) {
       return std::distance(column_names.begin(), it);
@@ -77,7 +77,7 @@ class Table {
     }
   }
 
-  Data_Type GetColumnType(size_t col) {
+  Data_Type GetColumnType(size_t col) const {
     assert(col < n_cols && "Column index out of bounds");
     return type_col[col];
   }
