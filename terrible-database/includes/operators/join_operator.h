@@ -35,9 +35,10 @@ private:
   std::vector<std::pair<size_t, size_t>> idxs;
   // Token op_token;
 
+  template<bool left>
   std::unique_ptr<BaseColumn> GetColumn(BaseColumn *column, Data_Type type);
 
-  template<typename T, typename V>
+  template<typename T, typename V, bool left>
   std::unique_ptr<BaseColumn> GetColumn(BaseColumn *column) {
     std::vector<T> vec;
     vec.reserve(idxs.size());
@@ -45,7 +46,11 @@ private:
     V *pcol = static_cast<V *>(column);
 
     for(auto [l, r]: idxs) {
-      vec.push_back((*pcol)[l]);
+      if constexpr (left) {
+        vec.push_back((*pcol)[l]);
+      } else {
+        vec.push_back((*pcol)[r]);
+      }
     }
 
     return std::make_unique<V>(vec.size(), std::move(vec));

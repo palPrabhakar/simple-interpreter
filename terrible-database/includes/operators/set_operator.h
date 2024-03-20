@@ -47,9 +47,6 @@ public:
   }
 
 private:
-  Table_Vec tables;
-  std::vector<size_t> arg_results;
-
   std::unique_ptr<BinaryOperator> lhs;
   std::unique_ptr<BinaryOperator> rhs;
 

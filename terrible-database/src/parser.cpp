@@ -234,6 +234,8 @@ Operator_Vec ParseSelectQuery(Token_Vector &tokens, size_t &index) {
     operators = std::move(ssm.join_ops);
   }
 
+  // operators.emplace_back(std::make_unique<StdOutWriter>());
+
   // If where clause add Binary Operator
   if (ssm.where_op) {
     operators.emplace_back(std::move(ssm.where_op));

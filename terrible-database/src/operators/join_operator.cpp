@@ -67,27 +67,28 @@ Table_Vec JoinOperator::GetData() {
   for(auto i = 0; i < lcols; ++i) {
     auto *col = ltable->GetColumn(i);
     auto type = ltable->GetColumnType(i);
-    output_tables[0]->SetColumn(i, GetColumn(col, type));
+    output_tables[0]->SetColumn(i, GetColumn<true>(col, type));
   }
 
   for(auto i = 0; i < rcols; ++i) {
     auto *col = rtable->GetColumn(i);
     auto type = rtable->GetColumnType(i);
-    output_tables[0]->SetColumn(i+lcols, GetColumn(col, type));
+    output_tables[0]->SetColumn(i+lcols, GetColumn<false>(col, type));
   }
 
   return std::move(output_tables);
 }
 
+template <bool left>
 std::unique_ptr<BaseColumn> JoinOperator::GetColumn(BaseColumn *column,
                                                     Data_Type type) {
   switch (type) {
   case DT_INT:
-    return GetColumn<sINT::type, Int64Column>(column);
+    return GetColumn<sINT::type, Int64Column, left>(column);
   case DT_DOUBLE:
-    return GetColumn<sDOUBLE::type, DoubleColumn>(column);
+    return GetColumn<sDOUBLE::type, DoubleColumn, left>(column);
   case DT_STRING:
-    return GetColumn<sSTRING::type, StringColumn>(column);
+    return GetColumn<sSTRING::type, StringColumn, left>(column);
   default:
     throw std::runtime_error("BinaryOperator: Invalid column type\n");
   }

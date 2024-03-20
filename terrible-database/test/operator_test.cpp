@@ -75,7 +75,8 @@ TEST(OperatorTest, TestCreatePipeline) {
 
 TEST(OperatorTest, TestInsertPipeline) {
   {
-    auto operators = tdb::ParseInputQuery("insert test_table values 42 2.5 lol");
+    auto operators =
+        tdb::ParseInputQuery("insert test_table values 42 2.5 lol");
 
     EXPECT_TRUE(operators.size() == 3);
     tdb::Table_Vec vec;
@@ -89,9 +90,25 @@ TEST(OperatorTest, TestInsertPipeline) {
 
 TEST(OperatorTest, TestJoinPipeline) {
   {
-    auto operators = tdb::ParseInputQuery("select * from jl_table join jr_table on ( jl_table.gid == jr_table.id )");
+    auto operators =
+        tdb::ParseInputQuery("select * from jl_table join jr_table on ( "
+                             "jl_table.gid == jr_table.id )");
 
     EXPECT_TRUE(operators.size() == 5);
+    tdb::Table_Vec vec;
+    for (auto &op : operators) {
+      op->AddData(std::move(vec));
+      op->Execute();
+      vec = std::move(op->GetData());
+    }
+  }
+
+  {
+    auto operators =
+        tdb::ParseInputQuery("select * from jl_table join jr_table on ( "
+                             "jl_table.gid == jr_table.id ) where ( ( jl_table.age > 40 ) and ( jr_table.id == 1 ) )");
+
+    EXPECT_TRUE(operators.size() == 6);
     tdb::Table_Vec vec;
     for (auto &op : operators) {
       op->AddData(std::move(vec));
@@ -103,7 +120,8 @@ TEST(OperatorTest, TestJoinPipeline) {
 
 TEST(OperatorTest, TestUpdatePipeline) {
   {
-    auto operators = tdb::ParseInputQuery("Update u1_table values name lol age 11");
+    auto operators =
+        tdb::ParseInputQuery("Update u1_table values name lol age 11");
 
     EXPECT_TRUE(operators.size() == 3);
     tdb::Table_Vec vec;
@@ -115,7 +133,8 @@ TEST(OperatorTest, TestUpdatePipeline) {
   }
 
   {
-    auto operators = tdb::ParseInputQuery("Update u2_table values name lol age 11 where ( age > 40 )");
+    auto operators = tdb::ParseInputQuery(
+        "Update u2_table values name lol age 11 where ( age > 40 )");
 
     EXPECT_TRUE(operators.size() == 3);
     tdb::Table_Vec vec;
