@@ -26,12 +26,11 @@ class UnionOperator : public BinaryOperator {
   std::unique_ptr<BinaryOperator> rhs;
 
   void DoUnion(const Table *ptr) {
-    auto ltask =
-        std::async(std::launch::async, &BinaryOperator::GetArgResults,
-                   lhs.get(), ptr);
+    auto ltask = std::async(std::launch::async, &BinaryOperator::GetArgResults,
+                            lhs.get(), ptr);
 
-    auto rtask =
-        std::async(std::launch::async, &BinaryOperator::GetArgResults, rhs.get(), ptr);
+    auto rtask = std::async(std::launch::async, &BinaryOperator::GetArgResults,
+                            rhs.get(), ptr);
 
     ltask.wait();
     rtask.wait();
@@ -61,12 +60,11 @@ class IntersectionOperator : public BinaryOperator {
   std::unique_ptr<BinaryOperator> rhs;
 
   void DoIntersection(const Table *ptr) {
-    auto ltask =
-        std::async(std::launch::async, &BinaryOperator::GetArgResults,
-                   lhs.get(), ptr);
+    auto ltask = std::async(std::launch::async, &BinaryOperator::GetArgResults,
+                            lhs.get(), ptr);
 
-    auto rtask =
-        std::async(std::launch::async, &BinaryOperator::GetArgResults, rhs.get(), ptr);
+    auto rtask = std::async(std::launch::async, &BinaryOperator::GetArgResults,
+                            rhs.get(), ptr);
 
     ltask.wait();
     rtask.wait();

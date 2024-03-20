@@ -53,18 +53,18 @@ Table_Vec JoinOperator::GetData() {
   std::vector<Data_Type> col_types;
 
   for (auto i = 0; i < lcols; ++i) {
-    col_names.emplace_back(
+    col_names.push_back(
         std::format("{}.{}", ltable->GetTableName(), ltable->GetColumnName(i)));
     col_types.push_back(ltable->GetColumnType(i));
   }
 
   for (auto i = 0; i < rcols; ++i) {
-    col_names.emplace_back(
+    col_names.push_back(
         std::format("{}.{}", rtable->GetTableName(), rtable->GetColumnName(i)));
     col_types.push_back(rtable->GetColumnType(i));
   }
 
-  output_tables.emplace_back(
+  output_tables.push_back(
       std::make_unique<Table>(ncols, nrows, table_name, col_names, col_types));
 
   for (auto i = 0; i < lcols; ++i) {

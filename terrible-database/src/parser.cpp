@@ -61,9 +61,9 @@ Operator_Vec ParseJoinClause(Token_Vector &tokens, size_t &index) {
 
   // the order should be this
   // the join operator implicity assumes index - 0 for left table
-  operators.emplace_back(std::make_unique<ReadOperator>(jsm.left_table));
-  operators.emplace_back(std::make_unique<ReadOperator>(jsm.right_table));
-  operators.emplace_back(std::make_unique<JoinOperator>(
+  operators.push_back(std::make_unique<ReadOperator>(jsm.left_table));
+  operators.push_back(std::make_unique<ReadOperator>(jsm.right_table));
+  operators.push_back(std::make_unique<JoinOperator>(
       jsm.left_table, jsm.right_table, jsm.left_column, jsm.right_column));
 
   return operators;
@@ -190,15 +190,15 @@ Operator_Vec ParseUpdateQuery(Token_Vector &tokens, size_t &index) {
     throw std::runtime_error("Failed to parse update query\n");
   }
 
-  operators.emplace_back(std::make_unique<ReadOperator>(usm.table_name));
+  operators.push_back(std::make_unique<ReadOperator>(usm.table_name));
 
   // TODO:
   // Update Op
   BinaryOp_Ptr op(static_cast<BinaryOperator *>(usm.where_op.release()));
-  operators.emplace_back(std::make_unique<UpdateOperator>(
+  operators.push_back(std::make_unique<UpdateOperator>(
       usm.col_names, usm.col_values, std::move(op)));
 
-  operators.emplace_back(std::make_unique<FileWriter>());
+  operators.push_back(std::make_unique<FileWriter>());
 
   return operators;
 }
@@ -237,7 +237,7 @@ Operator_Vec ParseSelectQuery(Token_Vector &tokens, size_t &index) {
   }
 
   if (!ssm.join_clause) {
-    operators.emplace_back(std::make_unique<ReadOperator>(ssm.table_name));
+    operators.push_back(std::make_unique<ReadOperator>(ssm.table_name));
   } else {
     operators = std::move(ssm.join_ops);
   }
@@ -246,14 +246,14 @@ Operator_Vec ParseSelectQuery(Token_Vector &tokens, size_t &index) {
 
   // If where clause add Binary Operator
   if (ssm.where_op) {
-    operators.emplace_back(std::move(ssm.where_op));
+    operators.push_back(std::move(ssm.where_op));
   }
 
   // Add Project Operator
-  operators.emplace_back(std::make_unique<ProjectOperator>(ssm.col_names));
+  operators.push_back(std::make_unique<ProjectOperator>(ssm.col_names));
 
   // Add Write Operator
-  operators.emplace_back(std::make_unique<StdOutWriter>());
+  operators.push_back(std::make_unique<StdOutWriter>());
 
   return operators;
 }
@@ -273,10 +273,10 @@ Operator_Vec ParseCreateQuery(Token_Vector &tokens, size_t &index) {
     throw std::runtime_error("Failed to parse create query\n");
   }
 
-  operators.emplace_back(std::make_unique<CreateOperator>(
+  operators.push_back(std::make_unique<CreateOperator>(
       csm.table_name, csm.col_names, csm.col_types));
 
-  operators.emplace_back(std::make_unique<FileWriter>());
+  operators.push_back(std::make_unique<FileWriter>());
 
   return operators;
 }
@@ -296,9 +296,9 @@ Operator_Vec ParseInsertQuery(Token_Vector &tokens, size_t &index) {
     throw std::runtime_error("Failed to parse insert query\n");
   }
 
-  operators.emplace_back(std::make_unique<ReadOperator>(ism.table_name));
-  operators.emplace_back(std::make_unique<InsertOperator>(ism.col_values));
-  operators.emplace_back(std::make_unique<FileWriter>());
+  operators.push_back(std::make_unique<ReadOperator>(ism.table_name));
+  operators.push_back(std::make_unique<InsertOperator>(ism.col_values));
+  operators.push_back(std::make_unique<FileWriter>());
 
   return operators;
 }

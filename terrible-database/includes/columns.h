@@ -124,7 +124,7 @@ class StringColumn : public Column<std::string> {
   const std::string &operator[](std::size_t idx) const { return vec[idx]; }
 
   void append(std::string val) {
-    vec.emplace_back(val);
+    vec.push_back(std::move(val));
     n_rows++;
   }
 };

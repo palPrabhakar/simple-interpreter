@@ -20,7 +20,7 @@ class CreateOperator : public Operator {
     assert(column_names.size() == column_types.size() &&
            "CreateOperator column_names.size() != column_types.size()");
 
-    tables.emplace_back(std::make_unique<Table>(
+    tables.push_back(std::make_unique<Table>(
         column_names.size(), 0, table_name, column_names, column_types));
   }
 

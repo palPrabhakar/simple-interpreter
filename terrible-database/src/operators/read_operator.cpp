@@ -54,7 +54,7 @@ std::unique_ptr<BaseColumn> GetColumn<std::string>(const Json::Value &data,
          "ReadOperator: Number of columns don't match given size\n");
 
   for (int i = 0; i < data.size(); ++i) {
-    vec.emplace_back(data[i].asString());
+    vec.push_back(data[i].asString());
   }
 
   return std::make_unique<StringColumn>(size, std::move(vec));
@@ -86,19 +86,19 @@ void ReadOperator::ReadTable() {
          "Table: cols and type size does not match\n");
 
   for (int i = 0; i < cols.size(); ++i) {
-    col_names.emplace_back(cols[i].asString());
-    col_types.emplace_back(static_cast<Data_Type>(types[i].asInt()));
+    col_names.push_back(cols[i].asString());
+    col_types.push_back(static_cast<Data_Type>(types[i].asInt()));
   }
 
   // assert(tables.size() == 0 && "Vec<Table> not empty\n");
 
   auto tidx = tables.size();
-  tables.emplace_back(
+  tables.push_back(
       std::make_unique<Table>(ncols, nrows, table_name, col_names, col_types));
 
   std::vector<std::future<std::unique_ptr<BaseColumn>>> tasks;
   for (size_t i = 0; i < col_names.size(); ++i) {
-    tasks.emplace_back(std::async(std::launch::async, GetColumnValues,
+    tasks.push_back(std::async(std::launch::async, GetColumnValues,
                                   data["data"][col_names[i]], col_types[i],
                                   nrows));
 

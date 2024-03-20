@@ -19,10 +19,10 @@ Table_Vec BinaryOperator::GetData() {
 
   for (auto i = 0; i < n_cols; ++i) {
     ctypes.push_back(tables[0]->GetColumnType(i));
-    cnames.emplace_back(tables[0]->GetColumnName(i));
+    cnames.push_back(tables[0]->GetColumnName(i));
   }
 
-  output.emplace_back(
+  output.push_back(
       std::make_unique<Table>(n_cols, n_rows, table_name, cnames, ctypes));
 
   for (auto i = 0; i < n_cols; ++i) {
