@@ -101,9 +101,6 @@ void ReadOperator::ReadTable() {
     tasks.push_back(std::async(std::launch::async, GetColumnValues,
                                   data["data"][col_names[i]], col_types[i],
                                   nrows));
-
-    // auto ptr = GetColumnValues(data["data"][col_names[i]], col_types[i],
-    // nrows); tables[tidx]->SetColumn(i, std::move(ptr));
   }
 
   for (auto &task : tasks) {

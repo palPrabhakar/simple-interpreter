@@ -51,7 +51,7 @@ class FileWriter : public WriteOperator<FileWriter> {
     return column;
   }
 
-  Json::Value GetColumn(size_t col_idx, Data_Type type) {
+  Json::Value GetColumnObj(size_t col_idx, Data_Type type) {
     switch (type) {
       case DT_INT:
         return GetColumn<Int64Column>(col_idx);

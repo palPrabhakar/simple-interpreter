@@ -4,6 +4,7 @@
 
 #include <format>
 #include <fstream>
+#include <future>
 #include <iostream>
 #include <sstream>
 
@@ -62,12 +63,23 @@ void FileWriter::WriteTable() {
   Json::Value types(Json::arrayValue);
 
   Json::Value data;
+  std::vector<std::future<Json::Value>> tasks;
   for (auto i = 0; i < ncols; ++i) {
     auto col_name = tables[0]->GetColumnName(i);
     auto col_type = tables[0]->GetColumnType(i);
     columns.append(col_name);
     types.append(col_type);
-    data[col_name] = GetColumn(i, col_type);
+    tasks.push_back(std::async(std::launch::async, &FileWriter::GetColumnObj, this, i, col_type));
+    // data[col_name] = GetColumn(i, col_type);
+  }
+
+  for (auto &task : tasks) {
+    task.wait();
+  }
+
+  for (size_t i = 0; i < ncols; ++i) {
+    auto col_name = tables[0]->GetColumnName(i);
+    data[col_name] = tasks[i].get();
   }
 
   schema["columns"] = columns;
