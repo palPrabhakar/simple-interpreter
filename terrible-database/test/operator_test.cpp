@@ -8,25 +8,25 @@
 #include <format>
 
 TEST(OperatorTest, ReadOperator) {
-  tdb::ReadOperator read_op("simple_table");
+  tdb::ReadOperator read_op("large_table");
   read_op.Execute();
 
-  auto un_op =
-      tdb::UnionOperator(std::make_unique<tdb::GreaterThanFilter>("age", "40"),
-                         std::make_unique<tdb::EqualityFilter>("name", "John"));
-  un_op.AddData(read_op.GetData());
-  un_op.Execute();
+  // auto un_op =
+  //     tdb::UnionOperator(std::make_unique<tdb::GreaterThanFilter>("age", "40"),
+  //                        std::make_unique<tdb::EqualityFilter>("name", "John"));
+  // un_op.AddData(read_op.GetData());
+  // un_op.Execute();
 
   // tdb::EqualityFilter eq_op("age", "44");
   // eq_op.AddData(read_op.GetData());
   // eq_op.Execute();
 
-  tdb::ProjectOperator proj_op({"age"});
-  proj_op.AddData(un_op.GetData());
-  proj_op.Execute();
+  // tdb::ProjectOperator proj_op({"age"});
+  // proj_op.AddData(un_op.GetData());
+  // proj_op.Execute();
 
   auto write_op = tdb::StdOutWriter();
-  write_op.AddData(proj_op.GetData());
+  write_op.AddData(read_op.GetData());
   write_op.Execute();
   // EXPECT_NO_THROW(op.ReadTable());
 }

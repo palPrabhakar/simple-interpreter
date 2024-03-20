@@ -3,18 +3,21 @@
 #include "json/json.h"
 #include <cstdint>
 #include <fstream>
+#include <future>
+#include <iostream>
 #include <memory>
 #include <stdexcept>
 
 namespace tdb {
 
 template <>
-std::unique_ptr<BaseColumn>
-ReadOperator::GetColumn<int64_t>(const Json::Value &data, const size_t size) {
+std::unique_ptr<BaseColumn> GetColumn<int64_t>(const Json::Value &data,
+                                               const size_t size) {
   std::vector<int64_t> vec;
   vec.reserve(size);
 
-  assert(data.size() == size && "ReadOperator: Number of columns don't match given size\n");
+  assert(data.size() == size &&
+         "ReadOperator: Number of columns don't match given size\n");
 
   for (int i = 0; i < data.size(); ++i) {
     vec.push_back(data[i].asInt64());
@@ -24,12 +27,13 @@ ReadOperator::GetColumn<int64_t>(const Json::Value &data, const size_t size) {
 }
 
 template <>
-std::unique_ptr<BaseColumn>
-ReadOperator::GetColumn<double>(const Json::Value &data, const size_t size) {
+std::unique_ptr<BaseColumn> GetColumn<double>(const Json::Value &data,
+                                              const size_t size) {
   std::vector<double> vec;
   vec.reserve(size);
 
-  assert(data.size() == size && "ReadOperator: Number of columns don't match given size\n");
+  assert(data.size() == size &&
+         "ReadOperator: Number of columns don't match given size\n");
 
   for (int i = 0; i < data.size(); ++i) {
     vec.push_back(data[i].asDouble());
@@ -39,13 +43,13 @@ ReadOperator::GetColumn<double>(const Json::Value &data, const size_t size) {
 }
 
 template <>
-std::unique_ptr<BaseColumn>
-ReadOperator::GetColumn<std::string>(const Json::Value &data,
-                                     const size_t size) {
+std::unique_ptr<BaseColumn> GetColumn<std::string>(const Json::Value &data,
+                                                   const size_t size) {
   std::vector<std::string> vec;
   vec.reserve(size);
 
-  assert(data.size() == size && "ReadOperator: Number of columns don't match given size\n");
+  assert(data.size() == size &&
+         "ReadOperator: Number of columns don't match given size\n");
 
   for (int i = 0; i < data.size(); ++i) {
     vec.emplace_back(data[i].asString());
@@ -90,16 +94,28 @@ void ReadOperator::ReadTable() {
   tables.emplace_back(
       std::make_unique<Table>(ncols, nrows, table_name, col_names, col_types));
 
+  std::vector<std::future<std::unique_ptr<BaseColumn>>> tasks;
   for (size_t i = 0; i < col_names.size(); ++i) {
-    const Json::Value col_val = data["data"][col_names[i]];
-    auto ptr = GetColumn(col_val, col_types[i], nrows);
-    tables[tidx]->SetColumn(i, std::move(ptr));
+    tasks.emplace_back(std::async(std::launch::async, GetColumnValues,
+                                  data["data"][col_names[i]], col_types[i],
+                                  nrows));
+
+    // auto ptr = GetColumnValues(data["data"][col_names[i]], col_types[i],
+    // nrows); tables[tidx]->SetColumn(i, std::move(ptr));
+  }
+
+  for (auto &task : tasks) {
+    task.wait();
+  }
+
+  for (size_t i = 0; i < col_names.size(); ++i) {
+    tables[tidx]->SetColumn(i, std::move(tasks[i].get()));
   }
 }
 
-std::unique_ptr<BaseColumn> ReadOperator::GetColumn(const Json::Value &data,
-                                                    const Data_Type type,
-                                                    const size_t size) {
+std::unique_ptr<BaseColumn> GetColumnValues(const Json::Value &data,
+                                            const Data_Type type,
+                                            const size_t size) {
   switch (type) {
   case DT_INT:
     return GetColumn<int64_t>(data, size);

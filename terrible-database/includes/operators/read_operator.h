@@ -30,10 +30,11 @@ private:
   Table_Vec tables;
 
   void ReadTable();
-  std::unique_ptr<BaseColumn> GetColumn(const Json::Value &data, Data_Type type,
-                                        const size_t size);
-  template <typename T>
-  std::unique_ptr<BaseColumn> GetColumn(const Json::Value &data,
-                                        const size_t size);
 };
+
+std::unique_ptr<BaseColumn> GetColumnValues(const Json::Value &data, Data_Type type,
+                                      const size_t size);
+template <typename T>
+std::unique_ptr<BaseColumn> GetColumn(const Json::Value &data,
+                                      const size_t size);
 } // namespace tdb
