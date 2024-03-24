@@ -10,8 +10,8 @@
 
 namespace tci {
 
-static const std::unordered_map<Token, int> op_precedence = {
-    {Add, 20}, {Sub, 20}, {Mul, 40}, {Div, 40}};
+// static const std::unordered_map<Token, int> op_precedence = {
+//     {Add, 20}, {Sub, 20}, {Mul, 40}, {Div, 40}};
 
 void CheckTokenizer(Tokenizer &tokenizer) {
   if (tokenizer.EOP()) {
@@ -19,44 +19,66 @@ void CheckTokenizer(Tokenizer &tokenizer) {
   }
 }
 
+std::unique_ptr<Expr<int>> ParseExpression(Tokenizer &tokenizer) {
+  CheckTokenizer(tokenizer);
+  auto [tok0, word0] = tokenizer.GetNextToken();
+  std::unique_ptr<Expr<int>> op0;
+
+  if(tok0 == LBrack) {
+    op0 = ParseExpression(tokenizer);
+  }
+  else if(tok0 == Text) {
+    op0 = std::make_unique<ValueExpr<int>>(std::stoi(word0));
+  }
+  else {
+    assert(false && "Failed to parse expression\n");
+  }
+
+  CheckTokenizer(tokenizer);
+  auto [tok1, word1] = tokenizer.GetNextToken();
+
+  if(tok1 == SColon || tok1 == RBrack) {
+    return op0;
+  } else {
+    auto nexp =  MakeOpExpr::GetOpExpr<int>(tok1);
+    nexp->SetLhs(std::move(op0));
+    return ParseExpression(tokenizer, std::move(nexp));
+  }
+}
+
 std::unique_ptr<Expr<int>> ParseExpression(Tokenizer &tokenizer, std::unique_ptr<OpExpr<int, int>> expr) {
-  // std::cout << "ParseExpression\n";
-  CheckTokenizer(tokenizer);
-  auto [vtok, val] = tokenizer.GetNextToken();
-  assert(vtok == Text && "Text token expected\n");
+  std::unique_ptr<Expr<int>> op0;
 
   CheckTokenizer(tokenizer);
-  auto [ntoken, nword] = tokenizer.GetNextToken();
+  auto [tok0, word0] = tokenizer.GetNextToken();
 
-  if (ntoken == SColon) {
-    if(expr) {
-      expr->SetRhs(std::make_unique<ValueExpr<int>>(std::stoi(val)));
-      return std::move(expr);
-    } else {
-      return std::make_unique<ValueExpr<int>>(std::stoi(val));
-    }
+  if(tok0 == LBrack) {
+    op0 = ParseExpression(tokenizer);
+  }
+  else if(tok0 == Text) {
+    op0 = std::make_unique<ValueExpr<int>>(std::stoi(word0));
+  }
+  else {
+    assert(false && "Failed to parse expression\n");
+  }
+
+  CheckTokenizer(tokenizer);
+  auto [tok1, word1] = tokenizer.GetNextToken();
+
+  if (tok1 == SColon || tok1 == RBrack) {
+    expr->SetRhs(std::move(op0));
+    return std::move(expr);
   } else {
     // std::cout<<"op: "<<nword<<std::endl;
-    auto nexp =  MakeOpExpr::GetOpExpr<int>(ntoken);
-
-    if(expr) {
-      if (expr->GetPrecedence() >= nexp->GetPrecedence()) {
-        expr->SetRhs(std::make_unique<ValueExpr<int>>(std::stoi(val)));
-
-        nexp->SetLhs(std::move(expr));
-
-        return ParseExpression(tokenizer, std::move(nexp));
-
-      } else {
-        nexp->SetLhs(std::make_unique<ValueExpr<int>>(std::stoi(val)));
-
-        expr->SetRhs(ParseExpression(tokenizer, std::move(nexp)));
-
-        return std::move(expr);
-      }
+    auto nexp =  MakeOpExpr::GetOpExpr<int>(tok1);
+    if (expr->GetPrecedence() >= nexp->GetPrecedence()) {
+      expr->SetRhs(std::move(op0));
+      nexp->SetLhs(std::move(expr));
+      return ParseExpression(tokenizer, std::move(nexp));
     } else {
-        nexp->SetLhs(std::make_unique<ValueExpr<int>>(std::stoi(val)));
-        return ParseExpression(tokenizer, std::move(nexp));
+      nexp->SetLhs(std::move(op0));
+      expr->SetRhs(ParseExpression(tokenizer, std::move(nexp)));
+      return std::move(expr);
     }
   }
 }
@@ -72,7 +94,7 @@ void ParseStatement(Tokenizer &tokenizer) {
       auto [aToken, aWord] = tokenizer.GetNextToken();
       assert(aToken == Assign && "Assign token expected\n");
 
-      auto exp = ParseExpression(tokenizer, nullptr);
+      auto exp = ParseExpression(tokenizer);
 
       std::cout<<"Result: "<<exp->Operate()<<std::endl;
     }

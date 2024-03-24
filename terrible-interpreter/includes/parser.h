@@ -13,4 +13,5 @@ void ParseStatement(Tokenizer &tokenizer);
 std::unique_ptr<Expr<int>> ParseExpression(Tokenizer &tokenizer,
                                          std::unique_ptr<OpExpr<int, int>> expr);
 
+std::unique_ptr<Expr<int>> ParseExpression(Tokenizer &tokenizer);
 }  // namespace tci
