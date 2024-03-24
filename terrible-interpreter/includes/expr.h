@@ -4,6 +4,7 @@
 
 #include "ast.h"
 #include "tokens.h"
+#include "symbol_table.h"
 
 namespace tci {
 template <typename T>
@@ -21,6 +22,21 @@ class ValueExpr : public Expr<T> {
 
  private:
   T m_val;
+};
+
+template<typename T>
+class VarExpr: public Expr<T> {
+ public:
+  VarExpr(std::string name) : m_name(name) {}
+  T Operate() {
+    auto &st = SymbolTable::GetInstance();
+    return std::get<T>(st.symbols[m_name].val);
+  }
+
+ private:
+  std::string m_name;
+  T m_val;
+
 };
 
 template <typename T, typename V>
