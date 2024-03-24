@@ -14,6 +14,11 @@ public:
     return pos >= m_file.size();
   }
 
+  void ResetTokenizer(std::string file) {
+    m_file = std::move(file);
+    pos = 0;
+  }
+
 private:
   std::string m_file;
   size_t pos = 0;

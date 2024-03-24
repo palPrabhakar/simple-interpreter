@@ -6,6 +6,7 @@ enum Token {
   // Keywords
   Int,
   Double,
+  Bool,
   Char,
   Void,
   If,

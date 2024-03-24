@@ -1,4 +1,5 @@
 #include "tokenizer.h"
+#include "parser.h"
 #include <iostream>
 #include <string>
 
@@ -12,12 +13,13 @@ int main() {
       exit(0);
 
     tci::Tokenizer tokenizer(cmd);
+    tci::Parse(tokenizer);
 
-    while (!tokenizer.EOP()) {
-      std::cout << tokenizer.GetNextToken().second << std::endl;
-    }
+    // while (!tokenizer.EOP()) {
+    //   std::cout << tokenizer.GetNextToken().second << std::endl;
+    // }
 
-    std::cout << cmd << "\n";
+    // std::cout << cmd << "\n";
   }
   return 0;
 }

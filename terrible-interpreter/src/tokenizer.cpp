@@ -5,7 +5,7 @@
 #include <unordered_set>
 
 namespace tci {
-const std::unordered_map<std::string, Token> token_map = {
+static const std::unordered_map<std::string, Token> token_map = {
     {"int", Token::Int},     {"double", Token::Double},
     {"char", Token::Char},   {"void", Token::Void},
     {"if", Token::If},       {"else", Token::Else},
@@ -25,11 +25,11 @@ const std::unordered_map<std::string, Token> token_map = {
     {")", Token::RBrack},    {"[", Token::LSBrack},
     {"]", Token::RSBrack},   {";", Token::SColon}};
 
-const std::unordered_set<char> stop_words = {';', '(', ')', '{', '}', ' ', '[',
+static const std::unordered_set<char> stop_words = {';', '(', ')', '{', '}', ' ', '[',
                                              ']', '+', '-', '*', '/', '%', '=',
                                              '!', '<', '>', '&', '|'};
 
-const std::unordered_set<char> sp_words = {'=', '!', '>', '<', '+', '-'};
+static const std::unordered_set<char> sp_words = {'=', '!', '>', '<', '+', '-'};
 
 std::pair<Token, std::string> Tokenizer::GetNextToken() {
   std::string word;
