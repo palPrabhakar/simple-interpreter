@@ -35,8 +35,6 @@ class VarExpr: public Expr<T> {
 
  private:
   std::string m_name;
-  T m_val;
-
 };
 
 template <typename T, typename V>

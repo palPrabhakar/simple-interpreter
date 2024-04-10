@@ -43,6 +43,7 @@ enum Token {
   RParen,
   RSBrack,
   SColon,
+  Fn,
   End
 };
 

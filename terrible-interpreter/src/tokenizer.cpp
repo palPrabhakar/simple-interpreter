@@ -1,4 +1,5 @@
 #include "tokenizer.h"
+
 #include <cctype>
 #include <string>
 #include <unordered_map>
@@ -23,11 +24,12 @@ static const std::unordered_map<std::string, Token> token_map = {
     {"--", Token::Dec},      {"{", Token::LParen},
     {"}", Token::RParen},    {"(", Token::LBrack},
     {")", Token::RBrack},    {"[", Token::LSBrack},
-    {"]", Token::RSBrack},   {";", Token::SColon}};
+    {"]", Token::RSBrack},   {";", Token::SColon},
+    {"fn", Token::Fn}};
 
-static const std::unordered_set<char> stop_words = {';', '(', ')', '{', '}', ' ', '[',
-                                             ']', '+', '-', '*', '/', '%', '=',
-                                             '!', '<', '>', '&', '|'};
+static const std::unordered_set<char> stop_words = {
+    ';', '(', ')', '{', '}', ' ', '[', ']', '+', '-',
+    '*', '/', '%', '=', '!', '<', '>', '&', '|'};
 
 static const std::unordered_set<char> sp_words = {'=', '!', '>', '<', '+', '-'};
 
@@ -81,4 +83,4 @@ std::pair<Token, std::string> Tokenizer::GetNextToken() {
   return {token, word};
 }
 
-} // namespace tci
+}  // namespace tci

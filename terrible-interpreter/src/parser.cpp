@@ -12,9 +12,6 @@
 
 namespace tci {
 
-// static const std::unordered_map<Token, int> op_precedence = {
-//     {Add, 20}, {Sub, 20}, {Mul, 40}, {Div, 40}};
-
 void CheckTokenizer(Tokenizer &tokenizer) {
   if (tokenizer.EOP()) {
     assert(false && "Unexpected end of Parsing\n");
@@ -29,7 +26,7 @@ std::unique_ptr<Expr<int>> ParseExpression(Tokenizer &tokenizer) {
   if (tok0 == LBrack) {
     op0 = ParseExpression(tokenizer);
   } else if (tok0 == Text) {
-    if(std::isalpha(word0[0])) {
+    if (std::isalpha(word0[0])) {
       op0 = std::make_unique<VarExpr<int>>(word0);
     } else {
       op0 = std::make_unique<ValueExpr<int>>(std::stoi(word0));
@@ -60,7 +57,7 @@ std::unique_ptr<Expr<int>> ParseExpression(
   if (tok0 == LBrack) {
     op0 = ParseExpression(tokenizer);
   } else if (tok0 == Text) {
-    if(std::isalpha(word0[0])) {
+    if (std::isalpha(word0[0])) {
       op0 = std::make_unique<VarExpr<int>>(word0);
     } else {
       op0 = std::make_unique<ValueExpr<int>>(std::stoi(word0));
@@ -91,33 +88,92 @@ std::unique_ptr<Expr<int>> ParseExpression(
 }
 
 void ParseStatement(Tokenizer &tokenizer) {
-    CheckTokenizer(tokenizer);
-    auto [token, word] = tokenizer.GetNextToken();
+  // CheckTokenizer(tokenizer);
+  // auto [token, word] = tokenizer.GetNextToken();
 
-    if (token == Int) {
+  // if (token == Int) {
 
-      CheckTokenizer(tokenizer);
-      auto [token, word] = tokenizer.GetNextToken();
-      assert(token == Text && "Text token expected\n");
-      auto varName = word;
+  CheckTokenizer(tokenizer);
+  auto [token, word] = tokenizer.GetNextToken();
+  assert(token == Text && "Text token expected\n");
+  auto varName = word;
 
-      CheckTokenizer(tokenizer);
-      auto [aToken, aWord] = tokenizer.GetNextToken();
-      assert(aToken == Assign && "Assign token expected\n");
+  CheckTokenizer(tokenizer);
+  auto [aToken, aWord] = tokenizer.GetNextToken();
+  assert(aToken == Assign && "Assign token expected\n");
 
-      auto exp = ParseExpression(tokenizer);
+  auto exp = ParseExpression(tokenizer);
 
-      auto &st = SymbolTable::GetInstance();
-      st.symbols.insert({word, Symbol{Int, exp->Operate()}});
+  auto &st = SymbolTable::GetInstance();
 
-      std::cout << "Result: " << std::get<int>(st.symbols[word].val) << std::endl;
-    }
+  if (st.symbols.contains(word)) {
+    assert(false && "Redeclaration of variable\n");
+  }
+
+  st.symbols.insert({word, Symbol{Int, exp->Operate()}});
+  std::cout << "Result: " << std::get<int>(st.symbols[word].val) << std::endl;
+  // }
   // }
 }
 
+std::vector<std::pair<Token, std::string>> ParseArgumentList(
+    Tokenizer &tokenizer) {
+  CheckTokenizer(tokenizer);
+  auto [token0, word0] = tokenizer.GetNextToken();
+  assert(token0 == LBrack && "Expected (\n.");
+
+  std::vector<std::pair<Token, std::string>> args;
+
+  while (true) {
+    CheckTokenizer(tokenizer);
+    auto [token0, word0] = tokenizer.GetNextToken();
+
+    if(token0 == RBrack) {
+      break;
+    }
+
+    assert(token0 == Int && "Expected Type keyword\n.");
+
+    CheckTokenizer(tokenizer);
+    auto [token1, word1] = tokenizer.GetNextToken();
+    assert(token1 == Text && "Expected Variable Name\n.");
+
+    args.emplace_back(token0, word1);
+  }
+
+  return args;
+}
+
+void ParseFunction(Tokenizer &tokenizer) {
+  CheckTokenizer(tokenizer);
+  auto [token0, word0] = tokenizer.GetNextToken();
+  assert(token0 == Int && "Only Int type supported for now\n");
+
+  CheckTokenizer(tokenizer);
+  auto [token1, word1] = tokenizer.GetNextToken();
+  assert(token1 == Text && "Function name expected\n");
+
+  auto args = ParseArgumentList(tokenizer);
+
+  for(auto &[token, word] : args) {
+    std::cout<<word<<std::endl;
+  }
+
+  // ParseFunctionBody(tokenizer);
+}
+
 void Parse(Tokenizer &tokenizer) {
-  // while (!tokenizer.EOP()) {
-  ParseStatement(tokenizer);
-  // }
+  CheckTokenizer(tokenizer);
+  auto [token, word] = tokenizer.GetNextToken();
+  switch (token) {
+    case Int:
+      ParseStatement(tokenizer);
+      break;
+    case Fn:
+      ParseFunction(tokenizer);
+      break;
+    default:
+      assert(false && "Invalid token\n");
+  }
 }
 }  // namespace tci
