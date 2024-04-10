@@ -5,6 +5,7 @@ enum Token {
   Text,
   // Keywords
   Let,
+  Mut,
   If,
   Else,
   For,
@@ -39,6 +40,7 @@ enum Token {
   RParen,
   RSBrack,
   SColon,
+  Comma,
   Fn,
   End
 };

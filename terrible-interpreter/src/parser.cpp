@@ -104,64 +104,98 @@ std::unique_ptr<StatementAST> ParseStatement(Tokenizer &tokenizer) {
 
   auto &st = SymbolTable::GetInstance();
 
-  if (st.symbols.contains(word)) {
-    assert(false && "Redeclaration of variable\n");
+  if (!st.symbols.contains(word)) {
+    assert(false && "Undefined variable\n");
   }
 
   return std::make_unique<StatementAST>(word, std::move(expr));
 }
 
-// std::vector<std::pair<Token, std::string>> ParseArgumentList(
-//     Tokenizer &tokenizer) {
-//   CheckTokenizer(tokenizer);
-//   auto [token0, word0] = tokenizer.GetNextToken();
-//   assert(token0 == LBrack && "Expected (\n.");
+std::unique_ptr<StatementAST> ParseDeclaration(Tokenizer &tokenizer) {
+  int count = 0;
 
-//   std::vector<std::pair<Token, std::string>> args;
+  CheckTokenizer(tokenizer);
+  auto [token, word] = tokenizer.GetNextToken();
+  assert(token == Text && "Text token expected\n");
+  auto varName = word;
 
-//   while (true) {
-//     CheckTokenizer(tokenizer);
-//     auto [token0, word0] = tokenizer.GetNextToken();
+  CheckTokenizer(tokenizer);
+  auto [aToken, aWord] = tokenizer.GetNextToken();
+  assert(aToken == Assign && "Assign token expected\n");
 
-//     if (token0 == RBrack) {
-//       break;
-//     }
+  auto expr = ParseExpression(tokenizer, count);
 
-//     // assert(token0 == Int && "Expected Type keyword\n.");
+  auto &st = SymbolTable::GetInstance();
 
-//     CheckTokenizer(tokenizer);
-//     auto [token1, word1] = tokenizer.GetNextToken();
-//     assert(token1 == Text && "Expected Variable Name\n.");
+  if (st.symbols.contains(word)) {
+    assert(false && "Redeclaration of variable\n");
+  }
 
-//     args.emplace_back(token0, word1);
-//   }
+  st.symbols.insert({word, 0});
 
-//   return args;
-// }
+  return std::make_unique<StatementAST>(word, std::move(expr));
+}
 
-// void ParseFunction(Tokenizer &tokenizer) {
-//   CheckTokenizer(tokenizer);
-//   // auto [token0, word0] = tokenizer.GetNextToken();
-//   // assert(token0 == Int && "Only Int type supported for now\n");
+std::vector<std::string> ParseArgumentList(
+    Tokenizer &tokenizer) {
+  CheckTokenizer(tokenizer);
+  auto [token, word] = tokenizer.GetNextToken();
+  assert(token == LBrack && "Expected (\n.");
 
-//   CheckTokenizer(tokenizer);
-//   auto [token1, word1] = tokenizer.GetNextToken();
-//   assert(token1 == Text && "Function name expected\n");
+  std::vector<std::string> args;
 
-//   auto args = ParseArgumentList(tokenizer);
+  while (true) {
+    CheckTokenizer(tokenizer);
+    auto [token, word] = tokenizer.GetNextToken();
 
-//   for (auto &[token, word] : args) {
-//     std::cout << word << std::endl;
-//   }
+    if (token == RBrack) {
+      break;
+    }
 
-//   // ParseFunctionBody(tokenizer);
-// }
+    if (token == Comma) {
+      continue;
+    }
+
+    assert(token == Text && "Expected Variable Name\n.");
+    args.push_back(word);
+
+  }
+
+  return args;
+}
+
+void ParseFunction(Tokenizer &tokenizer) {
+  CheckTokenizer(tokenizer);
+
+  CheckTokenizer(tokenizer);
+  auto [token, word] = tokenizer.GetNextToken();
+  assert(token == Text && "Function name expected\n");
+
+  std::string fn_name = word;
+
+  auto args = ParseArgumentList(tokenizer);
+
+  for (auto  arg : args) {
+    std::cout << arg << std::endl;
+  }
+
+  // ParseFunctionBody(tokenizer);
+}
 
 void Parse(Tokenizer &tokenizer) {
   CheckTokenizer(tokenizer);
   auto [token, word] = tokenizer.GetNextToken();
   switch (token) {
     case Let:
+      {
+        auto st = ParseDeclaration(tokenizer);
+        auto operations = st->GenerateCode();
+        for(auto op: operations) {
+          std::cout<<op<<std::endl;
+        }
+      }
+      break;
+    case Mut:
       {
         auto st = ParseStatement(tokenizer);
         auto operations = st->GenerateCode();
@@ -170,8 +204,9 @@ void Parse(Tokenizer &tokenizer) {
         }
       }
       break;
+
     case Fn:
-      // ParseFunction(tokenizer);
+      ParseFunction(tokenizer);
       break;
     default:
       assert(false && "Invalid token\n");

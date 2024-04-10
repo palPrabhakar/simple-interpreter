@@ -8,6 +8,7 @@
 namespace tci {
 static const std::unordered_map<std::string, Token> token_map = {
     {"let", Token::Let},
+    {"mut", Token::Mut},
     {"if", Token::If},
     {"else", Token::Else},
     {"for", Token::For},
@@ -40,12 +41,14 @@ static const std::unordered_map<std::string, Token> token_map = {
     {"[", Token::LSBrack},
     {"]", Token::RSBrack},
     {";", Token::SColon},
+    {",", Token::Comma},
     {"fn", Token::Fn}};
 
 static const std::unordered_set<char> stop_words = {
-    ';', '(', ')', '{', '}', ' ', '[', ']', '+', '-',
+    ';', '(', ')', '{', '}', ' ', '[', ']', '+', '-', ',',
     '*', '/', '%', '=', '!', '<', '>', '&', '|'};
 
+// TODO: Fix for case && and ||
 static const std::unordered_set<char> sp_words = {'=', '!', '>', '<', '+', '-'};
 
 std::pair<Token, std::string> Tokenizer::GetNextToken() {
@@ -64,6 +67,7 @@ std::pair<Token, std::string> Tokenizer::GetNextToken() {
 
   if (pos + 1 < m_file.size() && sp_words.contains(m_file[pos])) {
     word = m_file[pos];
+    // TODO: Fix for case <=, >=
     if (m_file[pos] == '!' && m_file[pos + 1] == '=') {
       word += m_file[++pos];
     } else if (m_file[pos] == m_file[pos + 1]) {
