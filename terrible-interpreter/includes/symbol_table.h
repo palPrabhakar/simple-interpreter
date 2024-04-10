@@ -7,11 +7,6 @@
 #include "tokens.h"
 
 namespace tci {
-struct Symbol {
-  Token token;
-  std::variant<int, double , bool> val;
-};
-
 class SymbolTable {
  public:
   SymbolTable(const SymbolTable& other) = delete;
@@ -19,7 +14,7 @@ class SymbolTable {
 
   static SymbolTable& GetInstance();
 
-  std::unordered_map<std::string, Symbol> symbols;
+  std::unordered_map<std::string, double> symbols;
 
  protected:
   SymbolTable() {}

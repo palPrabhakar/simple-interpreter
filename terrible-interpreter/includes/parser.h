@@ -15,8 +15,8 @@ void ParseFunction(Tokenizer &tokenizer);
 std::vector<std::pair<Token, std::string>> ParseArgumentList(
     Tokenizer &tokenizer);
 
-std::unique_ptr<Expr<int>> ParseExpression(
-    Tokenizer &tokenizer, std::unique_ptr<OpExpr<int, int>> expr);
+std::unique_ptr<Expr> ParseExpression(Tokenizer &tokenizer,
+                                      std::unique_ptr<OpExpr> expr);
 
-std::unique_ptr<Expr<int>> ParseExpression(Tokenizer &tokenizer);
+std::unique_ptr<Expr> ParseExpression(Tokenizer &tokenizer);
 }  // namespace tci

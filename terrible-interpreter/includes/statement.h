@@ -9,7 +9,6 @@
 #include "expr.h"
 
 namespace tci {
-template <typename T>
 class Statement : public AST {
  public:
   void Operate() {
@@ -18,6 +17,6 @@ class Statement : public AST {
 
  private:
   std::string m_varName;
-  std::unique_ptr<Expr<T>> expr;
+  std::unique_ptr<Expr> expr;
 };
 }  // namespace tci

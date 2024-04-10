@@ -4,11 +4,7 @@ namespace tci {
 enum Token {
   Text,
   // Keywords
-  Int,
-  Double,
-  Bool,
-  Char,
-  Void,
+  Let,
   If,
   Else,
   For,

@@ -18,18 +18,18 @@ void CheckTokenizer(Tokenizer &tokenizer) {
   }
 }
 
-std::unique_ptr<Expr<int>> ParseExpression(Tokenizer &tokenizer) {
+std::unique_ptr<Expr> ParseExpression(Tokenizer &tokenizer) {
   CheckTokenizer(tokenizer);
   auto [tok0, word0] = tokenizer.GetNextToken();
-  std::unique_ptr<Expr<int>> op0;
+  std::unique_ptr<Expr> op0;
 
   if (tok0 == LBrack) {
     op0 = ParseExpression(tokenizer);
   } else if (tok0 == Text) {
     if (std::isalpha(word0[0])) {
-      op0 = std::make_unique<VarExpr<int>>(word0);
+      op0 = std::make_unique<VarExpr>(word0);
     } else {
-      op0 = std::make_unique<ValueExpr<int>>(std::stoi(word0));
+      op0 = std::make_unique<ValueExpr>(std::stoi(word0));
     }
   } else {
     assert(false && "Failed to parse expression\n");
@@ -41,15 +41,15 @@ std::unique_ptr<Expr<int>> ParseExpression(Tokenizer &tokenizer) {
   if (tok1 == SColon || tok1 == RBrack) {
     return op0;
   } else {
-    auto nexp = MakeOpExpr::GetOpExpr<int>(tok1);
+    auto nexp = MakeOpExpr::GetOpExpr(tok1);
     nexp->SetLhs(std::move(op0));
     return ParseExpression(tokenizer, std::move(nexp));
   }
 }
 
-std::unique_ptr<Expr<int>> ParseExpression(
-    Tokenizer &tokenizer, std::unique_ptr<OpExpr<int, int>> expr) {
-  std::unique_ptr<Expr<int>> op0;
+std::unique_ptr<Expr> ParseExpression(Tokenizer &tokenizer,
+                                      std::unique_ptr<OpExpr> expr) {
+  std::unique_ptr<Expr> op0;
 
   CheckTokenizer(tokenizer);
   auto [tok0, word0] = tokenizer.GetNextToken();
@@ -58,9 +58,9 @@ std::unique_ptr<Expr<int>> ParseExpression(
     op0 = ParseExpression(tokenizer);
   } else if (tok0 == Text) {
     if (std::isalpha(word0[0])) {
-      op0 = std::make_unique<VarExpr<int>>(word0);
+      op0 = std::make_unique<VarExpr>(word0);
     } else {
-      op0 = std::make_unique<ValueExpr<int>>(std::stoi(word0));
+      op0 = std::make_unique<ValueExpr>(std::stoi(word0));
     }
   } else {
     assert(false && "Failed to parse expression\n");
@@ -73,8 +73,7 @@ std::unique_ptr<Expr<int>> ParseExpression(
     expr->SetRhs(std::move(op0));
     return std::move(expr);
   } else {
-    // std::cout<<"op: "<<nword<<std::endl;
-    auto nexp = MakeOpExpr::GetOpExpr<int>(tok1);
+    auto nexp = MakeOpExpr::GetOpExpr(tok1);
     if (expr->GetPrecedence() >= nexp->GetPrecedence()) {
       expr->SetRhs(std::move(op0));
       nexp->SetLhs(std::move(expr));
@@ -88,11 +87,6 @@ std::unique_ptr<Expr<int>> ParseExpression(
 }
 
 void ParseStatement(Tokenizer &tokenizer) {
-  // CheckTokenizer(tokenizer);
-  // auto [token, word] = tokenizer.GetNextToken();
-
-  // if (token == Int) {
-
   CheckTokenizer(tokenizer);
   auto [token, word] = tokenizer.GetNextToken();
   assert(token == Text && "Text token expected\n");
@@ -110,10 +104,8 @@ void ParseStatement(Tokenizer &tokenizer) {
     assert(false && "Redeclaration of variable\n");
   }
 
-  st.symbols.insert({word, Symbol{Int, exp->Operate()}});
-  std::cout << "Result: " << std::get<int>(st.symbols[word].val) << std::endl;
-  // }
-  // }
+  st.symbols.insert({word, exp->Operate()});
+  std::cout << "Result: " << st.symbols[word] << std::endl;
 }
 
 std::vector<std::pair<Token, std::string>> ParseArgumentList(
@@ -128,11 +120,11 @@ std::vector<std::pair<Token, std::string>> ParseArgumentList(
     CheckTokenizer(tokenizer);
     auto [token0, word0] = tokenizer.GetNextToken();
 
-    if(token0 == RBrack) {
+    if (token0 == RBrack) {
       break;
     }
 
-    assert(token0 == Int && "Expected Type keyword\n.");
+    // assert(token0 == Int && "Expected Type keyword\n.");
 
     CheckTokenizer(tokenizer);
     auto [token1, word1] = tokenizer.GetNextToken();
@@ -146,8 +138,8 @@ std::vector<std::pair<Token, std::string>> ParseArgumentList(
 
 void ParseFunction(Tokenizer &tokenizer) {
   CheckTokenizer(tokenizer);
-  auto [token0, word0] = tokenizer.GetNextToken();
-  assert(token0 == Int && "Only Int type supported for now\n");
+  // auto [token0, word0] = tokenizer.GetNextToken();
+  // assert(token0 == Int && "Only Int type supported for now\n");
 
   CheckTokenizer(tokenizer);
   auto [token1, word1] = tokenizer.GetNextToken();
@@ -155,8 +147,8 @@ void ParseFunction(Tokenizer &tokenizer) {
 
   auto args = ParseArgumentList(tokenizer);
 
-  for(auto &[token, word] : args) {
-    std::cout<<word<<std::endl;
+  for (auto &[token, word] : args) {
+    std::cout << word << std::endl;
   }
 
   // ParseFunctionBody(tokenizer);
@@ -166,7 +158,7 @@ void Parse(Tokenizer &tokenizer) {
   CheckTokenizer(tokenizer);
   auto [token, word] = tokenizer.GetNextToken();
   switch (token) {
-    case Int:
+    case Let:
       ParseStatement(tokenizer);
       break;
     case Fn:

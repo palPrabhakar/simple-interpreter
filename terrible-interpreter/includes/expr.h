@@ -7,78 +7,70 @@
 #include "symbol_table.h"
 
 namespace tci {
-template <typename T>
+
 class Expr : public AST {
  public:
   virtual ~Expr() = default;
-  virtual T Operate() = 0;
+  virtual double Operate() = 0;
 };
 
-template <typename T>
-class ValueExpr : public Expr<T> {
+class ValueExpr : public Expr {
  public:
-  ValueExpr(T val) : m_val(val) {}
-  T Operate() { return m_val; }
-
+  ValueExpr(double val) : m_val(val) {}
+  double Operate() { return m_val; }
  private:
-  T m_val;
+  double m_val;
 };
 
-template<typename T>
-class VarExpr: public Expr<T> {
+class VarExpr: public Expr {
  public:
   VarExpr(std::string name) : m_name(name) {}
-  T Operate() {
+  double Operate() {
     auto &st = SymbolTable::GetInstance();
-    return std::get<T>(st.symbols[m_name].val);
+    return st.symbols[m_name];
   }
 
  private:
   std::string m_name;
 };
 
-template <typename T, typename V>
-class OpExpr : public Expr<V> {
+class OpExpr : public Expr {
  public:
-  virtual V Operate() = 0;
+  virtual double Operate() = 0;
 
-  void SetLhs(std::unique_ptr<Expr<T>> lhs) { this->lhs = std::move(lhs); }
+  void SetLhs(std::unique_ptr<Expr> lhs) { this->lhs = std::move(lhs); }
 
-  void SetRhs(std::unique_ptr<Expr<T>> rhs) { this->rhs = std::move(rhs); }
+  void SetRhs(std::unique_ptr<Expr> rhs) { this->rhs = std::move(rhs); }
 
   virtual const int GetPrecedence() const = 0;
 
  protected:
-  std::unique_ptr<Expr<T>> lhs;
-  std::unique_ptr<Expr<T>> rhs;
+  std::unique_ptr<Expr> lhs;
+  std::unique_ptr<Expr> rhs;
 };
 
-template <typename T>
-class AddOp : public OpExpr<T, T> {
+class AddOp : public OpExpr {
  public:
-  T Operate() { return this->lhs->Operate() + this->rhs->Operate(); }
+  double Operate() { return this->lhs->Operate() + this->rhs->Operate(); }
   const int GetPrecedence() const { return 20; }
 };
 
-template <typename T>
-class SubOp : public OpExpr<T, T> {
+class SubOp : public OpExpr {
  public:
-  T Operate() { return this->lhs->Operate() - this->rhs->Operate(); }
+  double Operate() { return this->lhs->Operate() - this->rhs->Operate(); }
   const int GetPrecedence() const { return 20; }
 };
 
-template <typename T>
-class MulOp : public OpExpr<T, T> {
+class MulOp : public OpExpr {
  public:
-  T Operate() { return this->lhs->Operate() * this->rhs->Operate(); }
+  double Operate() { return this->lhs->Operate() * this->rhs->Operate(); }
 
   const int GetPrecedence() const { return 40; }
 };
 
-template <typename T>
-class DivOp : public OpExpr<T, T> {
+class DivOp : public OpExpr {
  public:
-  T Operate() { return this->lhs->Operate() / this->rhs->Operate(); }
+  double Operate() { return this->lhs->Operate() / this->rhs->Operate(); }
 
   const int GetPrecedence() const { return 40; }
 };
@@ -97,17 +89,16 @@ class DivOp : public OpExpr<T, T> {
 
 class MakeOpExpr {
  public:
-  template <typename T, typename V = T>
-  static std::unique_ptr<OpExpr<T, V>> GetOpExpr(Token token) {
+  static std::unique_ptr<OpExpr> GetOpExpr(Token token) {
     switch (token) {
       case Add:
-        return std::make_unique<AddOp<T>>();
+        return std::make_unique<AddOp>();
       case Sub:
-        return std::make_unique<SubOp<T>>();
+        return std::make_unique<SubOp>();
       case Mul:
-        return std::make_unique<MulOp<T>>();
+        return std::make_unique<MulOp>();
       case Div:
-        return std::make_unique<DivOp<T>>();
+        return std::make_unique<DivOp>();
       default:
         throw;
     }
