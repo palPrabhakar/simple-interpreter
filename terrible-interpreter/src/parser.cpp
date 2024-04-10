@@ -6,6 +6,7 @@
 #include <unordered_map>
 
 #include "expr.h"
+#include "statement.h"
 #include "symbol_table.h"
 #include "tokenizer.h"
 #include "tokens.h"
@@ -18,18 +19,18 @@ void CheckTokenizer(Tokenizer &tokenizer) {
   }
 }
 
-std::unique_ptr<Expr> ParseExpression(Tokenizer &tokenizer) {
+std::unique_ptr<ExprAST> ParseExpression(Tokenizer &tokenizer, int &count) {
   CheckTokenizer(tokenizer);
   auto [tok0, word0] = tokenizer.GetNextToken();
-  std::unique_ptr<Expr> op0;
+  std::unique_ptr<ExprAST> op0;
 
   if (tok0 == LBrack) {
-    op0 = ParseExpression(tokenizer);
+    op0 = ParseExpression(tokenizer, count);
   } else if (tok0 == Text) {
     if (std::isalpha(word0[0])) {
-      op0 = std::make_unique<VarExpr>(word0);
+      op0 = std::make_unique<VarAST>(word0);
     } else {
-      op0 = std::make_unique<ValueExpr>(std::stoi(word0));
+      op0 = std::make_unique<ValueAST>(word0);
     }
   } else {
     assert(false && "Failed to parse expression\n");
@@ -41,26 +42,26 @@ std::unique_ptr<Expr> ParseExpression(Tokenizer &tokenizer) {
   if (tok1 == SColon || tok1 == RBrack) {
     return op0;
   } else {
-    auto nexp = MakeOpExpr::GetOpExpr(tok1);
+    auto nexp = std::make_unique<OpAST>(tok1, word1);
     nexp->SetLhs(std::move(op0));
-    return ParseExpression(tokenizer, std::move(nexp));
+    return ParseExpression(tokenizer, std::move(nexp), count);
   }
 }
 
-std::unique_ptr<Expr> ParseExpression(Tokenizer &tokenizer,
-                                      std::unique_ptr<OpExpr> expr) {
-  std::unique_ptr<Expr> op0;
+std::unique_ptr<ExprAST> ParseExpression(Tokenizer &tokenizer,
+                                      std::unique_ptr<ExprAST> expr, int &count) {
+  std::unique_ptr<ExprAST> op0;
 
   CheckTokenizer(tokenizer);
   auto [tok0, word0] = tokenizer.GetNextToken();
 
   if (tok0 == LBrack) {
-    op0 = ParseExpression(tokenizer);
+    op0 = ParseExpression(tokenizer, count);
   } else if (tok0 == Text) {
     if (std::isalpha(word0[0])) {
-      op0 = std::make_unique<VarExpr>(word0);
+      op0 = std::make_unique<VarAST>(word0);
     } else {
-      op0 = std::make_unique<ValueExpr>(std::stoi(word0));
+      op0 = std::make_unique<ValueAST>(word0);
     }
   } else {
     assert(false && "Failed to parse expression\n");
@@ -71,22 +72,25 @@ std::unique_ptr<Expr> ParseExpression(Tokenizer &tokenizer,
 
   if (tok1 == SColon || tok1 == RBrack) {
     expr->SetRhs(std::move(op0));
-    return std::move(expr);
+    return expr;
   } else {
-    auto nexp = MakeOpExpr::GetOpExpr(tok1);
+    auto nexp = std::make_unique<OpAST>(tok1, word1);
+
     if (expr->GetPrecedence() >= nexp->GetPrecedence()) {
       expr->SetRhs(std::move(op0));
       nexp->SetLhs(std::move(expr));
-      return ParseExpression(tokenizer, std::move(nexp));
+      return ParseExpression(tokenizer, std::move(nexp), count);
     } else {
       nexp->SetLhs(std::move(op0));
-      expr->SetRhs(ParseExpression(tokenizer, std::move(nexp)));
-      return std::move(expr);
+      expr->SetRhs(ParseExpression(tokenizer, std::move(nexp), count));
+      return expr;
     }
   }
 }
 
-void ParseStatement(Tokenizer &tokenizer) {
+std::unique_ptr<StatementAST> ParseStatement(Tokenizer &tokenizer) {
+  int count = 0;
+
   CheckTokenizer(tokenizer);
   auto [token, word] = tokenizer.GetNextToken();
   assert(token == Text && "Text token expected\n");
@@ -96,7 +100,7 @@ void ParseStatement(Tokenizer &tokenizer) {
   auto [aToken, aWord] = tokenizer.GetNextToken();
   assert(aToken == Assign && "Assign token expected\n");
 
-  auto exp = ParseExpression(tokenizer);
+  auto expr = ParseExpression(tokenizer, count);
 
   auto &st = SymbolTable::GetInstance();
 
@@ -104,65 +108,70 @@ void ParseStatement(Tokenizer &tokenizer) {
     assert(false && "Redeclaration of variable\n");
   }
 
-  st.symbols.insert({word, exp->Operate()});
-  std::cout << "Result: " << st.symbols[word] << std::endl;
+  return std::make_unique<StatementAST>(word, std::move(expr));
 }
 
-std::vector<std::pair<Token, std::string>> ParseArgumentList(
-    Tokenizer &tokenizer) {
-  CheckTokenizer(tokenizer);
-  auto [token0, word0] = tokenizer.GetNextToken();
-  assert(token0 == LBrack && "Expected (\n.");
+// std::vector<std::pair<Token, std::string>> ParseArgumentList(
+//     Tokenizer &tokenizer) {
+//   CheckTokenizer(tokenizer);
+//   auto [token0, word0] = tokenizer.GetNextToken();
+//   assert(token0 == LBrack && "Expected (\n.");
 
-  std::vector<std::pair<Token, std::string>> args;
+//   std::vector<std::pair<Token, std::string>> args;
 
-  while (true) {
-    CheckTokenizer(tokenizer);
-    auto [token0, word0] = tokenizer.GetNextToken();
+//   while (true) {
+//     CheckTokenizer(tokenizer);
+//     auto [token0, word0] = tokenizer.GetNextToken();
 
-    if (token0 == RBrack) {
-      break;
-    }
+//     if (token0 == RBrack) {
+//       break;
+//     }
 
-    // assert(token0 == Int && "Expected Type keyword\n.");
+//     // assert(token0 == Int && "Expected Type keyword\n.");
 
-    CheckTokenizer(tokenizer);
-    auto [token1, word1] = tokenizer.GetNextToken();
-    assert(token1 == Text && "Expected Variable Name\n.");
+//     CheckTokenizer(tokenizer);
+//     auto [token1, word1] = tokenizer.GetNextToken();
+//     assert(token1 == Text && "Expected Variable Name\n.");
 
-    args.emplace_back(token0, word1);
-  }
+//     args.emplace_back(token0, word1);
+//   }
 
-  return args;
-}
+//   return args;
+// }
 
-void ParseFunction(Tokenizer &tokenizer) {
-  CheckTokenizer(tokenizer);
-  // auto [token0, word0] = tokenizer.GetNextToken();
-  // assert(token0 == Int && "Only Int type supported for now\n");
+// void ParseFunction(Tokenizer &tokenizer) {
+//   CheckTokenizer(tokenizer);
+//   // auto [token0, word0] = tokenizer.GetNextToken();
+//   // assert(token0 == Int && "Only Int type supported for now\n");
 
-  CheckTokenizer(tokenizer);
-  auto [token1, word1] = tokenizer.GetNextToken();
-  assert(token1 == Text && "Function name expected\n");
+//   CheckTokenizer(tokenizer);
+//   auto [token1, word1] = tokenizer.GetNextToken();
+//   assert(token1 == Text && "Function name expected\n");
 
-  auto args = ParseArgumentList(tokenizer);
+//   auto args = ParseArgumentList(tokenizer);
 
-  for (auto &[token, word] : args) {
-    std::cout << word << std::endl;
-  }
+//   for (auto &[token, word] : args) {
+//     std::cout << word << std::endl;
+//   }
 
-  // ParseFunctionBody(tokenizer);
-}
+//   // ParseFunctionBody(tokenizer);
+// }
 
 void Parse(Tokenizer &tokenizer) {
   CheckTokenizer(tokenizer);
   auto [token, word] = tokenizer.GetNextToken();
   switch (token) {
     case Let:
-      ParseStatement(tokenizer);
+      {
+        auto st = ParseStatement(tokenizer);
+        auto operations = st->GenerateCode();
+        for(auto op: operations) {
+          std::cout<<op<<std::endl;
+        }
+      }
       break;
     case Fn:
-      ParseFunction(tokenizer);
+      // ParseFunction(tokenizer);
       break;
     default:
       assert(false && "Invalid token\n");

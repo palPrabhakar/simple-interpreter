@@ -9,14 +9,18 @@
 #include "expr.h"
 
 namespace tci {
-class Statement : public AST {
+class StatementAST : public BaseAST {
  public:
-  void Operate() {
-    std::cout<<expr->Operate()<<"\n";
-  }
+  StatementAST(std::string name, std::unique_ptr<ExprAST> expr): m_varName(name), m_expr(std::move(expr)) {}
+
+   std::vector<std::string> GenerateCode() {
+     auto operations = m_expr->GenerateCode();
+     operations.push_back(std::format("{} = {}", m_varName, m_expr->GetValue()));
+     return operations;
+   }
 
  private:
   std::string m_varName;
-  std::unique_ptr<Expr> expr;
+  std::unique_ptr<ExprAST> m_expr;
 };
 }  // namespace tci

@@ -1,79 +1,131 @@
 #pragma once
 
 #include <memory>
+#include <string>
+#include <format>
+
 
 #include "ast.h"
-#include "tokens.h"
 #include "symbol_table.h"
+#include "tokens.h"
 
 namespace tci {
 
-class Expr : public AST {
+class ExprAST : public BaseAST {
  public:
-  virtual ~Expr() = default;
-  virtual double Operate() = 0;
+  virtual ~ExprAST() = default;
+  virtual std::string GetValue() = 0;
+  virtual void SetLhs(std::unique_ptr<ExprAST> lhs) {}
+  virtual void SetRhs(std::unique_ptr<ExprAST> rhs) {}
+  virtual const int GetPrecedence() const { return 0; }
 };
 
-class ValueExpr : public Expr {
+class ValueAST : public ExprAST {
  public:
-  ValueExpr(double val) : m_val(val) {}
-  double Operate() { return m_val; }
+  ValueAST(std::string val) : m_val(val) {}
+
+  std::vector<std::string> GenerateCode() {
+    return {};
+  }
+
+  std::string GetValue() {
+    return m_val;
+  }
+
  private:
-  double m_val;
+  std::string m_val;
 };
 
-class VarExpr: public Expr {
+class VarAST : public ExprAST {
  public:
-  VarExpr(std::string name) : m_name(name) {}
-  double Operate() {
-    auto &st = SymbolTable::GetInstance();
-    return st.symbols[m_name];
+  VarAST(std::string name) : m_name(name) {}
+
+  std::vector<std::string> GenerateCode() {
+    return {};
+  }
+
+  std::string GetValue() {
+    return m_name;
   }
 
  private:
   std::string m_name;
 };
 
-class OpExpr : public Expr {
+class OpAST : public ExprAST {
  public:
-  virtual double Operate() = 0;
+  OpAST(Token op, std::string sop) : m_op(op), m_sop(sop) {}
 
-  void SetLhs(std::unique_ptr<Expr> lhs) { this->lhs = std::move(lhs); }
+  std::vector<std::string> GenerateCode() {
+    std::vector<std::string> operations;
+    auto left_tree = lhs->GenerateCode();
+    auto right_tree = rhs->GenerateCode();
+    for(auto &op: left_tree) {
+      operations.push_back(std::move(op));
+    }
 
-  void SetRhs(std::unique_ptr<Expr> rhs) { this->rhs = std::move(rhs); }
+    for(auto &op: right_tree) {
+      operations.push_back(std::move(op));
+    }
 
-  virtual const int GetPrecedence() const = 0;
+    operations.push_back(std::format("t0 = {} {} {}", lhs->GetValue(), m_sop, rhs->GetValue()));
+
+    return operations;
+  }
+
+  std::string GetValue() {
+    return "t0";
+  }
+
+  void SetLhs(std::unique_ptr<ExprAST> lhs) { this->lhs = std::move(lhs); }
+
+  void SetRhs(std::unique_ptr<ExprAST> rhs) { this->rhs = std::move(rhs); }
+
+  const int GetPrecedence() const  {
+    switch(m_op) {
+      case Add:
+      case Sub:
+        return 20;
+      case Mul:
+      case Div:
+        return 40;
+      default:
+        return 0;
+    }
+  }
 
  protected:
-  std::unique_ptr<Expr> lhs;
-  std::unique_ptr<Expr> rhs;
+  Token m_op;
+  std::string m_sop;
+  std::unique_ptr<ExprAST> lhs;
+  std::unique_ptr<ExprAST> rhs;
 };
 
-class AddOp : public OpExpr {
- public:
-  double Operate() { return this->lhs->Operate() + this->rhs->Operate(); }
-  const int GetPrecedence() const { return 20; }
-};
+// class AddOp : public OpExpr {
+//  public:
+//   double Operate() { return this->lhs->Operate() + this->rhs->Operate(); }
+//   const int GetPrecedence() const { return 20; }
+// };
 
-class SubOp : public OpExpr {
- public:
-  double Operate() { return this->lhs->Operate() - this->rhs->Operate(); }
-  const int GetPrecedence() const { return 20; }
-};
+// class SubOp : public OpExpr {
+//  public:
+//   double Operate() { return this->lhs->Operate() - this->rhs->Operate(); }
+//   const int GetPrecedence() const { return 20; }
+// };
 
-class MulOp : public OpExpr {
- public:
-  double Operate() { return this->lhs->Operate() * this->rhs->Operate(); }
+// class MulOp : public OpExpr {
+//  public:
+//   double Operate() { return this->lhs->Operate() * this->rhs->Operate(); }
 
-  const int GetPrecedence() const { return 40; }
-};
+//   const int GetPrecedence() const { return 40; }
+// };
 
-class DivOp : public OpExpr {
- public:
-  double Operate() { return this->lhs->Operate() / this->rhs->Operate(); }
+// class DivOp : public OpExpr {
+//  public:
+//   double Operate() { return this->lhs->Operate() / this->rhs->Operate(); }
 
-  const int GetPrecedence() const { return 40; }
-};
+//   const int GetPrecedence() const { return 40; }
+// };
 
 // template <typename T>
 // class LessOp : OpExpr<T, bool> {
@@ -87,22 +139,22 @@ class DivOp : public OpExpr {
 //   bool Operate() { return this->lhs->Operate() > this->rhs->Operate(); }
 // };
 
-class MakeOpExpr {
- public:
-  static std::unique_ptr<OpExpr> GetOpExpr(Token token) {
-    switch (token) {
-      case Add:
-        return std::make_unique<AddOp>();
-      case Sub:
-        return std::make_unique<SubOp>();
-      case Mul:
-        return std::make_unique<MulOp>();
-      case Div:
-        return std::make_unique<DivOp>();
-      default:
-        throw;
-    }
-  }
-};
+// class MakeOpExpr {
+//  public:
+//   static std::unique_ptr<OpExpr> GetOpExpr(Token token) {
+//     switch (token) {
+//       case Add:
+//         return std::make_unique<AddOp>();
+//       case Sub:
+//         return std::make_unique<SubOp>();
+//       case Mul:
+//         return std::make_unique<MulOp>();
+//       case Div:
+//         return std::make_unique<DivOp>();
+//       default:
+//         throw;
+//     }
+//   }
+// };
 
 }  // namespace tci
