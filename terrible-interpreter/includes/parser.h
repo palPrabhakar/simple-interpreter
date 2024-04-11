@@ -3,27 +3,32 @@
 #include <memory>
 #include <vector>
 
+#include "ast.h"
 #include "expr.h"
 #include "statement.h"
+#include "symbol_table.h"
 #include "tokenizer.h"
 
 namespace tci {
-void Parse(Tokenizer &tokenizer);
+void Parse(Tokenizer &tokenizer, SymbolTable &st);
 
-std::unique_ptr<StatementAST> ParseStatement(Tokenizer &tokenizer);
+std::unique_ptr<StatementAST> ParseStatement(Tokenizer &tokenizer,
+                                             SymbolTable &st);
 
-std::unique_ptr<StatementAST> ParseDeclaration(Tokenizer &tokenizer);
+std::unique_ptr<StatementAST> ParseDeclaration(Tokenizer &tokenizer,
+                                               SymbolTable &st);
 
 std::unique_ptr<ExprAST> ParseExpression(Tokenizer &tokenizer,
-                                      std::unique_ptr<ExprAST> expr);
+                                         std::unique_ptr<ExprAST> expr, SymbolTable &st);
 
-std::unique_ptr<ExprAST> ParseExpression(Tokenizer &tokenizerm);
+std::unique_ptr<ExprAST> ParseExpression(Tokenizer &tokenizer, SymbolTable &st);
 
-void ParseFunction(Tokenizer &tokenizer);
+void ParseIfStatement(Tokenizer &tokenizer, SymbolTable &st);
 
-void ParseFunctionBody(Tokenizer &tokenizer);
+void ParseFunction(Tokenizer &tokenizer, SymbolTable &st);
 
-std::vector<std::string> ParseArgumentList(
-    Tokenizer &tokenizer);
+std::vector<std::unique_ptr<BaseAST>> ParseFunctionBody(Tokenizer &tokenizer, SymbolTable &st);
+
+std::vector<std::string> ParseArgumentList(Tokenizer &tokenizer, SymbolTable &st);
 
 }  // namespace tci

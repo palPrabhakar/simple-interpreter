@@ -1,25 +1,21 @@
-#include "tokenizer.h"
-#include "parser.h"
 #include <iostream>
 #include <string>
 
+#include "parser.h"
+#include "symbol_table.h"
+#include "tokenizer.h"
+
 int main() {
+  tci::SymbolTable st;
   while (true) {
     std::string cmd;
     std::cout << ">>> ";
     std::getline(std::cin, cmd);
 
-    if(cmd == "exit")
-      exit(0);
+    if (cmd == "exit") exit(0);
 
     tci::Tokenizer tokenizer(cmd);
-    tci::Parse(tokenizer);
-
-    // while (!tokenizer.EOP()) {
-    //   std::cout << tokenizer.GetNextToken().second << std::endl;
-    // }
-
-    // std::cout << cmd << "\n";
+    tci::Parse(tokenizer, st);
   }
   return 0;
 }

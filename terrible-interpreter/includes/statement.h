@@ -24,4 +24,9 @@ class StatementAST : public BaseAST {
   std::unique_ptr<ExprAST> m_expr;
 };
 
+class IfStatementAST : public BaseAST {
+  private:
+    bool else_cond = false;
+};
+
 }  // namespace tci

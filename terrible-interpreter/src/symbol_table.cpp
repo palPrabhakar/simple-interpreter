@@ -3,8 +3,15 @@
 #include <memory>
 
 namespace tci {
-SymbolTable& SymbolTable::GetInstance() {
-  static SymbolTable st;
-  return st;
+bool SymbolTable::CheckSymbol(std::string name) const {
+  if (symbols.contains(name)) {
+    return true;
+  } else {
+    if(m_parent) {
+      return m_parent->CheckSymbol(name);
+    } else {
+      return false;
+    }
+  }
 }
 }  // namespace tci

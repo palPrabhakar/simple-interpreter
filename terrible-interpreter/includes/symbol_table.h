@@ -8,15 +8,15 @@
 
 namespace tci {
 class SymbolTable {
- public:
+  public:
+  SymbolTable(const SymbolTable * parent=nullptr) : m_parent(parent) {}
+
   SymbolTable(const SymbolTable& other) = delete;
   void operator=(const SymbolTable&) = delete;
 
-  static SymbolTable& GetInstance();
+  bool CheckSymbol(std::string) const;
 
   std::unordered_map<std::string, double> symbols;
-
- protected:
-  SymbolTable() {}
+  const SymbolTable *const m_parent;
 };
 }  // namespace tci
