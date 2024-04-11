@@ -8,7 +8,7 @@ enum Token {
   Mut,
   If,
   Else,
-  For,
+  // For, --> no support for for-loop
   While,
   Continue,
   Break,

@@ -25,6 +25,8 @@ std::unique_ptr<ExprAST> ParseExpression(Tokenizer &tokenizer, SymbolTable &st);
 
 std::unique_ptr<IfStatementAST> ParseIfStatement(Tokenizer &tokenizer, SymbolTable &st);
 
+std::unique_ptr<WhileStatementAST> ParseWhileStatement(Tokenizer &tokenzier, SymbolTable &st);
+
 std::vector<std::unique_ptr<BaseAST>> ParseConditionalBody(Tokenizer &tokenizer, SymbolTable &st);
 
 void ParseFunction(Tokenizer &tokenizer, SymbolTable &st);

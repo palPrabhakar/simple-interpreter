@@ -152,6 +152,9 @@ std::vector<std::unique_ptr<BaseAST>> ParseConditionalBody(Tokenizer &tokenizer,
       case If:
         nodes.push_back(ParseIfStatement(tokenizer, st));
         break;
+      case While:
+        nodes.push_back(ParseWhileStatement(tokenizer, st));
+        break;
       case RParen:
         cont = false;
         break;
@@ -218,6 +221,41 @@ std::vector<std::string> ParseArgumentList(Tokenizer &tokenizer,
   }
 
   return args;
+}
+
+std::unique_ptr<WhileStatementAST> ParseWhileStatement(Tokenizer &tokenizer,
+                                                       SymbolTable &st) {
+  auto cexpr = ParseExpression(tokenizer, st);
+
+  std::vector<std::unique_ptr<BaseAST>> nodes;
+
+  bool cont = true;
+  while (cont) {
+    CheckTokenizer(tokenizer);
+    auto [token, word] = tokenizer.GetNextToken();
+    // std::cout<<"token: "<<word<<std::endl;
+    switch (token) {
+      case Let:
+        nodes.push_back(ParseDeclaration(tokenizer, st));
+        break;
+      case Mut:
+        nodes.push_back(ParseStatement(tokenizer, st));
+        break;
+      case If:
+        nodes.push_back(ParseIfStatement(tokenizer, st));
+        break;
+      case While:
+        nodes.push_back(ParseWhileStatement(tokenizer, st));
+        break;
+      case RParen:
+        cont = false;
+        break;
+      default:
+        assert(false && "Invalid token\n");
+    }
+  }
+
+  return std::make_unique<WhileStatementAST>(std::move(cexpr), std::move(nodes));
 }
 
 void ParseFunction(Tokenizer &tokenizer, SymbolTable &st) {
@@ -293,6 +331,15 @@ void Parse(Tokenizer &tokenizer, SymbolTable &st) {
     case Fn:
       ParseFunction(tokenizer, st);
       break;
+    case While: {
+      auto ast = ParseWhileStatement(tokenizer, st);
+      uint ridx = 0;
+      auto operations = ast->GenerateCode(ridx);
+      for (auto op : operations) {
+        std::cout << op << std::endl;
+      }
+      break;
+    }
     case If: {
       auto ast = ParseIfStatement(tokenizer, st);
       uint ridx = 0;

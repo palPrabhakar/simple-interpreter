@@ -11,7 +11,7 @@ static const std::unordered_map<std::string, Token> token_map = {
     {"mut", Token::Mut},
     {"if", Token::If},
     {"else", Token::Else},
-    {"for", Token::For},
+    // {"for", Token::For},
     {"while", Token::While},
     {"continue", Token::Continue},
     {"break", Token::Break},
