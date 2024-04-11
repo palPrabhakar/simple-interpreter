@@ -13,9 +13,9 @@ class StatementAST : public BaseAST {
  public:
   StatementAST(std::string name, std::unique_ptr<ExprAST> expr): m_varName(name), m_expr(std::move(expr)) {}
 
-   std::vector<std::string> GenerateCode() {
-     auto operations = m_expr->GenerateCode();
-     operations.push_back(std::format("{} = {}", m_varName, m_expr->GetValue()));
+   std::vector<std::string> GenerateCode(uint &ridx) {
+     auto operations = m_expr->GenerateCode(ridx);
+     operations.push_back(std::format("store r{} m@{}", m_expr->GetValue(), m_varName));
      return operations;
    }
 
@@ -23,4 +23,5 @@ class StatementAST : public BaseAST {
   std::string m_varName;
   std::unique_ptr<ExprAST> m_expr;
 };
+
 }  // namespace tci

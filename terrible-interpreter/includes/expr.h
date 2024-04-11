@@ -1,9 +1,8 @@
 #pragma once
 
+#include <format>
 #include <memory>
 #include <string>
-#include <format>
-
 
 #include "ast.h"
 #include "symbol_table.h"
@@ -14,7 +13,7 @@ namespace tci {
 class ExprAST : public BaseAST {
  public:
   virtual ~ExprAST() = default;
-  virtual std::string GetValue() = 0;
+  virtual uint GetValue() = 0;
   virtual void SetLhs(std::unique_ptr<ExprAST> lhs) {}
   virtual void SetRhs(std::unique_ptr<ExprAST> rhs) {}
   virtual const int GetPrecedence() const { return 0; }
@@ -24,79 +23,47 @@ class ValueAST : public ExprAST {
  public:
   ValueAST(std::string val) : m_val(val) {}
 
-  std::vector<std::string> GenerateCode() {
-    return {};
-  }
+  std::vector<std::string> GenerateCode(uint &ridx);
 
-  std::string GetValue() {
-    return m_val;
-  }
+  uint GetValue() { return reg; }
 
  private:
   std::string m_val;
+  uint reg;
 };
 
 class VarAST : public ExprAST {
  public:
   VarAST(std::string name) : m_name(name) {}
 
-  std::vector<std::string> GenerateCode() {
-    return {};
-  }
+  std::vector<std::string> GenerateCode(uint &ridx);
 
-  std::string GetValue() {
-    return m_name;
-  }
+  uint GetValue() { return reg; }
 
  private:
   std::string m_name;
+  uint reg;
 };
 
 class OpAST : public ExprAST {
  public:
-  OpAST(Token op, std::string sop) : m_op(op), m_sop(sop) {}
+  OpAST(Token op, std::string sop);
 
-  std::vector<std::string> GenerateCode() {
-    std::vector<std::string> operations;
-    auto left_tree = lhs->GenerateCode();
-    auto right_tree = rhs->GenerateCode();
-    for(auto &op: left_tree) {
-      operations.push_back(std::move(op));
-    }
+  std::vector<std::string> GenerateCode(uint &ridx);
 
-    for(auto &op: right_tree) {
-      operations.push_back(std::move(op));
-    }
-
-    operations.push_back(std::format("t0 = {} {} {}", lhs->GetValue(), m_sop, rhs->GetValue()));
-
-    return operations;
-  }
-
-  std::string GetValue() {
-    return "t0";
-  }
+  uint GetValue() { return reg; }
 
   void SetLhs(std::unique_ptr<ExprAST> lhs) { this->lhs = std::move(lhs); }
 
   void SetRhs(std::unique_ptr<ExprAST> rhs) { this->rhs = std::move(rhs); }
 
-  const int GetPrecedence() const  {
-    switch(m_op) {
-      case Add:
-      case Sub:
-        return 20;
-      case Mul:
-      case Div:
-        return 40;
-      default:
-        return 0;
-    }
-  }
+  const int GetPrecedence() const { return m_precedence; }
 
  protected:
   Token m_op;
   std::string m_sop;
+  int m_precedence;
+  uint reg;
   std::unique_ptr<ExprAST> lhs;
   std::unique_ptr<ExprAST> rhs;
 };

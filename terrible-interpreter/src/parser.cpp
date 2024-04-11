@@ -189,7 +189,8 @@ void Parse(Tokenizer &tokenizer) {
     case Let:
       {
         auto st = ParseDeclaration(tokenizer);
-        auto operations = st->GenerateCode();
+        uint ridx = 0;
+        auto operations = st->GenerateCode(ridx);
         for(auto op: operations) {
           std::cout<<op<<std::endl;
         }
@@ -198,7 +199,8 @@ void Parse(Tokenizer &tokenizer) {
     case Mut:
       {
         auto st = ParseStatement(tokenizer);
-        auto operations = st->GenerateCode();
+        uint ridx = 0;
+        auto operations = st->GenerateCode(ridx);
         for(auto op: operations) {
           std::cout<<op<<std::endl;
         }
