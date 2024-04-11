@@ -30,6 +30,22 @@ OpAST::OpAST(Token op, std::string sop) : m_op(op), m_sop(sop) {
       m_sop = "div";
       m_precedence = 40;
       break;
+    case Less:
+      m_sop = "lt";
+      m_precedence = 0;
+      break;
+    case More:
+      m_sop = "gt";
+      m_precedence = 0;
+      break;
+    case LessEq:
+      m_sop = "lteq";
+      m_precedence = 0;
+      break;
+    case MoreEq:
+      m_sop = "gteq";
+      m_precedence = 0;
+      break;
     default:
       m_precedence = 0;
       break;

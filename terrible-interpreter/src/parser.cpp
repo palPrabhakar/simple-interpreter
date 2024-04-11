@@ -41,7 +41,7 @@ std::unique_ptr<ExprAST> ParseExpression(Tokenizer &tokenizer,
   CheckTokenizer(tokenizer);
   auto [tok1, word1] = tokenizer.GetNextToken();
 
-  if (tok1 == SColon || tok1 == RBrack) {
+  if (tok1 == SColon || tok1 == RBrack || tok1 == LParen) {
     return op0;
   } else {
     auto nexp = std::make_unique<OpAST>(tok1, word1);
@@ -79,7 +79,6 @@ std::unique_ptr<ExprAST> ParseExpression(Tokenizer &tokenizer,
     return expr;
   } else {
     auto nexp = std::make_unique<OpAST>(tok1, word1);
-
     if (expr->GetPrecedence() >= nexp->GetPrecedence()) {
       expr->SetRhs(std::move(op0));
       nexp->SetLhs(std::move(expr));
@@ -114,7 +113,6 @@ std::unique_ptr<StatementAST> ParseStatement(Tokenizer &tokenizer,
 
 std::unique_ptr<StatementAST> ParseDeclaration(Tokenizer &tokenizer,
                                                SymbolTable &st) {
-  std::cout << "ParseDecl\n";
   CheckTokenizer(tokenizer);
   auto [token, word] = tokenizer.GetNextToken();
   assert(token == Text && "Text token expected\n");
@@ -135,8 +133,57 @@ std::unique_ptr<StatementAST> ParseDeclaration(Tokenizer &tokenizer,
   return std::make_unique<StatementAST>(word, std::move(expr));
 }
 
-void ParseIfStatement(Tokenizer &tokenizer, SymbolTable &st) {
-  std::cout << "Parse If Statement\n" << std::endl;
+std::vector<std::unique_ptr<BaseAST>> ParseConditionalBody(Tokenizer &tokenizer,
+                                                           SymbolTable &st) {
+  std::vector<std::unique_ptr<BaseAST>> nodes;
+
+  bool cont = true;
+  while (cont) {
+    CheckTokenizer(tokenizer);
+    auto [token, word] = tokenizer.GetNextToken();
+    // std::cout<<"token: "<<word<<std::endl;
+    switch (token) {
+      case Let:
+        nodes.push_back(ParseDeclaration(tokenizer, st));
+        break;
+      case Mut:
+        nodes.push_back(ParseStatement(tokenizer, st));
+        break;
+      case If:
+        nodes.push_back(ParseIfStatement(tokenizer, st));
+        break;
+      case RParen:
+        cont = false;
+        break;
+      default:
+        assert(false && "Invalid token\n");
+    }
+  }
+
+  return nodes;
+}
+
+std::unique_ptr<IfStatementAST> ParseIfStatement(Tokenizer &tokenizer,
+                                                 SymbolTable &st) {
+  auto cexpr = ParseExpression(tokenizer, st);
+
+  auto ast = std::make_unique<IfStatementAST>(std::move(cexpr));
+
+  auto tbranch = ParseConditionalBody(tokenizer, st);
+  ast->SetTrueBranch(std::move(tbranch));
+
+  CheckTokenizer(tokenizer);
+  auto [token0, word0] = tokenizer.GetNextToken();
+  assert(token0 == Else && "Expected keyword else\n.");
+
+  CheckTokenizer(tokenizer);
+  auto [token1, word1] = tokenizer.GetNextToken();
+  assert(token1 == LParen && "Expected {\n.");
+
+  auto fbranch = ParseConditionalBody(tokenizer, st);
+  ast->SetFalseBranch(std::move(fbranch));
+
+  return ast;
 }
 
 std::vector<std::string> ParseArgumentList(Tokenizer &tokenizer,
@@ -246,9 +293,15 @@ void Parse(Tokenizer &tokenizer, SymbolTable &st) {
     case Fn:
       ParseFunction(tokenizer, st);
       break;
-    case If:
-      ParseIfStatement(tokenizer, st);
+    case If: {
+      auto ast = ParseIfStatement(tokenizer, st);
+      uint ridx = 0;
+      auto operations = ast->GenerateCode(ridx);
+      for (auto op : operations) {
+        std::cout << op << std::endl;
+      }
       break;
+    }
     default:
       assert(false && "Invalid token\n");
   }
