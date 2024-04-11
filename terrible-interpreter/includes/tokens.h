@@ -10,9 +10,9 @@ enum Token {
   Else,
   For,
   While,
-  Do,
   Continue,
   Break,
+  Return,
   // Operators
   Add,
   Sub,
