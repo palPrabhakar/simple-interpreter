@@ -8,9 +8,10 @@
 #include "statement.h"
 #include "symbol_table.h"
 #include "tokenizer.h"
+#include "function.h"
 
 namespace tci {
-void Parse(Tokenizer &tokenizer, SymbolTable &st);
+std::unique_ptr<BaseAST> Parse(Tokenizer &tokenizer, SymbolTable &st);
 
 std::unique_ptr<StatementAST> ParseStatement(Tokenizer &tokenizer,
                                              SymbolTable &st);
@@ -27,12 +28,11 @@ std::unique_ptr<IfStatementAST> ParseIfStatement(Tokenizer &tokenizer, SymbolTab
 
 std::unique_ptr<WhileStatementAST> ParseWhileStatement(Tokenizer &tokenzier, SymbolTable &st);
 
-std::vector<std::unique_ptr<BaseAST>> ParseConditionalBody(Tokenizer &tokenizer, SymbolTable &st);
+std::unique_ptr<FunctionAST> ParseFunction(Tokenizer &tokenizer, SymbolTable &st);
 
-void ParseFunction(Tokenizer &tokenizer, SymbolTable &st);
+std::vector<std::unique_ptr<BaseAST>> ParseConditionalBody(Tokenizer &tokenizer, SymbolTable &st);
 
 std::vector<std::unique_ptr<BaseAST>> ParseFunctionBody(Tokenizer &tokenizer, SymbolTable &st);
 
 std::vector<std::string> ParseArgumentList(Tokenizer &tokenizer, SymbolTable &st);
-
 }  // namespace tci

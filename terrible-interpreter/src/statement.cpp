@@ -61,7 +61,6 @@ std::vector<std::string> WhileStatementAST::GenerateCode(uint &ridx) {
     operations.push_back(std::move(op));
   }
 
-
   std::vector<std::string> body;
   for (auto &node : m_body) {
     auto ops = node->GenerateCode(ridx);
@@ -70,7 +69,8 @@ std::vector<std::string> WhileStatementAST::GenerateCode(uint &ridx) {
     }
   }
 
-  operations.push_back(std::format("cjmp r{} p@{}", m_cexpr->GetValue(), body.size() + 2));
+  operations.push_back(
+      std::format("cjmp r{} p@{}", m_cexpr->GetValue(), body.size() + 2));
   operations.emplace_back("label: loop_body");
 
   for (auto &op : body) {

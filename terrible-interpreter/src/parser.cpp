@@ -227,9 +227,8 @@ std::unique_ptr<WhileStatementAST> ParseWhileStatement(Tokenizer &tokenizer,
                                                        SymbolTable &st) {
   auto cexpr = ParseExpression(tokenizer, st);
 
-  std::vector<std::unique_ptr<BaseAST>> nodes;
-
   bool cont = true;
+  std::vector<std::unique_ptr<BaseAST>> nodes;
   while (cont) {
     CheckTokenizer(tokenizer);
     auto [token, word] = tokenizer.GetNextToken();
@@ -255,10 +254,12 @@ std::unique_ptr<WhileStatementAST> ParseWhileStatement(Tokenizer &tokenizer,
     }
   }
 
-  return std::make_unique<WhileStatementAST>(std::move(cexpr), std::move(nodes));
+  return std::make_unique<WhileStatementAST>(std::move(cexpr),
+                                             std::move(nodes));
 }
 
-void ParseFunction(Tokenizer &tokenizer, SymbolTable &st) {
+std::unique_ptr<FunctionAST> ParseFunction(Tokenizer &tokenizer,
+                                           SymbolTable &st) {
   CheckTokenizer(tokenizer);
   auto [token, word] = tokenizer.GetNextToken();
   assert(token == Text && "Function name expected\n");
@@ -275,6 +276,8 @@ void ParseFunction(Tokenizer &tokenizer, SymbolTable &st) {
   }
 
   auto body = ParseFunctionBody(tokenizer, fst);
+
+  return {};
 }
 
 // single return statement
@@ -308,49 +311,29 @@ std::vector<std::unique_ptr<BaseAST>> ParseFunctionBody(Tokenizer &tokenizer,
   return nodes;
 }
 
-void Parse(Tokenizer &tokenizer, SymbolTable &st) {
+std::unique_ptr<BaseAST> Parse(Tokenizer &tokenizer, SymbolTable &st) {
   CheckTokenizer(tokenizer);
   auto [token, word] = tokenizer.GetNextToken();
+  std::unique_ptr<BaseAST> ast;
   switch (token) {
-    case Let: {
-      auto ast = ParseDeclaration(tokenizer, st);
-      uint ridx = 0;
-      auto operations = ast->GenerateCode(ridx);
-      for (auto op : operations) {
-        std::cout << op << std::endl;
-      }
-    } break;
-    case Mut: {
-      auto ast = ParseStatement(tokenizer, st);
-      uint ridx = 0;
-      auto operations = ast->GenerateCode(ridx);
-      for (auto op : operations) {
-        std::cout << op << std::endl;
-      }
-    } break;
+    case Let:
+      ast = ParseDeclaration(tokenizer, st);
+      break;
+    case Mut:
+      ast = ParseStatement(tokenizer, st);
+      break;
     case Fn:
-      ParseFunction(tokenizer, st);
+      ast = ParseFunction(tokenizer, st);
       break;
-    case While: {
-      auto ast = ParseWhileStatement(tokenizer, st);
-      uint ridx = 0;
-      auto operations = ast->GenerateCode(ridx);
-      for (auto op : operations) {
-        std::cout << op << std::endl;
-      }
+    case While:
+      ast = ParseWhileStatement(tokenizer, st);
       break;
-    }
-    case If: {
-      auto ast = ParseIfStatement(tokenizer, st);
-      uint ridx = 0;
-      auto operations = ast->GenerateCode(ridx);
-      for (auto op : operations) {
-        std::cout << op << std::endl;
-      }
+    case If:
+      ast = ParseIfStatement(tokenizer, st);
       break;
-    }
     default:
       assert(false && "Invalid token\n");
   }
+  return ast;
 }
 }  // namespace tci

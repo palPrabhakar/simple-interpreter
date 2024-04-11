@@ -15,7 +15,12 @@ int main() {
     if (cmd == "exit") exit(0);
 
     tci::Tokenizer tokenizer(cmd);
-    tci::Parse(tokenizer, st);
+    auto ast = tci::Parse(tokenizer, st);
+    uint ridx = 0;
+    auto operations = ast->GenerateCode(ridx);
+    for (auto op : operations) {
+      std::cout << op << std::endl;
+    }
   }
   return 0;
 }
