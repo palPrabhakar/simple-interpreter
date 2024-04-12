@@ -189,40 +189,6 @@ std::unique_ptr<IfStatementAST> ParseIfStatement(Tokenizer &tokenizer,
   return ast;
 }
 
-std::vector<std::string> ParseArgumentList(Tokenizer &tokenizer,
-                                           SymbolTable &st) {
-  CheckTokenizer(tokenizer);
-  auto [token, word] = tokenizer.GetNextToken();
-  assert(token == LBrack && "Expected (\n.");
-
-  std::vector<std::string> args;
-
-  while (true) {
-    CheckTokenizer(tokenizer);
-    auto [token, word] = tokenizer.GetNextToken();
-
-    if (token == RBrack) {
-      break;
-    }
-
-    if (token == Comma) {
-      continue;
-    }
-
-    assert(token == Text && "Expected Variable Name\n.");
-
-    // don't want to check recursively
-    if (st.symbols.contains(word)) {
-      assert(false && "Redecleration of function parameter");
-    }
-
-    st.symbols.insert({word, 0});
-    args.push_back(word);
-  }
-
-  return args;
-}
-
 std::unique_ptr<WhileStatementAST> ParseWhileStatement(Tokenizer &tokenizer,
                                                        SymbolTable &st) {
   auto cexpr = ParseExpression(tokenizer, st);
@@ -270,14 +236,50 @@ std::unique_ptr<FunctionAST> ParseFunction(Tokenizer &tokenizer,
   SymbolTable fst(&st);
 
   auto args = ParseArgumentList(tokenizer, fst);
-
-  for (auto arg : args) {
-    std::cout << arg << std::endl;
-  }
-
   auto body = ParseFunctionBody(tokenizer, fst);
 
-  return {};
+  return std::make_unique<FunctionAST>(std::move(args), std::move(body));
+}
+
+std::unique_ptr<ReturnStatementAST> ParseReturnStatement(Tokenizer &tokenizer,
+                                                         SymbolTable &st) {
+  auto expr = ParseExpression(tokenizer, st);
+
+  return std::make_unique<ReturnStatementAST>(std::move(expr));
+}
+
+std::vector<std::string> ParseArgumentList(Tokenizer &tokenizer,
+                                           SymbolTable &st) {
+  CheckTokenizer(tokenizer);
+  auto [token, word] = tokenizer.GetNextToken();
+  assert(token == LBrack && "Expected (\n.");
+
+  std::vector<std::string> args;
+
+  while (true) {
+    CheckTokenizer(tokenizer);
+    auto [token, word] = tokenizer.GetNextToken();
+
+    if (token == RBrack) {
+      break;
+    }
+
+    if (token == Comma) {
+      continue;
+    }
+
+    assert(token == Text && "Expected Variable Name\n.");
+
+    // don't want to check recursively
+    if (st.symbols.contains(word)) {
+      assert(false && "Redecleration of function parameter");
+    }
+
+    st.symbols.insert({word, 0});
+    args.push_back(word);
+  }
+
+  return args;
 }
 
 // single return statement
@@ -294,8 +296,19 @@ std::vector<std::unique_ptr<BaseAST>> ParseFunctionBody(Tokenizer &tokenizer,
     CheckTokenizer(tokenizer);
     auto [token, word] = tokenizer.GetNextToken();
     switch (token) {
+      case Let:
+        nodes.push_back(ParseDeclaration(tokenizer, st));
+        break;
+      case Mut:
+        nodes.push_back(ParseStatement(tokenizer, st));
+      case If:
+        nodes.push_back(ParseIfStatement(tokenizer, st));
+        break;
+      case While:
+        nodes.push_back(ParseWhileStatement(tokenizer, st));
+        break;
       case Return: {
-        nodes.push_back(ParseExpression(tokenizer, st));
+        nodes.push_back(ParseReturnStatement(tokenizer, st));
         cont = false;
         break;
       }
