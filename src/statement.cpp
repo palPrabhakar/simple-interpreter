@@ -91,10 +91,13 @@ std::vector<std::string> WhileStatementAST::GenerateCodeStr(uint &ridx) {
   }
 
   operations.push_back(
-      std::format("cjmp r{} p@{}", m_cexpr->GetValue(), body.size() + 2));
+      std::format("cjmp r{} p@{}", m_cexpr->GetValue(), 2));
+  operations.emplace_back("#label: false-branch");
+  operations.push_back(std::format("jmp p@{}", body.size() + 2));
+
   operations.emplace_back("#label: loop_body");
   std::copy(body.begin(), body.end(), std::back_inserter(operations));
-  operations.push_back(std::format("jmp p@-{}", operations.size()-2));
+  operations.push_back(std::format("jmp p@-{}", operations.size()-3));
 
   return operations;
 }
@@ -111,7 +114,12 @@ std::vector<Instruction> WhileStatementAST::GenerateCode(uint &ridx) {
     std::copy(ops.begin(), ops.end(), std::back_inserter(body));
   }
 
-  operations.emplace_back(InsCode::cjmp, static_cast<int>(m_cexpr->GetValue()), static_cast<int>(body.size() + 2));
+  operations.emplace_back(InsCode::cjmp, static_cast<int>(m_cexpr->GetValue()), 2);
+
+  // false branch
+  operations.emplace_back(InsCode::jmp, static_cast<int>(body.size() + 2));
+
+  // loop body
   std::copy(body.begin(), body.end(), std::back_inserter(operations));
   operations.emplace_back(InsCode::jmp, -static_cast<int>(operations.size()));
 
