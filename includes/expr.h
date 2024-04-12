@@ -23,7 +23,7 @@ class ValueAST : public ExprAST {
  public:
   ValueAST(std::string val) : m_val(val) {}
 
-  std::vector<std::string> GenerateCode(uint &ridx);
+  std::vector<std::string> GenerateCodeStr(uint &ridx);
 
   uint GetValue() { return reg; }
 
@@ -36,7 +36,7 @@ class VarAST : public ExprAST {
  public:
   VarAST(std::string name) : m_name(name) {}
 
-  std::vector<std::string> GenerateCode(uint &ridx);
+  std::vector<std::string> GenerateCodeStr(uint &ridx);
 
   uint GetValue() { return reg; }
 
@@ -49,7 +49,7 @@ class OpAST : public ExprAST {
  public:
   OpAST(Token op, std::string sop);
 
-  std::vector<std::string> GenerateCode(uint &ridx);
+  std::vector<std::string> GenerateCodeStr(uint &ridx);
 
   uint GetValue() { return reg; }
 

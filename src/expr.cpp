@@ -2,12 +2,12 @@
 
 namespace tci {
 
-std::vector<std::string> ValueAST::GenerateCode(uint &ridx) {
+std::vector<std::string> ValueAST::GenerateCodeStr(uint &ridx) {
   reg = ridx++;
   return {std::format("loadi {} r{}", m_val, reg)};
 }
 
-std::vector<std::string> VarAST::GenerateCode(uint &ridx) {
+std::vector<std::string> VarAST::GenerateCodeStr(uint &ridx) {
   reg = ridx++;
   return {std::format("load m@{} r{}", m_name, reg)};
 }
@@ -52,10 +52,10 @@ OpAST::OpAST(Token op, std::string sop) : m_op(op), m_sop(sop) {
   }
 }
 
-std::vector<std::string> OpAST::GenerateCode(uint &ridx) {
+std::vector<std::string> OpAST::GenerateCodeStr(uint &ridx) {
   std::vector<std::string> operations;
-  auto left_tree = lhs->GenerateCode(ridx);
-  auto right_tree = rhs->GenerateCode(ridx);
+  auto left_tree = lhs->GenerateCodeStr(ridx);
+  auto right_tree = rhs->GenerateCodeStr(ridx);
 
   for (auto &op : left_tree) {
     operations.push_back(std::move(op));

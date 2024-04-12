@@ -13,7 +13,7 @@ class StatementAST : public BaseAST {
   StatementAST(std::string name, std::unique_ptr<ExprAST> expr)
       : m_varName(name), m_expr(std::move(expr)) {}
 
-  std::vector<std::string> GenerateCode(uint &ridx);
+  std::vector<std::string> GenerateCodeStr(uint &ridx);
 
  private:
   std::string m_varName;
@@ -32,7 +32,7 @@ class IfStatementAST : public BaseAST {
     false_branch = std::move(fbranch);
   }
 
-  std::vector<std::string> GenerateCode(uint &ridx);
+  std::vector<std::string> GenerateCodeStr(uint &ridx);
 
  private:
   std::unique_ptr<ExprAST> m_cexpr;
@@ -44,7 +44,7 @@ class WhileStatementAST : public BaseAST {
  public:
   WhileStatementAST(std::unique_ptr<ExprAST> expr, std::vector<std::unique_ptr<BaseAST>> body): m_cexpr(std::move(expr)), m_body(std::move(body)) {}
 
-  std::vector<std::string> GenerateCode(uint &ridx);
+  std::vector<std::string> GenerateCodeStr(uint &ridx);
 
  private:
   std::unique_ptr<ExprAST> m_cexpr;

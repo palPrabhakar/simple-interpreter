@@ -17,7 +17,7 @@ int main() {
     tci::Tokenizer tokenizer(cmd);
     auto ast = tci::Parse(tokenizer, st);
     uint ridx = 0;
-    auto operations = ast->GenerateCode(ridx);
+    auto operations = ast->GenerateCodeStr(ridx);
     for (auto op : operations) {
       std::cout << op << std::endl;
     }

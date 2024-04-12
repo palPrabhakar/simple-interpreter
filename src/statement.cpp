@@ -1,26 +1,26 @@
 #include "statement.h"
 
 namespace tci {
-std::vector<std::string> StatementAST::GenerateCode(uint &ridx) {
-  auto operations = m_expr->GenerateCode(ridx);
+std::vector<std::string> StatementAST::GenerateCodeStr(uint &ridx) {
+  auto operations = m_expr->GenerateCodeStr(ridx);
   operations.push_back(
       std::format("store r{} m@{}", m_expr->GetValue(), m_varName));
   return operations;
 }
 
-std::vector<std::string> IfStatementAST::GenerateCode(uint &ridx) {
+std::vector<std::string> IfStatementAST::GenerateCodeStr(uint &ridx) {
   std::vector<std::string> operations;
 
   operations.push_back("label: conditional_block");
 
-  auto expr_tree = m_cexpr->GenerateCode(ridx);
+  auto expr_tree = m_cexpr->GenerateCodeStr(ridx);
   for (auto &op : expr_tree) {
     operations.push_back(std::move(op));
   }
 
   std::vector<std::string> fb;
   for (auto &node : false_branch) {
-    auto ops = node->GenerateCode(ridx);
+    auto ops = node->GenerateCodeStr(ridx);
     for (auto &op : ops) {
       fb.push_back(std::move(op));
     }
@@ -28,7 +28,7 @@ std::vector<std::string> IfStatementAST::GenerateCode(uint &ridx) {
 
   std::vector<std::string> tb;
   for (auto &node : true_branch) {
-    auto ops = node->GenerateCode(ridx);
+    auto ops = node->GenerateCodeStr(ridx);
     for (auto &op : ops) {
       tb.push_back(std::move(op));
     }
@@ -52,18 +52,18 @@ std::vector<std::string> IfStatementAST::GenerateCode(uint &ridx) {
   return operations;
 }
 
-std::vector<std::string> WhileStatementAST::GenerateCode(uint &ridx) {
+std::vector<std::string> WhileStatementAST::GenerateCodeStr(uint &ridx) {
   std::vector<std::string> operations;
 
   operations.emplace_back("label: conditional_block");
-  auto expr_tree = m_cexpr->GenerateCode(ridx);
+  auto expr_tree = m_cexpr->GenerateCodeStr(ridx);
   for (auto &op : expr_tree) {
     operations.push_back(std::move(op));
   }
 
   std::vector<std::string> body;
   for (auto &node : m_body) {
-    auto ops = node->GenerateCode(ridx);
+    auto ops = node->GenerateCodeStr(ridx);
     for (auto &op : ops) {
       body.push_back(std::move(op));
     }
