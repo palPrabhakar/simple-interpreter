@@ -5,6 +5,7 @@
 #include <string>
 
 #include "ast.h"
+#include "instructions.h"
 #include "symbol_table.h"
 #include "tokens.h"
 
@@ -24,6 +25,7 @@ class ValueAST : public ExprAST {
   ValueAST(std::string val) : m_val(val) {}
 
   std::vector<std::string> GenerateCodeStr(uint &ridx);
+  std::vector<Instruction> GenerateCode(uint &ridx);
 
   uint GetValue() { return reg; }
 
@@ -37,6 +39,7 @@ class VarAST : public ExprAST {
   VarAST(std::string name) : m_name(name) {}
 
   std::vector<std::string> GenerateCodeStr(uint &ridx);
+  std::vector<Instruction> GenerateCode(uint &ridx);
 
   uint GetValue() { return reg; }
 
@@ -50,11 +53,11 @@ class OpAST : public ExprAST {
   OpAST(Token op, std::string sop);
 
   std::vector<std::string> GenerateCodeStr(uint &ridx);
+  std::vector<Instruction> GenerateCode(uint &ridx);
 
   uint GetValue() { return reg; }
 
   void SetLhs(std::unique_ptr<ExprAST> lhs) { this->lhs = std::move(lhs); }
-
   void SetRhs(std::unique_ptr<ExprAST> rhs) { this->rhs = std::move(rhs); }
 
   const int GetPrecedence() const { return m_precedence; }
@@ -63,6 +66,7 @@ class OpAST : public ExprAST {
   Token m_op;
   std::string m_sop;
   int m_precedence;
+  InsCode m_code;
   uint reg;
   std::unique_ptr<ExprAST> lhs;
   std::unique_ptr<ExprAST> rhs;

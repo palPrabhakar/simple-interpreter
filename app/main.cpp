@@ -18,8 +18,13 @@ int main() {
     auto ast = tci::Parse(tokenizer, st);
     uint ridx = 0;
     auto operations = ast->GenerateCodeStr(ridx);
+    auto count = 0;
     for (auto op : operations) {
-      std::cout << op << std::endl;
+      if (op[0] == '#') {
+        continue;
+      }
+
+      std::cout << count++ << ": " << op << std::endl;
     }
   }
   return 0;

@@ -14,6 +14,7 @@ class StatementAST : public BaseAST {
       : m_varName(name), m_expr(std::move(expr)) {}
 
   std::vector<std::string> GenerateCodeStr(uint &ridx);
+  std::vector<Instruction> GenerateCode(uint &ridx);
 
  private:
   std::string m_varName;
@@ -33,6 +34,7 @@ class IfStatementAST : public BaseAST {
   }
 
   std::vector<std::string> GenerateCodeStr(uint &ridx);
+  std::vector<Instruction> GenerateCode(uint &ridx);
 
  private:
   std::unique_ptr<ExprAST> m_cexpr;
@@ -42,9 +44,12 @@ class IfStatementAST : public BaseAST {
 
 class WhileStatementAST : public BaseAST {
  public:
-  WhileStatementAST(std::unique_ptr<ExprAST> expr, std::vector<std::unique_ptr<BaseAST>> body): m_cexpr(std::move(expr)), m_body(std::move(body)) {}
+  WhileStatementAST(std::unique_ptr<ExprAST> expr,
+                    std::vector<std::unique_ptr<BaseAST>> body)
+      : m_cexpr(std::move(expr)), m_body(std::move(body)) {}
 
   std::vector<std::string> GenerateCodeStr(uint &ridx);
+  std::vector<Instruction> GenerateCode(uint &ridx);
 
  private:
   std::unique_ptr<ExprAST> m_cexpr;
