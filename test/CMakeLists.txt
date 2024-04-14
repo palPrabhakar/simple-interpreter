@@ -2,7 +2,7 @@ enable_testing()
 
 find_package(GTest REQUIRED)
 
-# add_executable(test test.cpp)
+add_executable(test interpreter_test.cpp ir_test.cpp)
 
 target_link_libraries(test PRIVATE tci GTest::gtest_main)
 
