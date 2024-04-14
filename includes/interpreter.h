@@ -14,6 +14,7 @@ class Interpreter {
   void Interpret(std::vector<Instruction> instructions);
 
  private:
+  // 0 idx fixed for rax (storing function return value)
   std::vector<double> m_registers;
   SymbolTable &m_st;
 

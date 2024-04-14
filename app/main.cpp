@@ -11,7 +11,8 @@ int main(int argc, char **argv) {
   if (argc > 1) {
     debug = true;
   }
-  tci::SymbolTable st;
+
+  auto st = tci::SymbolTable();
   tci::Interpreter interpreter(st);
   while (true) {
     std::string cmd;
@@ -21,14 +22,15 @@ int main(int argc, char **argv) {
     if (cmd == "exit") exit(0);
 
     tci::Tokenizer tokenizer(cmd);
-    auto ast = tci::Parse(tokenizer, st);
-    uint ridx = 0;
+    auto ast = tci::Parse(tokenizer, st, debug);
+    // idx 0 fixed for rax
+    uint ridx = 1;
 
     if (!debug) {
       auto operations = ast->GenerateCode(ridx);
       interpreter.Interpret(std::move(operations));
 
-      for (auto &[k, v] : st.symbols) {
+      for (auto &[k, v] : st.GetGlobalSymbols()) {
         std::cout << std::format("{}: {}", k, v) << std::endl;
       }
 

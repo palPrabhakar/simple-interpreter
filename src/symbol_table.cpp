@@ -4,34 +4,49 @@
 
 namespace tci {
 bool SymbolTable::CheckSymbol(std::string name) const {
-  if (symbols.contains(name)) {
+  if (!m_st.empty() && m_st.top().contains(name)) {
     return true;
-  } else {
-    if (m_parent) {
-      return m_parent->CheckSymbol(name);
-    } else {
-      return false;
-    }
   }
+
+  if (g_symbols.contains(name)) {
+    return true;
+  }
+
+  return false;
+}
+
+bool SymbolTable::CheckTopLevelSymbol(std::string name) const {
+
+  if (!m_st.empty()) {
+    return m_st.top().contains(name);
+  } else {
+    return g_symbols.contains(name);
+  }
+
+  return false;
 }
 
 double SymbolTable::GetValue(std::string name) const {
-  assert(CheckSymbol(name) && "Symbol not found\n");
-
-  if (symbols.contains(name)) {
-    return symbols.at(name);
-  } else {
-    return m_parent->GetValue(name);
+  if (!m_st.empty() && m_st.top().contains(name)) {
+    return m_st.top().at(name);
   }
+
+  return g_symbols.at(name);
 }
 
 void SymbolTable::SetValue(std::string name, double val) {
-  assert(CheckSymbol(name) && "Symbol not found\n");
+  if (!m_st.empty() && m_st.top().contains(name)) {
+    m_st.top()[name] = val;
+  }
 
-  if (symbols.contains(name)) {
-    symbols[name] = val;
+  g_symbols[name] = val;
+}
+
+void SymbolTable::InsertSymbol(std::string name) {
+  if (!m_st.empty()) {
+    m_st.top().insert({name, 0});
   } else {
-    m_parent->SetValue(name, val);
+    g_symbols.insert({name, 0});
   }
 }
 }  // namespace tci

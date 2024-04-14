@@ -5,7 +5,9 @@
 #include <memory>
 #include <unordered_map>
 
+#include "ast.h"
 #include "expr.h"
+#include "function.h"
 #include "statement.h"
 #include "symbol_table.h"
 #include "tokenizer.h"
@@ -124,11 +126,11 @@ std::unique_ptr<StatementAST> ParseDeclaration(Tokenizer &tokenizer,
 
   auto expr = ParseExpression(tokenizer, st);
 
-  if (st.CheckSymbol(word)) {
+  if (st.CheckTopLevelSymbol(word)) {
     assert(false && "Redeclaration of variable\n");
   }
 
-  st.symbols.insert({word, 0});
+  st.InsertSymbol(word);
 
   return std::make_unique<StatementAST>(word, std::move(expr));
 }
@@ -233,10 +235,13 @@ std::unique_ptr<FunctionAST> ParseFunction(Tokenizer &tokenizer,
   std::string fn_name = word;
 
   // functions symbol table
-  SymbolTable fst(&st);
+  // SymbolTable fst(&st);
+  st.PushSymbolTable();
 
-  auto args = ParseArgumentList(tokenizer, fst);
-  auto body = ParseFunctionBody(tokenizer, fst);
+  auto args = ParseArgumentList(tokenizer, st);
+  auto body = ParseFunctionBody(tokenizer, st);
+
+  st.PopSymbolTable();
 
   return std::make_unique<FunctionAST>(std::move(args), std::move(body));
 }
@@ -271,11 +276,11 @@ std::vector<std::string> ParseArgumentList(Tokenizer &tokenizer,
     assert(token == Text && "Expected Variable Name\n.");
 
     // don't want to check recursively
-    if (st.symbols.contains(word)) {
+    if (st.CheckTopLevelSymbol(word)) {
       assert(false && "Redecleration of function parameter");
     }
 
-    st.symbols.insert({word, 0});
+    st.InsertSymbol(word);
     args.push_back(word);
   }
 
@@ -324,7 +329,7 @@ std::vector<std::unique_ptr<BaseAST>> ParseFunctionBody(Tokenizer &tokenizer,
   return nodes;
 }
 
-std::unique_ptr<BaseAST> Parse(Tokenizer &tokenizer, SymbolTable &st) {
+std::unique_ptr<BaseAST> Parse(Tokenizer &tokenizer, SymbolTable &st, bool debug) {
   CheckTokenizer(tokenizer);
   auto [token, word] = tokenizer.GetNextToken();
   std::unique_ptr<BaseAST> ast;
@@ -335,9 +340,18 @@ std::unique_ptr<BaseAST> Parse(Tokenizer &tokenizer, SymbolTable &st) {
     case Mut:
       ast = ParseStatement(tokenizer, st);
       break;
-    case Fn:
-      ast = ParseFunction(tokenizer, st);
-      break;
+    case Fn: {
+      if(!debug) {
+        auto fn_ast = ParseFunction(tokenizer, st);
+        uint size = fn_ast->GetArgumentSize();
+        auto fn = std::make_unique<FunctionPrototype>(fn_ast->GetArgumentList(), fn_ast->GenerateCode(++size));
+        ast = std::make_unique<DummyAST>();
+        break;
+      } else {
+        ast = ParseFunction(tokenizer, st);
+        break;
+      }
+    }
     case While:
       ast = ParseWhileStatement(tokenizer, st);
       break;
