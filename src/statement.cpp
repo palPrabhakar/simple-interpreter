@@ -20,7 +20,7 @@ std::vector<Instruction> StatementAST::GenerateCode(uint &ridx) {
 std::vector<std::string> IfStatementAST::GenerateCodeStr(uint &ridx) {
   std::vector<std::string> operations;
 
-  operations.push_back("#label: conditional_block");
+  // operations.push_back("#label: conditional_block");
 
   auto expr_arr = m_cexpr->GenerateCodeStr(ridx);
   std::copy(expr_arr.begin(), expr_arr.end(), std::back_inserter(operations));
@@ -40,12 +40,12 @@ std::vector<std::string> IfStatementAST::GenerateCodeStr(uint &ridx) {
   operations.push_back(
       std::format("cjmp r{} p@{}", m_cexpr->GetValue(), fb.size() + 2));
 
-  operations.push_back("#label: false_branch");
+  // operations.push_back("#label: false_branch");
   std::copy(fb.begin(), fb.end(), std::back_inserter(operations));
 
   operations.push_back(std::format("jmp p@{}", tb.size() + 1));
 
-  operations.push_back("#label: true_branch");
+  // operations.push_back("#label: true_branch");
   std::copy(tb.begin(), tb.end(), std::back_inserter(operations));
 
   return operations;
@@ -80,7 +80,7 @@ std::vector<Instruction> IfStatementAST::GenerateCode(uint &ridx) {
 std::vector<std::string> WhileStatementAST::GenerateCodeStr(uint &ridx) {
   std::vector<std::string> operations;
 
-  operations.emplace_back("#label: conditional_block");
+  // operations.emplace_back("#label: conditional_block");
   auto expr_arr = m_cexpr->GenerateCodeStr(ridx);
   std::copy(expr_arr.begin(), expr_arr.end(), std::back_inserter(operations));
 
@@ -92,10 +92,10 @@ std::vector<std::string> WhileStatementAST::GenerateCodeStr(uint &ridx) {
 
   operations.push_back(
       std::format("cjmp r{} p@{}", m_cexpr->GetValue(), 2));
-  operations.emplace_back("#label: false-branch");
+  // operations.emplace_back("#label: false-branch");
   operations.push_back(std::format("jmp p@{}", body.size() + 2));
 
-  operations.emplace_back("#label: loop_body");
+  // operations.emplace_back("#label: loop_body");
   std::copy(body.begin(), body.end(), std::back_inserter(operations));
   operations.push_back(std::format("jmp p@-{}", operations.size()-3));
 
