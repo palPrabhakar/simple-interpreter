@@ -9,7 +9,7 @@ std::vector<Instruction> ArgumentAST::GenerateCode(uint &ridx) { return {}; }
 
 std::vector<std::string> ReturnStatementAST::GenerateCodeStr(uint &ridx) {
   auto operations = m_expr->GenerateCodeStr(ridx);
-  operations.push_back(std::format("rmov r{} rax", m_expr->GetValue()));
+  operations.push_back(std::format("rmov r{} r0", m_expr->GetValue()));
   return operations;
 }
 

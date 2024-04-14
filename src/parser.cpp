@@ -243,7 +243,8 @@ std::unique_ptr<FunctionAST> ParseFunction(Tokenizer &tokenizer,
 
   st.PopSymbolTable();
 
-  return std::make_unique<FunctionAST>(std::move(args), std::move(body));
+  return std::make_unique<FunctionAST>(fn_name, std::move(args),
+                                       std::move(body));
 }
 
 std::unique_ptr<ReturnStatementAST> ParseReturnStatement(Tokenizer &tokenizer,
@@ -329,7 +330,8 @@ std::vector<std::unique_ptr<BaseAST>> ParseFunctionBody(Tokenizer &tokenizer,
   return nodes;
 }
 
-std::unique_ptr<BaseAST> Parse(Tokenizer &tokenizer, SymbolTable &st, bool debug) {
+std::unique_ptr<BaseAST> Parse(Tokenizer &tokenizer, SymbolTable &st,
+                               bool debug) {
   CheckTokenizer(tokenizer);
   auto [token, word] = tokenizer.GetNextToken();
   std::unique_ptr<BaseAST> ast;
@@ -341,10 +343,14 @@ std::unique_ptr<BaseAST> Parse(Tokenizer &tokenizer, SymbolTable &st, bool debug
       ast = ParseStatement(tokenizer, st);
       break;
     case Fn: {
-      if(!debug) {
+      if (!debug) {
         auto fn_ast = ParseFunction(tokenizer, st);
-        uint size = fn_ast->GetArgumentSize();
-        auto fn = std::make_unique<FunctionPrototype>(fn_ast->GetArgumentList(), fn_ast->GenerateCode(++size));
+        // uint size = fn_ast->GetArgumentSize();
+        uint ridx = 1;
+        st.InsertFunction(
+            fn_ast->GetName(),
+            std::make_unique<FunctionPrototype>(fn_ast->GetArgumentList(),
+                                                fn_ast->GenerateCode(ridx)));
         ast = std::make_unique<DummyAST>();
         break;
       } else {

@@ -9,7 +9,7 @@ namespace tci {
 class FunctionPrototype {
  public:
   FunctionPrototype(std::vector<std::string> args, std::vector<Instruction> fn)
-      : m_args(args), m_fn(fn) {}
+      : m_args(std::move(args)), m_fn(std::move(fn)) {}
 
  private:
   std::vector<std::string> m_args;

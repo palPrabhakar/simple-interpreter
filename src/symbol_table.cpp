@@ -16,7 +16,6 @@ bool SymbolTable::CheckSymbol(std::string name) const {
 }
 
 bool SymbolTable::CheckTopLevelSymbol(std::string name) const {
-
   if (!m_st.empty()) {
     return m_st.top().contains(name);
   } else {
@@ -49,4 +48,14 @@ void SymbolTable::InsertSymbol(std::string name) {
     g_symbols.insert({name, 0});
   }
 }
+
+void SymbolTable::InsertFunction(std::string name,
+                                 std::unique_ptr<FunctionPrototype> func) {
+  if (m_functions.contains(name)) {
+    assert(false && "Redefinition of function.\n");
+  }
+
+  m_functions.insert({name, std::move(func)});
+}
+
 }  // namespace tci

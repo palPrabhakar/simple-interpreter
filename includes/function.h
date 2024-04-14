@@ -31,9 +31,11 @@ class ArgumentAST : public BaseAST {
 
 class FunctionAST : public BaseAST {
  public:
-  FunctionAST(std::vector<std::string> argumentList,
+  FunctionAST(std::string name, std::vector<std::string> argumentList,
               std::vector<std::unique_ptr<BaseAST>> body)
-      : m_argumentList(std::move(argumentList)), m_body(std::move(body)) {}
+      : m_name(name),
+        m_argumentList(std::move(argumentList)),
+        m_body(std::move(body)) {}
 
   std::vector<std::string> GenerateCodeStr(uint &ridx);
   std::vector<Instruction> GenerateCode(uint &ridx);
@@ -42,14 +44,14 @@ class FunctionAST : public BaseAST {
     return std::move(m_argumentList);
   }
 
-  size_t GetArgumentSize() const {
-    return m_argumentList.size();
-  }
+  size_t GetArgumentSize() const { return m_argumentList.size(); }
+
+  const std::string GetName() const { return m_name; }
 
  private:
+  std::string m_name;
   std::vector<std::string> m_argumentList;
   std::vector<std::unique_ptr<BaseAST>> m_body;
 };
-
 
 }  // namespace tci

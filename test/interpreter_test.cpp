@@ -1,8 +1,10 @@
+#include "interpreter.h"
+
 #include <gtest/gtest.h>
+
+#include "parser.h"
 #include "symbol_table.h"
 #include "tokenizer.h"
-#include "parser.h"
-#include "interpreter.h"
 
 TEST(Interpreter_Test, TestExpr) {
   auto st = tci::SymbolTable();
@@ -48,11 +50,12 @@ TEST(Interpreter_Test, TestIfStatement) {
   EXPECT_TRUE(st.CheckSymbol("x"));
   EXPECT_EQ(st.GetValue("x"), 4);
 
-
   st.InsertSymbol("y");
   st.SetValue("y", 5);
 
-  tokenizer.ResetTokenizer("if ( x < 10) { if (y > 10) { mut x = y / x; } else { mut x = x * y; } } else { mut x = x / 4; }");
+  tokenizer.ResetTokenizer(
+      "if ( x < 10) { if (y > 10) { mut x = y / x; } else { mut x = x * y; } } "
+      "else { mut x = x / 4; }");
   ast = tci::Parse(tokenizer, st);
   ridx = 1;
   code = ast->GenerateCode(ridx);
