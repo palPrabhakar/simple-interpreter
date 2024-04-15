@@ -34,6 +34,10 @@ class SymbolTable {
   void InsertFunction(std::string name,
                       std::unique_ptr<FunctionPrototype> func);
 
+  FunctionPrototype* GetPrototype(std::string name) {
+    return m_functions[name].get();
+  }
+
  private:
   std::stack<Symbols> m_st;
   Symbols g_symbols;  // global symbol space

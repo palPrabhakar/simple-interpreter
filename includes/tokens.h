@@ -42,6 +42,7 @@ enum Token {
   SColon,
   Comma,
   Fn,
+  Call,
   End
 };
 

@@ -72,4 +72,50 @@ class OpAST : public ExprAST {
   std::unique_ptr<ExprAST> rhs;
 };
 
+class FunctionCallAST : public ExprAST {
+ public:
+  FunctionCallAST(std::string name, std::vector<std::unique_ptr<ExprAST>> args,
+                  std::vector<Instruction> body, std::vector<std::string> sbody,
+                  std::vector<std::string> argnames)
+      : m_name(name),
+        m_args(std::move(args)),
+        m_body(std::move(body)),
+        m_sbody(std::move(sbody)),
+        m_argnames(std::move(argnames)) {
+    assert(m_args.size() == m_argnames.size() && "Argument size mismatch.\n");
+  }
+
+  FunctionCallAST(std::string name, std::vector<std::unique_ptr<ExprAST>> args,
+                  std::vector<Instruction> body,
+                  std::vector<std::string> argnames)
+      : m_name(name),
+        m_args(std::move(args)),
+        m_body(std::move(body)),
+        m_argnames(argnames) {
+    assert(m_args.size() == m_argnames.size() && "Argument size mismatch.\n");
+  }
+
+  FunctionCallAST(std::string name, std::vector<std::unique_ptr<ExprAST>> args,
+                  std::vector<std::string> body,
+                  std::vector<std::string> argnames)
+      : m_name(name),
+        m_args(std::move(args)),
+        m_sbody(std::move(body)),
+        m_argnames(argnames) {
+    assert(m_args.size() == m_argnames.size() && "Argument size mismatch.\n");
+  }
+
+  uint GetValue() { return 0; }
+
+  std::vector<std::string> GenerateCodeStr(uint &ridx);
+  std::vector<Instruction> GenerateCode(uint &ridx) { return {}; }
+
+ private:
+  std::string m_name;
+  std::vector<std::unique_ptr<ExprAST>> m_args;
+  std::vector<Instruction> m_body;
+  std::vector<std::string> m_sbody;
+  std::vector<std::string> m_argnames;
+};
+
 }  // namespace tci

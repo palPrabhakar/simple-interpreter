@@ -114,4 +114,25 @@ std::vector<Instruction> OpAST::GenerateCode(uint &ridx) {
   return operations;
 }
 
+std::vector<std::string> FunctionCallAST::GenerateCodeStr(uint &ridx) {
+  std::vector<std::string> operations;
+
+  for(auto &expr: m_args) {
+    auto ops = expr->GenerateCodeStr(ridx);
+    std::copy(ops.begin(), ops.end(), std::back_inserter(operations));
+  }
+
+  operations.push_back(std::format("call {}", m_name));
+
+  for(size_t i = 0; i < m_args.size(); ++i) {
+    auto &expr = m_args[i];
+    auto name = m_argnames[i];
+    operations.push_back(std::format("store r{} m@{}", expr->GetValue(), name));
+  }
+
+  std::copy(m_sbody.begin(), m_sbody.end(), std::back_inserter(operations));
+
+  return operations;
+}
+
 }  // namespace tci

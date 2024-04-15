@@ -27,18 +27,40 @@ std::unique_ptr<ExprAST> ParseExpression(Tokenizer &tokenizer,
   auto [tok0, word0] = tokenizer.GetNextToken();
   std::unique_ptr<ExprAST> op0;
 
-  if (tok0 == LBrack) {
-    op0 = ParseExpression(tokenizer, st);
-  } else if (tok0 == Text) {
-    if (std::isalpha(word0[0])) {
-      assert(st.CheckSymbol(word0) && "Undefined variable");
-      op0 = std::make_unique<VarAST>(word0);
-    } else {
-      op0 = std::make_unique<ValueAST>(word0);
+  switch (tok0) {
+    case LBrack:
+      op0 = ParseExpression(tokenizer, st);
+      break;
+    case Text: {
+      if (std::isalpha(word0[0])) {
+        assert(st.CheckSymbol(word0) && "Undefined variable");
+        op0 = std::make_unique<VarAST>(word0);
+      } else {
+        op0 = std::make_unique<ValueAST>(word0);
+      }
+      break;
     }
-  } else {
-    assert(false && "Failed to parse expression\n");
+    case Call: {
+      // std::cout << "Call" << std::endl;
+      op0 = ParseFunctionCall(tokenizer, st);
+      break;
+    }
+    default:
+      assert(false && "Failed to parse expression\n");
   }
+
+  // if (tok0 == LBrack) {
+  //   op0 = ParseExpression(tokenizer, st);
+  // } else if (tok0 == Text) {
+  //   if (std::isalpha(word0[0])) {
+  //     assert(st.CheckSymbol(word0) && "Undefined variable");
+  //     op0 = std::make_unique<VarAST>(word0);
+  //   } else {
+  //     op0 = std::make_unique<ValueAST>(word0);
+  //   }
+  // } else {
+  //   assert(false && "Failed to parse expression\n");
+  // }
 
   CheckTokenizer(tokenizer);
   auto [tok1, word1] = tokenizer.GetNextToken();
@@ -60,18 +82,38 @@ std::unique_ptr<ExprAST> ParseExpression(Tokenizer &tokenizer,
   CheckTokenizer(tokenizer);
   auto [tok0, word0] = tokenizer.GetNextToken();
 
-  if (tok0 == LBrack) {
-    op0 = ParseExpression(tokenizer, st);
-  } else if (tok0 == Text) {
-    if (std::isalpha(word0[0])) {
-      assert(st.CheckSymbol(word0) && "Undefined variable");
-      op0 = std::make_unique<VarAST>(word0);
-    } else {
-      op0 = std::make_unique<ValueAST>(word0);
+  switch (tok0) {
+    case LBrack:
+      op0 = ParseExpression(tokenizer, st);
+      break;
+    case Text: {
+      if (std::isalpha(word0[0])) {
+        assert(st.CheckSymbol(word0) && "Undefined variable");
+        op0 = std::make_unique<VarAST>(word0);
+      } else {
+        op0 = std::make_unique<ValueAST>(word0);
+      }
+      break;
     }
-  } else {
-    assert(false && "Failed to parse expression\n");
+    case Call:
+      op0 = ParseFunctionCall(tokenizer, st);
+      break;
+    default:
+      assert(false && "Failed to parse expression\n");
   }
+
+  // if (tok0 == LBrack) {
+  //   op0 = ParseExpression(tokenizer, st);
+  // } else if (tok0 == Text) {
+  //   if (std::isalpha(word0[0])) {
+  //     assert(st.CheckSymbol(word0) && "Undefined variable");
+  //     op0 = std::make_unique<VarAST>(word0);
+  //   } else {
+  //     op0 = std::make_unique<ValueAST>(word0);
+  //   }
+  // } else {
+  //   assert(false && "Failed to parse expression\n");
+  // }
 
   CheckTokenizer(tokenizer);
   auto [tok1, word1] = tokenizer.GetNextToken();
@@ -91,6 +133,47 @@ std::unique_ptr<ExprAST> ParseExpression(Tokenizer &tokenizer,
       return expr;
     }
   }
+}
+
+std::unique_ptr<FunctionCallAST> ParseFunctionCall(Tokenizer &tokenizer,
+                                                   SymbolTable &st) {
+  CheckTokenizer(tokenizer);
+  auto [token0, word0] = tokenizer.GetNextToken();
+  assert(token0 == Text && "Expected function name.\n");
+
+  if (!st.CheckFunction(word0)) {
+    assert(false && "Calling undefined function.\n");
+  }
+
+  CheckTokenizer(tokenizer);
+  auto [token1, word1] = tokenizer.GetNextToken();
+  assert(token1 == LBrack && "Expected (\n.");
+
+  std::vector<std::unique_ptr<ExprAST>> args;
+  while (true) {
+    CheckTokenizer(tokenizer);
+    auto [token, word] = tokenizer.GetNextToken();
+
+    if (token == RBrack) {
+      break;
+    }
+
+    if (token == Comma) {
+      continue;
+    }
+
+    if (std::isalpha(word[0])) {
+      assert(st.CheckSymbol(word) && "Undefined variable");
+      args.push_back(std::make_unique<VarAST>(word));
+    } else {
+      args.push_back(std::make_unique<ValueAST>(word));
+    }
+  }
+
+  auto *prototype = st.GetPrototype(word0);
+  return std::make_unique<FunctionCallAST>(word0, std::move(args),
+                                           prototype->GetInstructions(),
+                                           prototype->GetInstructionsStr(), prototype->GetArgsStr());
 }
 
 std::unique_ptr<StatementAST> ParseStatement(Tokenizer &tokenizer,
@@ -354,7 +437,13 @@ std::unique_ptr<BaseAST> Parse(Tokenizer &tokenizer, SymbolTable &st,
         ast = std::make_unique<DummyAST>();
         break;
       } else {
-        ast = ParseFunction(tokenizer, st);
+        auto fn_ast = ParseFunction(tokenizer, st);
+        uint ridx = 1;
+        st.InsertFunction(
+            fn_ast->GetName(),
+            std::make_unique<FunctionPrototype>(fn_ast->GetArgumentList(),
+                                                fn_ast->GenerateCodeStr(ridx)));
+        ast = std::move(fn_ast);
         break;
       }
     }

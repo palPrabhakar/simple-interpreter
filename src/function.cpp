@@ -1,11 +1,11 @@
 #include "function.h"
 
 namespace tci {
-std::vector<std::string> ArgumentAST::GenerateCodeStr(uint &ridx) {
-  return {};
-}
+// std::vector<std::string> ArgumentAST::GenerateCodeStr(uint &ridx) {
+//   return {};
+// }
 
-std::vector<Instruction> ArgumentAST::GenerateCode(uint &ridx) { return {}; }
+// std::vector<Instruction> ArgumentAST::GenerateCode(uint &ridx) { return {}; }
 
 std::vector<std::string> ReturnStatementAST::GenerateCodeStr(uint &ridx) {
   auto operations = m_expr->GenerateCodeStr(ridx);

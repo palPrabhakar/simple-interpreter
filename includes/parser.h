@@ -32,6 +32,8 @@ std::unique_ptr<FunctionAST> ParseFunction(Tokenizer &tokenizer, SymbolTable &st
 
 std::unique_ptr<ReturnStatementAST> ParseReturnStatement(Tokenizer &tokenizer, SymbolTable &st);
 
+std::unique_ptr<FunctionCallAST> ParseFunctionCall(Tokenizer &tokenizer, SymbolTable &st);
+
 std::vector<std::unique_ptr<BaseAST>> ParseConditionalBody(Tokenizer &tokenizer, SymbolTable &st);
 
 std::vector<std::unique_ptr<BaseAST>> ParseFunctionBody(Tokenizer &tokenizer, SymbolTable &st);

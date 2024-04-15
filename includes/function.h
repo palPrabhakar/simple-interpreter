@@ -18,16 +18,16 @@ class ReturnStatementAST : public BaseAST {
   std::unique_ptr<ExprAST> m_expr;
 };
 
-class ArgumentAST : public BaseAST {
- public:
-  ArgumentAST(std::string name) : m_name(name) {}
+// class ArgumentAST : public BaseAST {
+//  public:
+//   ArgumentAST(std::string name) : m_name(name) {}
 
-  std::vector<std::string> GenerateCodeStr(uint &ridx);
-  std::vector<Instruction> GenerateCode(uint &ridx);
+//   std::vector<std::string> GenerateCodeStr(uint &ridx);
+//   std::vector<Instruction> GenerateCode(uint &ridx);
 
- private:
-  std::string m_name;
-};
+//  private:
+//   std::string m_name;
+// };
 
 class FunctionAST : public BaseAST {
  public:

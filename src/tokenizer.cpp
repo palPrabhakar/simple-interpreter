@@ -42,11 +42,12 @@ static const std::unordered_map<std::string, Token> token_map = {
     {"]", Token::RSBrack},
     {";", Token::SColon},
     {",", Token::Comma},
-    {"fn", Token::Fn}};
+    {"fn", Token::Fn},
+    {"call", Token::Call}};
 
 static const std::unordered_set<char> stop_words = {
-    ';', '(', ')', '{', '}', ' ', '[', ']', '+', '-', ',',
-    '*', '/', '%', '=', '!', '<', '>', '&', '|'};
+    ';', '(', ')', '{', '}', ' ', '[', ']', '+', '-',
+    ',', '*', '/', '%', '=', '!', '<', '>', '&', '|'};
 
 // TODO: Fix for case && and ||
 static const std::unordered_set<char> sp_words = {'=', '!', '>', '<', '+', '-'};
