@@ -36,9 +36,9 @@ double SymbolTable::GetValue(std::string name) const {
 void SymbolTable::SetValue(std::string name, double val) {
   if (!m_st.empty() && m_st.top().contains(name)) {
     m_st.top()[name] = val;
+  } else {
+    g_symbols[name] = val;
   }
-
-  g_symbols[name] = val;
 }
 
 void SymbolTable::InsertSymbol(std::string name) {

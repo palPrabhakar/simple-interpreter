@@ -1,8 +1,10 @@
 #include "interpreter.h"
 
-#include <stdexcept>
-#include <iostream>
 #include <format>
+#include <iostream>
+#include <stdexcept>
+
+#include "instructions.h"
 
 namespace tci {
 void Interpreter::Load(Instruction ins, size_t &icounter) {
@@ -112,6 +114,24 @@ void Interpreter::CJmp(Instruction ins, size_t &icounter) {
   }
 }
 
+void Interpreter::Call(Instruction ins, size_t &icounter) {
+  auto fn_name = std::get<std::string>(ins.i0);
+  m_st.PushSymbolTable();
+  auto *proto = m_st.GetPrototype(fn_name);
+  for(auto var: proto->GetArgsStr()) {
+    m_st.InsertSymbol(var);
+  }
+  ++icounter;
+}
+
+void Interpreter::Rmov(Instruction ins, size_t &icounter) {
+  auto r0 = std::get<int>(ins.i0);
+  auto r1 = std::get<int>(ins.i1);
+  m_registers[r1] = m_registers[r0];
+  m_st.PopSymbolTable();
+  ++icounter;
+}
+
 void Interpreter::Interpret(std::vector<Instruction> instructions) {
   size_t icounter = 0;
   while (icounter < instructions.size()) {
@@ -155,6 +175,12 @@ void Interpreter::Interpret(std::vector<Instruction> instructions) {
         break;
       case jmp:
         Jmp(ins, icounter);
+        break;
+      case call:
+        Call(ins, icounter);
+        break;
+      case rmov:
+        Rmov(ins, icounter);
         break;
       default:
         throw std::runtime_error("Unknown instruction\n");

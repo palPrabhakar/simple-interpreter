@@ -85,30 +85,30 @@ class FunctionCallAST : public ExprAST {
     assert(m_args.size() == m_argnames.size() && "Argument size mismatch.\n");
   }
 
-  FunctionCallAST(std::string name, std::vector<std::unique_ptr<ExprAST>> args,
-                  std::vector<Instruction> body,
-                  std::vector<std::string> argnames)
-      : m_name(name),
-        m_args(std::move(args)),
-        m_body(std::move(body)),
-        m_argnames(argnames) {
-    assert(m_args.size() == m_argnames.size() && "Argument size mismatch.\n");
-  }
+  // FunctionCallAST(std::string name, std::vector<std::unique_ptr<ExprAST>> args,
+  //                 std::vector<Instruction> body,
+  //                 std::vector<std::string> argnames)
+  //     : m_name(name),
+  //       m_args(std::move(args)),
+  //       m_body(std::move(body)),
+  //       m_argnames(argnames) {
+  //   assert(m_args.size() == m_argnames.size() && "Argument size mismatch.\n");
+  // }
 
-  FunctionCallAST(std::string name, std::vector<std::unique_ptr<ExprAST>> args,
-                  std::vector<std::string> body,
-                  std::vector<std::string> argnames)
-      : m_name(name),
-        m_args(std::move(args)),
-        m_sbody(std::move(body)),
-        m_argnames(argnames) {
-    assert(m_args.size() == m_argnames.size() && "Argument size mismatch.\n");
-  }
+  // FunctionCallAST(std::string name, std::vector<std::unique_ptr<ExprAST>> args,
+  //                 std::vector<std::string> body,
+  //                 std::vector<std::string> argnames)
+  //     : m_name(name),
+  //       m_args(std::move(args)),
+  //       m_sbody(std::move(body)),
+  //       m_argnames(argnames) {
+  //   assert(m_args.size() == m_argnames.size() && "Argument size mismatch.\n");
+  // }
 
   uint GetValue() { return 0; }
 
   std::vector<std::string> GenerateCodeStr(uint &ridx);
-  std::vector<Instruction> GenerateCode(uint &ridx) { return {}; }
+  std::vector<Instruction> GenerateCode(uint &ridx);
 
  private:
   std::string m_name;

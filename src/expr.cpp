@@ -86,7 +86,8 @@ std::vector<std::string> OpAST::GenerateCodeStr(uint &ridx) {
   auto right_tree = rhs->GenerateCodeStr(ridx);
 
   std::copy(left_tree.begin(), left_tree.end(), std::back_inserter(operations));
-  std::copy(right_tree.begin(), right_tree.end(), std::back_inserter(operations));
+  std::copy(right_tree.begin(), right_tree.end(),
+            std::back_inserter(operations));
 
   reg = ridx++;
   operations.push_back(std::format("{} r{} r{} r{}", m_sop,
@@ -104,7 +105,8 @@ std::vector<Instruction> OpAST::GenerateCode(uint &ridx) {
   operations.reserve(left_tree.size() + right_tree.size() + 1);
 
   std::copy(left_tree.begin(), left_tree.end(), std::back_inserter(operations));
-  std::copy(right_tree.begin(), right_tree.end(), std::back_inserter(operations));
+  std::copy(right_tree.begin(), right_tree.end(),
+            std::back_inserter(operations));
 
   reg = ridx++;
   operations.emplace_back(m_code, static_cast<int>(lhs->GetValue()),
@@ -117,20 +119,42 @@ std::vector<Instruction> OpAST::GenerateCode(uint &ridx) {
 std::vector<std::string> FunctionCallAST::GenerateCodeStr(uint &ridx) {
   std::vector<std::string> operations;
 
-  for(auto &expr: m_args) {
+  for (auto &expr : m_args) {
     auto ops = expr->GenerateCodeStr(ridx);
     std::copy(ops.begin(), ops.end(), std::back_inserter(operations));
   }
 
   operations.push_back(std::format("call {}", m_name));
 
-  for(size_t i = 0; i < m_args.size(); ++i) {
+  for (size_t i = 0; i < m_args.size(); ++i) {
     auto &expr = m_args[i];
     auto name = m_argnames[i];
     operations.push_back(std::format("store r{} m@{}", expr->GetValue(), name));
   }
 
   std::copy(m_sbody.begin(), m_sbody.end(), std::back_inserter(operations));
+
+  return operations;
+}
+
+std::vector<Instruction> FunctionCallAST::GenerateCode(uint &ridx) {
+  std::vector<Instruction> operations;
+
+  for (auto &expr : m_args) {
+    auto ops = expr->GenerateCode(ridx);
+    std::copy(ops.begin(), ops.end(), std::back_inserter(operations));
+  }
+
+  operations.emplace_back(InsCode::call, m_name);
+
+  for (size_t i = 0; i < m_args.size(); ++i) {
+    auto &expr = m_args[i];
+    auto name = m_argnames[i];
+    operations.emplace_back(InsCode::store, static_cast<int>(expr->GetValue()),
+                            name);
+  }
+
+  std::copy(m_body.begin(), m_body.end(), std::back_inserter(operations));
 
   return operations;
 }

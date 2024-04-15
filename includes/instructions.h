@@ -18,7 +18,9 @@ enum InsCode {
   gteq,
   lteq,
   cjmp,
-  jmp
+  jmp,
+  call,
+  rmov
 };
 
 struct Instruction {
