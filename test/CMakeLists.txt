@@ -2,7 +2,9 @@ enable_testing()
 
 find_package(GTest REQUIRED)
 
-add_executable(test ifelse_test.cpp expr_test.cpp)
+file(GLOB_RECURSE SOURCE_FILES ${CMAKE_SOURCE_DIR}/test/*.cpp)
+
+add_executable(test ${SOURCE_FILES})
 
 target_link_libraries(test PRIVATE tci GTest::gtest_main)
 
