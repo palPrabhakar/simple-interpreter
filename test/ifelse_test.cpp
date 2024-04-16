@@ -14,7 +14,7 @@ TEST(IfElse_Test, TestIfElseStatement) {
 
   auto tokenizer =
       tci::Tokenizer("if (x  < 10) { mut x = x * 4; } else { mut x = x / 2; }");
-  auto ast = tci::Parse(tokenizer, st, true);
+  auto ast = tci::Parse(tokenizer, st);
   uint ridx = 1;
   auto code = ast->GenerateCode(ridx);
 
@@ -52,7 +52,7 @@ TEST(IfElse_Test, TestNestedIfElseStatement) {
       "mut "
       "x=x*4; }");
 
-  auto ast = tci::Parse(tokenizer, st, true);
+  auto ast = tci::Parse(tokenizer, st);
   uint ridx = 1;
   auto code = ast->GenerateCode(ridx);
 

@@ -11,7 +11,7 @@
 #include "function.h"
 
 namespace tci {
-std::unique_ptr<BaseAST> Parse(Tokenizer &tokenizer, SymbolTable &st, bool debug=false);
+std::unique_ptr<BaseAST> Parse(Tokenizer &tokenizer, SymbolTable &st);
 
 std::unique_ptr<StatementAST> ParseStatement(Tokenizer &tokenizer,
                                              SymbolTable &st);

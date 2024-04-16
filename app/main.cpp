@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
     if (cmd == "exit") exit(0);
 
     tci::Tokenizer tokenizer(cmd);
-    auto ast = tci::Parse(tokenizer, st, debug);
+    auto ast = tci::Parse(tokenizer, st);
     // idx 0 fixed for rax
     uint ridx = 1;
 

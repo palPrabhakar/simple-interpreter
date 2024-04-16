@@ -7,22 +7,12 @@
 
 namespace tci {
 
-std::vector<std::string> ValueAST::GenerateCodeStr(uint &ridx) {
-  reg = ridx++;
-  return {std::format("loadi {} r{}", m_val, reg)};
-}
-
 std::vector<Instruction> ValueAST::GenerateCode(uint &ridx) {
   std::vector<Instruction> instructions;
   reg = ridx++;
   instructions.emplace_back(InsCode::loadi, std::stod(m_val),
                             static_cast<int>(reg));
   return instructions;
-}
-
-std::vector<std::string> VarAST::GenerateCodeStr(uint &ridx) {
-  reg = ridx++;
-  return {std::format("load m@{} r{}", m_name, reg)};
 }
 
 std::vector<Instruction> VarAST::GenerateCode(uint &ridx) {
@@ -80,23 +70,6 @@ OpAST::OpAST(Token op, std::string sop) : m_op(op), m_sop(sop) {
   }
 }
 
-std::vector<std::string> OpAST::GenerateCodeStr(uint &ridx) {
-  std::vector<std::string> operations;
-  auto left_tree = lhs->GenerateCodeStr(ridx);
-  auto right_tree = rhs->GenerateCodeStr(ridx);
-
-  std::copy(left_tree.begin(), left_tree.end(), std::back_inserter(operations));
-  std::copy(right_tree.begin(), right_tree.end(),
-            std::back_inserter(operations));
-
-  reg = ridx++;
-  operations.push_back(std::format("{} r{} r{} r{}", m_sop,
-                                   static_cast<int>(lhs->GetValue()),
-                                   static_cast<int>(rhs->GetValue()), reg));
-
-  return operations;
-}
-
 std::vector<Instruction> OpAST::GenerateCode(uint &ridx) {
   auto left_tree = lhs->GenerateCode(ridx);
   auto right_tree = rhs->GenerateCode(ridx);
@@ -112,27 +85,6 @@ std::vector<Instruction> OpAST::GenerateCode(uint &ridx) {
   operations.emplace_back(m_code, static_cast<int>(lhs->GetValue()),
                           static_cast<int>(rhs->GetValue()),
                           static_cast<int>(reg));
-
-  return operations;
-}
-
-std::vector<std::string> FunctionCallAST::GenerateCodeStr(uint &ridx) {
-  std::vector<std::string> operations;
-
-  for (auto &expr : m_args) {
-    auto ops = expr->GenerateCodeStr(ridx);
-    std::copy(ops.begin(), ops.end(), std::back_inserter(operations));
-  }
-
-  operations.push_back(std::format("call {}", m_name));
-
-  for (size_t i = 0; i < m_args.size(); ++i) {
-    auto &expr = m_args[i];
-    auto name = m_argnames[i];
-    operations.push_back(std::format("store r{} m@{}", expr->GetValue(), name));
-  }
-
-  std::copy(m_sbody.begin(), m_sbody.end(), std::back_inserter(operations));
 
   return operations;
 }

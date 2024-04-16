@@ -41,26 +41,12 @@ std::unique_ptr<ExprAST> ParseExpression(Tokenizer &tokenizer,
       break;
     }
     case Call: {
-      // std::cout << "Call" << std::endl;
       op0 = ParseFunctionCall(tokenizer, st);
       break;
     }
     default:
       assert(false && "Failed to parse expression\n");
   }
-
-  // if (tok0 == LBrack) {
-  //   op0 = ParseExpression(tokenizer, st);
-  // } else if (tok0 == Text) {
-  //   if (std::isalpha(word0[0])) {
-  //     assert(st.CheckSymbol(word0) && "Undefined variable");
-  //     op0 = std::make_unique<VarAST>(word0);
-  //   } else {
-  //     op0 = std::make_unique<ValueAST>(word0);
-  //   }
-  // } else {
-  //   assert(false && "Failed to parse expression\n");
-  // }
 
   CheckTokenizer(tokenizer);
   auto [tok1, word1] = tokenizer.GetNextToken();
@@ -101,19 +87,6 @@ std::unique_ptr<ExprAST> ParseExpression(Tokenizer &tokenizer,
     default:
       assert(false && "Failed to parse expression\n");
   }
-
-  // if (tok0 == LBrack) {
-  //   op0 = ParseExpression(tokenizer, st);
-  // } else if (tok0 == Text) {
-  //   if (std::isalpha(word0[0])) {
-  //     assert(st.CheckSymbol(word0) && "Undefined variable");
-  //     op0 = std::make_unique<VarAST>(word0);
-  //   } else {
-  //     op0 = std::make_unique<ValueAST>(word0);
-  //   }
-  // } else {
-  //   assert(false && "Failed to parse expression\n");
-  // }
 
   CheckTokenizer(tokenizer);
   auto [tok1, word1] = tokenizer.GetNextToken();
@@ -173,7 +146,7 @@ std::unique_ptr<FunctionCallAST> ParseFunctionCall(Tokenizer &tokenizer,
   auto *prototype = st.GetPrototype(word0);
   return std::make_unique<FunctionCallAST>(word0, std::move(args),
                                            prototype->GetInstructions(),
-                                           prototype->GetInstructionsStr(), prototype->GetArgsStr());
+                                           prototype->GetArgsStr());
 }
 
 std::unique_ptr<StatementAST> ParseStatement(Tokenizer &tokenizer,
@@ -413,8 +386,7 @@ std::vector<std::unique_ptr<BaseAST>> ParseFunctionBody(Tokenizer &tokenizer,
   return nodes;
 }
 
-std::unique_ptr<BaseAST> Parse(Tokenizer &tokenizer, SymbolTable &st,
-                               bool debug) {
+std::unique_ptr<BaseAST> Parse(Tokenizer &tokenizer, SymbolTable &st) {
   CheckTokenizer(tokenizer);
   auto [token, word] = tokenizer.GetNextToken();
   std::unique_ptr<BaseAST> ast;
@@ -426,26 +398,13 @@ std::unique_ptr<BaseAST> Parse(Tokenizer &tokenizer, SymbolTable &st,
       ast = ParseStatement(tokenizer, st);
       break;
     case Fn: {
-      if (!debug) {
-        auto fn_ast = ParseFunction(tokenizer, st);
-        // uint size = fn_ast->GetArgumentSize();
-        uint ridx = 1;
-        st.InsertFunction(
-            fn_ast->GetName(),
-            std::make_unique<FunctionPrototype>(fn_ast->GetArgumentList(),
-                                                fn_ast->GenerateCode(ridx)));
-        ast = std::make_unique<DummyAST>();
-        break;
-      } else {
-        auto fn_ast = ParseFunction(tokenizer, st);
-        uint ridx = 1;
-        st.InsertFunction(
-            fn_ast->GetName(),
-            std::make_unique<FunctionPrototype>(fn_ast->GetArgumentList(),
-                                                fn_ast->GenerateCodeStr(ridx)));
-        ast = std::move(fn_ast);
-        break;
-      }
+      auto fn_ast = ParseFunction(tokenizer, st);
+      uint ridx = 1;
+      st.InsertFunction(fn_ast->GetName(), std::make_unique<FunctionPrototype>(
+                                               fn_ast->GetArgumentList(),
+                                               fn_ast->GenerateCode(ridx)));
+      ast = std::make_unique<DummyAST>();
+      break;
     }
     case While:
       ast = ParseWhileStatement(tokenizer, st);
