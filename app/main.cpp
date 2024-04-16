@@ -26,8 +26,8 @@ int main(int argc, char **argv) {
     // idx 0 fixed for rax
     uint ridx = 1;
 
+    auto operations = ast->GenerateCode(ridx);
     if (!debug) {
-      auto operations = ast->GenerateCode(ridx);
       interpreter.Interpret(std::move(operations));
 
       for (auto &[k, v] : st.GetGlobalSymbols()) {
@@ -35,13 +35,10 @@ int main(int argc, char **argv) {
       }
 
     } else {
-      auto operations = ast->GenerateCodeStr(ridx);
+      // auto operations = ast->GenerateCodeStr(ridx);
       auto count = 0;
-      for (auto op : operations) {
-        if (op[0] == '#') {
-          continue;
-        }
-        std::cout << count++ << ": " << op << std::endl;
+      for (auto &op : operations) {
+        std::cout << count++ << ": " << op.ToString() << std::endl;
       }
     }
   }

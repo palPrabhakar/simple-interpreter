@@ -10,7 +10,6 @@ namespace tci {
 void Interpreter::Load(Instruction ins, size_t &icounter) {
   auto vname = std::get<std::string>(ins.i0);
   auto ridx = std::get<int>(ins.i1);
-  // std::cout<<std::format("load {} {}", vname, ridx)<<std::endl;
   m_registers[ridx] = m_st.GetValue(vname);
   ++icounter;
 }
@@ -18,7 +17,6 @@ void Interpreter::Load(Instruction ins, size_t &icounter) {
 void Interpreter::Loadi(Instruction ins, size_t &icounter) {
   auto val = std::get<double>(ins.i0);
   auto ridx = std::get<int>(ins.i1);
-  // std::cout<<std::format("loadi {} {}", val, ridx)<<std::endl;
   m_registers[ridx] = val;
   ++icounter;
 }
@@ -26,7 +24,6 @@ void Interpreter::Loadi(Instruction ins, size_t &icounter) {
 void Interpreter::Store(Instruction ins, size_t &icounter) {
   auto ridx = std::get<int>(ins.i0);
   auto vname = std::get<std::string>(ins.i1);
-  // std::cout<<std::format("store {} {}", m_registers[ridx], ridx)<<std::endl;
   m_st.SetValue(vname, m_registers[ridx]);
   ++icounter;
 }
@@ -35,7 +32,6 @@ void Interpreter::Add(Instruction ins, size_t &icounter) {
   auto s0 = std::get<int>(ins.i0);
   auto s1 = std::get<int>(ins.i1);
   auto d = std::get<int>(ins.i2);
-  // std::cout<<std::format("add {} {} {}", s0, s1, d)<<std::endl;
   m_registers[d] = m_registers[s0] + m_registers[s1];
   ++icounter;
 }
