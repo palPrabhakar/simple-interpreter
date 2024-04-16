@@ -19,6 +19,10 @@ public:
     pos = 0;
   }
 
+  size_t GetPos() {
+    return pos;
+  }
+
 private:
   std::string m_file;
   size_t pos = 0;

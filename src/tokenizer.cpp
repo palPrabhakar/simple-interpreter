@@ -86,11 +86,13 @@ std::pair<Token, std::string> Tokenizer::GetNextToken() {
     return {token, word};
   }
 
-  for (; pos + 1 < m_file.size(); ++pos) {
-    word += m_file[pos];
-    if (stop_words.contains(m_file[pos + 1])) {
-      ++pos;
+  word += m_file[pos++];
+  for (; pos < m_file.size(); ++pos) {
+    if (stop_words.contains(m_file[pos])) {
+      // ++pos;
       break;
+    } else {
+      word += m_file[pos];
     }
   }
 

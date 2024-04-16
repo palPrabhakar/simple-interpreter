@@ -1,4 +1,5 @@
 #include <iostream>
+#include <stdexcept>
 #include <string>
 
 #include "interpreter.h"
@@ -22,24 +23,28 @@ int main(int argc, char **argv) {
     if (cmd == "exit") exit(0);
 
     tci::Tokenizer tokenizer(cmd);
-    auto ast = tci::Parse(tokenizer, st);
-    // idx 0 fixed for rax
-    uint ridx = 1;
+    try {
+      auto ast = tci::Parse(tokenizer, st);
+      // idx 0 fixed for rax
+      uint ridx = 1;
 
-    auto operations = ast->GenerateCode(ridx);
-    if (!debug) {
-      interpreter.Interpret(std::move(operations));
+      auto operations = ast->GenerateCode(ridx);
+      if (!debug) {
+        interpreter.Interpret(std::move(operations));
 
-      for (auto &[k, v] : st.GetGlobalSymbols()) {
-        std::cout << std::format("{}: {}", k, v) << std::endl;
+        for (auto &[k, v] : st.GetGlobalSymbols()) {
+          std::cout << std::format("{}: {}", k, v) << std::endl;
+        }
+
+      } else {
+        // auto operations = ast->GenerateCodeStr(ridx);
+        auto count = 0;
+        for (auto &op : operations) {
+          std::cout << count++ << ": " << op.ToString() << std::endl;
+        }
       }
-
-    } else {
-      // auto operations = ast->GenerateCodeStr(ridx);
-      auto count = 0;
-      for (auto &op : operations) {
-        std::cout << count++ << ": " << op.ToString() << std::endl;
-      }
+    } catch (std::runtime_error &err) {
+      std::cout << err.what() << "\n";
     }
   }
   return 0;
