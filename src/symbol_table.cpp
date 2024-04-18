@@ -1,6 +1,7 @@
 #include "symbol_table.h"
 
-#include <cassert>
+#include <format>
+#include <stdexcept>
 
 namespace tci {
 bool SymbolTable::CheckSymbol(std::string name) const {
@@ -52,7 +53,8 @@ void SymbolTable::InsertSymbol(std::string name) {
 void SymbolTable::InsertFunction(std::string name,
                                  std::unique_ptr<FunctionPrototype> func) {
   if (m_functions.contains(name)) {
-    assert(false && "Redefinition of function.\n");
+    throw std::runtime_error(
+        std::format("Redefinition of function {}.\n", name));
   }
 
   m_functions.insert({name, std::move(func)});

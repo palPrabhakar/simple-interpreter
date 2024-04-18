@@ -1,6 +1,6 @@
 enable_testing()
 
-find_package(GTest REQUIRED)
+ind_package(GTest REQUIRED)
 
 file(GLOB_RECURSE SOURCE_FILES ${CMAKE_SOURCE_DIR}/test/*.cpp)
 
