@@ -105,3 +105,49 @@ TEST(Function_Test, TestNestedFunction) {
   EXPECT_TRUE(st.CheckSymbol("a"));
   EXPECT_EQ(st.GetValue("a"), 3);
 }
+
+TEST(Function_Test, TestNestedTwoArgFunction) {
+  auto st = sci::SymbolTable();
+  auto interp = sci::Interpreter(st);
+
+  auto tokenizer = sci::Tokenizer("fn double(x) { return x*2; }");
+  auto ast = sci::Parse(tokenizer, st);
+  uint ridx = 1;
+  auto code = ast->GenerateCode(ridx);
+
+  tokenizer.ResetTokenizer("fn add_doubles(x, y) { let xd = call double(x); let yd = call double(y); return xd + yd; }");
+
+  ast = sci::Parse(tokenizer, st);
+  ridx = 1;
+  code = ast->GenerateCode(ridx);
+
+  tokenizer.ResetTokenizer("let a = call add_doubles(1, 2);");
+  ast = sci::Parse(tokenizer, st);
+  ridx = 1;
+  code = ast->GenerateCode(ridx);
+
+  interp.Interpret(std::move(code));
+  EXPECT_EQ(st.GetGlobalSymbols().size(), 1);
+  EXPECT_TRUE(st.CheckSymbol("a"));
+  EXPECT_EQ(st.GetValue("a"), 6);
+
+  tokenizer.ResetTokenizer("let b = call add_doubles(2, 4);");
+  ast = sci::Parse(tokenizer, st);
+  ridx = 1;
+  code = ast->GenerateCode(ridx);
+
+  interp.Interpret(std::move(code));
+  EXPECT_EQ(st.GetGlobalSymbols().size(), 2);
+  EXPECT_TRUE(st.CheckSymbol("b"));
+  EXPECT_EQ(st.GetValue("b"), 12);
+
+  tokenizer.ResetTokenizer("let c = call add_doubles(a, b);");
+  ast = sci::Parse(tokenizer, st);
+  ridx = 1;
+  code = ast->GenerateCode(ridx);
+
+  interp.Interpret(std::move(code));
+  EXPECT_EQ(st.GetGlobalSymbols().size(), 3);
+  EXPECT_TRUE(st.CheckSymbol("c"));
+  EXPECT_EQ(st.GetValue("c"), 36);
+}
