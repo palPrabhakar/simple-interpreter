@@ -113,17 +113,14 @@ void Interpreter::CJmp(Instruction ins, size_t &icounter) {
 void Interpreter::Call(Instruction ins, size_t &icounter) {
   auto fn_name = std::get<std::string>(ins.i0);
   m_st.PushSymbolTable();
-  auto *proto = m_st.GetPrototype(fn_name);
+  auto proto = m_st.GetPrototype(fn_name);
   for(auto var: proto->GetSymbols()) {
     m_st.InsertSymbol(var);
   }
   ++icounter;
 }
 
-void Interpreter::Rmov(Instruction ins, size_t &icounter) {
-  auto r0 = std::get<int>(ins.i0);
-  auto r1 = std::get<int>(ins.i1);
-  m_registers[r1] = m_registers[r0];
+void Interpreter::Ret(Instruction ins, size_t &icounter) {
   m_st.PopSymbolTable();
   ++icounter;
 }
@@ -175,8 +172,8 @@ void Interpreter::Interpret(std::vector<Instruction> instructions) {
       case call:
         Call(ins, icounter);
         break;
-      case rmov:
-        Rmov(ins, icounter);
+      case ret:
+        Ret(ins, icounter);
         break;
       default:
         throw std::runtime_error("Unknown instruction\n");

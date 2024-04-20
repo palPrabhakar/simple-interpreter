@@ -40,6 +40,6 @@ class Interpreter {
   void Jmp(Instruction ins, size_t &);
   void CJmp(Instruction ins, size_t &);
   void Call(Instruction ins, size_t &);
-  void Rmov(Instruction ins, size_t &);
+  void Ret(Instruction ins, size_t &);
 };
 }  // namespace sci

@@ -20,11 +20,11 @@ enum InsCode {
   cjmp,
   jmp,
   call,
-  rmov
+  ret
 };
 
 struct Instruction {
-  Instruction(InsCode _op, std::variant<int, double, std::string> _i0,
+  Instruction(InsCode _op, std::variant<int, double, std::string> _i0 = {},
               std::variant<int, double, std::string> _i1 = {},
               std::variant<int, double, std::string> _i2 = {})
       : op(_op), i0(_i0), i1(_i1), i2(_i2) {}
@@ -51,6 +51,6 @@ struct Instruction {
   std::string Jmp() const;
   std::string CJmp() const;
   std::string Call() const;
-  std::string Rmov() const;
+  std::string Ret() const;
 };
 }  // namespace sci

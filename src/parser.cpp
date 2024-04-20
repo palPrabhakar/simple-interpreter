@@ -166,10 +166,8 @@ std::unique_ptr<FunctionCallAST> ParseFunctionCall(Tokenizer &tokenizer,
     }
   }
 
-  auto *prototype = st.GetPrototype(word0);
   return std::make_unique<FunctionCallAST>(word0, std::move(args),
-                                           prototype->GetInstructions(),
-                                           prototype->GetArgsStr());
+                                           st.GetPrototype(word0));
 }
 
 std::unique_ptr<StatementAST> ParseStatement(Tokenizer &tokenizer,
@@ -329,7 +327,7 @@ std::unique_ptr<WhileStatementAST> ParseWhileStatement(Tokenizer &tokenizer,
                                              std::move(nodes));
 }
 
-std::unique_ptr<FunctionAST> ParseFunction(Tokenizer &tokenizer,
+std::shared_ptr<FunctionAST> ParseFunction(Tokenizer &tokenizer,
                                            SymbolTable &st) {
   CheckTokenizer(tokenizer);
   auto [token, word] = tokenizer.GetNextToken();
@@ -345,6 +343,15 @@ std::unique_ptr<FunctionAST> ParseFunction(Tokenizer &tokenizer,
 
   auto args = ParseArgumentList(tokenizer, st);
   auto body = ParseFunctionBody(tokenizer, st);
+  auto ret = ParseReturnStatement(tokenizer, st);
+
+  CheckTokenizer(tokenizer);
+  auto [token1, word1] = tokenizer.GetNextToken();
+  if (token1 != RParen) {
+    throw std::runtime_error(
+        std::format("Expected {} but found {} at pos {}.\n", "}", word1,
+                    tokenizer.GetPos()));
+  }
 
   std::vector<std::string> symbols;
   for (auto &[key, val] : st.GetTopLevelSymbols()) {
@@ -353,8 +360,8 @@ std::unique_ptr<FunctionAST> ParseFunction(Tokenizer &tokenizer,
 
   st.PopSymbolTable();
 
-  return std::make_unique<FunctionAST>(fn_name, std::move(args),
-                                       std::move(symbols), std::move(body));
+  return std::make_shared<FunctionAST>(fn_name, std::move(args),
+                                       std::move(symbols), std::move(body), std::move(ret));
 }
 
 std::unique_ptr<ReturnStatementAST> ParseReturnStatement(Tokenizer &tokenizer,
@@ -447,7 +454,7 @@ std::vector<std::unique_ptr<BaseAST>> ParseFunctionBody(Tokenizer &tokenizer,
         nodes.push_back(ParseWhileStatement(tokenizer, st));
         break;
       case Return: {
-        nodes.push_back(ParseReturnStatement(tokenizer, st));
+        // nodes.push_back(ParseReturnStatement(tokenizer, st));
         cont = false;
         break;
       }
@@ -455,14 +462,6 @@ std::vector<std::unique_ptr<BaseAST>> ParseFunctionBody(Tokenizer &tokenizer,
         throw std::runtime_error(std::format(
             "Invalid token: found {} at pos {}.\n", word, tokenizer.GetPos()));
     }
-  }
-
-  CheckTokenizer(tokenizer);
-  auto [token1, word1] = tokenizer.GetNextToken();
-  if (token1 != RParen) {
-    throw std::runtime_error(
-        std::format("Expected {} but found {} at pos {}.\n", "}", word1,
-                    tokenizer.GetPos()));
   }
 
   return nodes;
@@ -481,11 +480,7 @@ std::unique_ptr<BaseAST> Parse(Tokenizer &tokenizer, SymbolTable &st) {
         break;
       case Fn: {
         auto fn_ast = ParseFunction(tokenizer, st);
-        uint ridx = 1;
-        st.InsertFunction(fn_ast->GetName(),
-                          std::make_unique<FunctionPrototype>(
-                              fn_ast->GetArgumentList(), fn_ast->GetSymbols(),
-                              fn_ast->GenerateCode(ridx)));
+        st.InsertFunction(fn_ast->GetName(), fn_ast);
         ast = std::make_unique<DummyAST>();
         break;
       }

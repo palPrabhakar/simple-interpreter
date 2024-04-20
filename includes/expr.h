@@ -2,11 +2,11 @@
 
 #include <format>
 #include <memory>
+#include <stdexcept>
 #include <string>
 
 #include "ast.h"
 #include "instructions.h"
-#include "symbol_table.h"
 #include "tokens.h"
 
 namespace sci {
@@ -14,7 +14,7 @@ namespace sci {
 class ExprAST : public BaseAST {
  public:
   virtual ~ExprAST() = default;
-  virtual uint GetValue() = 0;
+  virtual const uint GetValue() const = 0;
   virtual void SetLhs(std::unique_ptr<ExprAST> lhs) {}
   virtual void SetRhs(std::unique_ptr<ExprAST> rhs) {}
   virtual const int GetPrecedence() const { return 0; }
@@ -26,7 +26,7 @@ class ValueAST : public ExprAST {
 
   std::vector<Instruction> GenerateCode(uint &ridx);
 
-  uint GetValue() { return reg; }
+  const uint GetValue() const { return reg; }
 
  private:
   std::string m_val;
@@ -39,7 +39,7 @@ class VarAST : public ExprAST {
 
   std::vector<Instruction> GenerateCode(uint &ridx);
 
-  uint GetValue() { return reg; }
+  const uint GetValue() const { return reg; }
 
  private:
   std::string m_name;
@@ -52,7 +52,7 @@ class OpAST : public ExprAST {
 
   std::vector<Instruction> GenerateCode(uint &ridx);
 
-  uint GetValue() { return reg; }
+  const uint GetValue() const { return reg; }
 
   void SetLhs(std::unique_ptr<ExprAST> lhs) { this->lhs = std::move(lhs); }
   void SetRhs(std::unique_ptr<ExprAST> rhs) { this->rhs = std::move(rhs); }
@@ -67,29 +67,6 @@ class OpAST : public ExprAST {
   uint reg;
   std::unique_ptr<ExprAST> lhs;
   std::unique_ptr<ExprAST> rhs;
-};
-
-class FunctionCallAST : public ExprAST {
- public:
-  FunctionCallAST(std::string name, std::vector<std::unique_ptr<ExprAST>> args,
-                  std::vector<Instruction> body,
-                  std::vector<std::string> argnames)
-      : m_name(name),
-        m_args(std::move(args)),
-        m_body(std::move(body)),
-        m_argnames(std::move(argnames)) {
-    assert(m_args.size() == m_argnames.size() && "Argument size mismatch.\n");
-  }
-
-  uint GetValue() { return 0; }
-
-  std::vector<Instruction> GenerateCode(uint &ridx);
-
- private:
-  std::string m_name;
-  std::vector<std::unique_ptr<ExprAST>> m_args;
-  std::vector<Instruction> m_body;
-  std::vector<std::string> m_argnames;
 };
 
 }  // namespace sci

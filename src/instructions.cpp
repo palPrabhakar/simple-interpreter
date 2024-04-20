@@ -70,9 +70,7 @@ std::string Instruction::Call() const {
   return std::format("call {}", std::get<std::string>(i0));
 }
 
-std::string Instruction::Rmov() const {
-  return std::format("rmov r{} r{}", std::get<int>(i0), std::get<int>(i1));
-}
+std::string Instruction::Ret() const { return std::string("ret"); }
 
 std::string Instruction::ToString() const {
   switch (op) {
@@ -104,8 +102,8 @@ std::string Instruction::ToString() const {
       return Jmp();
     case call:
       return Call();
-    case rmov:
-      return Rmov();
+    case ret:
+      return Ret();
     default:
       throw std::runtime_error("Unknown instruction\n");
   }
