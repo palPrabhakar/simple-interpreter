@@ -44,7 +44,7 @@ let a = call double(2);
 
 let b = call double(a);
 
-fn foo(x, y) { return call double(x) + y; }
+fn add_doubles(x, y) { return call double(x) + call double(y); }
 
 let x = call add_doubles(1, 2);
 ```
