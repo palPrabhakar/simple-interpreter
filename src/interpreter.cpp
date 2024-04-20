@@ -114,7 +114,7 @@ void Interpreter::Call(Instruction ins, size_t &icounter) {
   auto fn_name = std::get<std::string>(ins.i0);
   m_st.PushSymbolTable();
   auto *proto = m_st.GetPrototype(fn_name);
-  for(auto var: proto->GetArgsStr()) {
+  for(auto var: proto->GetSymbols()) {
     m_st.InsertSymbol(var);
   }
   ++icounter;

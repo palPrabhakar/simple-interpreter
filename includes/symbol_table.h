@@ -27,6 +27,8 @@ class SymbolTable {
   void PushSymbolTable() { m_st.push(Symbols()); }
   void PopSymbolTable() { m_st.pop(); }
 
+  const Symbols& GetTopLevelSymbols() const { return m_st.top(); }
+
   const Symbols& GetGlobalSymbols() const { return g_symbols; }
 
   bool CheckFunction(std::string name) { return m_functions.contains(name); }

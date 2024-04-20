@@ -346,10 +346,15 @@ std::unique_ptr<FunctionAST> ParseFunction(Tokenizer &tokenizer,
   auto args = ParseArgumentList(tokenizer, st);
   auto body = ParseFunctionBody(tokenizer, st);
 
+  std::vector<std::string> symbols;
+  for (auto &[key, val] : st.GetTopLevelSymbols()) {
+    symbols.push_back(key);
+  }
+
   st.PopSymbolTable();
 
   return std::make_unique<FunctionAST>(fn_name, std::move(args),
-                                       std::move(body));
+                                       std::move(symbols), std::move(body));
 }
 
 std::unique_ptr<ReturnStatementAST> ParseReturnStatement(Tokenizer &tokenizer,
@@ -373,7 +378,7 @@ std::vector<std::string> ParseArgumentList(Tokenizer &tokenizer,
   CheckTokenizer(tokenizer);
   auto [token, word] = tokenizer.GetNextToken();
 
-  if (token != RBrack) { // empty function with no parameters
+  if (token != RBrack) {  // empty function with no parameters
     while (true) {
       if (token != Text) {
         throw std::runtime_error(
@@ -398,8 +403,9 @@ std::vector<std::string> ParseArgumentList(Tokenizer &tokenizer,
       }
 
       if (token0 != Comma) {
-        throw std::runtime_error(std::format(
-            "Expected , or ) but found {} at pos {}.\n", word0, tokenizer.GetPos()));
+        throw std::runtime_error(
+            std::format("Expected , or ) but found {} at pos {}.\n", word0,
+                        tokenizer.GetPos()));
       }
 
       auto tok = tokenizer.GetNextToken();
@@ -476,10 +482,10 @@ std::unique_ptr<BaseAST> Parse(Tokenizer &tokenizer, SymbolTable &st) {
       case Fn: {
         auto fn_ast = ParseFunction(tokenizer, st);
         uint ridx = 1;
-        st.InsertFunction(
-            fn_ast->GetName(),
-            std::make_unique<FunctionPrototype>(fn_ast->GetArgumentList(),
-                                                fn_ast->GenerateCode(ridx)));
+        st.InsertFunction(fn_ast->GetName(),
+                          std::make_unique<FunctionPrototype>(
+                              fn_ast->GetArgumentList(), fn_ast->GetSymbols(),
+                              fn_ast->GenerateCode(ridx)));
         ast = std::make_unique<DummyAST>();
         break;
       }
