@@ -6,7 +6,7 @@
 
 #include "instructions.h"
 
-namespace tci {
+namespace sci {
 void Interpreter::Load(Instruction ins, size_t &icounter) {
   auto vname = std::get<std::string>(ins.i0);
   auto ridx = std::get<int>(ins.i1);
@@ -183,4 +183,4 @@ void Interpreter::Interpret(std::vector<Instruction> instructions) {
     }
   }
 }
-}  // namespace tci
+}  // namespace sci

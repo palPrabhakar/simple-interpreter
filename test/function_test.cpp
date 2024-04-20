@@ -6,16 +6,16 @@
 #include "tokenizer.h"
 
 TEST(Function_Test, TestSimpleFunction) {
-  auto st = tci::SymbolTable();
-  auto interp = tci::Interpreter(st);
+  auto st = sci::SymbolTable();
+  auto interp = sci::Interpreter(st);
 
-  auto tokenizer = tci::Tokenizer("fn double(x) { return x*2; }");
-  auto ast = tci::Parse(tokenizer, st);
+  auto tokenizer = sci::Tokenizer("fn double(x) { return x*2; }");
+  auto ast = sci::Parse(tokenizer, st);
   uint ridx = 1;
   auto code = ast->GenerateCode(ridx);
 
   tokenizer.ResetTokenizer("let a = call double(1);");
-  ast = tci::Parse(tokenizer, st);
+  ast = sci::Parse(tokenizer, st);
   ridx = 1;
   code = ast->GenerateCode(ridx);
 
@@ -35,16 +35,16 @@ TEST(Function_Test, TestSimpleFunction) {
 }
 
 TEST(Function_Test, TestTwoArgFunction) {
-  auto st = tci::SymbolTable();
-  auto interp = tci::Interpreter(st);
+  auto st = sci::SymbolTable();
+  auto interp = sci::Interpreter(st);
 
-  auto tokenizer = tci::Tokenizer("fn add(x, y) { return x + y; }");
-  auto ast = tci::Parse(tokenizer, st);
+  auto tokenizer = sci::Tokenizer("fn add(x, y) { return x + y; }");
+  auto ast = sci::Parse(tokenizer, st);
   uint ridx = 1;
   auto code = ast->GenerateCode(ridx);
 
   tokenizer.ResetTokenizer("let a = call add(1, 2);");
-  ast = tci::Parse(tokenizer, st);
+  ast = sci::Parse(tokenizer, st);
   ridx = 1;
   code = ast->GenerateCode(ridx);
 
@@ -66,22 +66,22 @@ TEST(Function_Test, TestTwoArgFunction) {
 }
 
 TEST(Function_Test, TestNestedFunction) {
-  auto st = tci::SymbolTable();
-  auto interp = tci::Interpreter(st);
+  auto st = sci::SymbolTable();
+  auto interp = sci::Interpreter(st);
 
-  auto tokenizer = tci::Tokenizer("fn double(x) { return x*2; }");
-  auto ast = tci::Parse(tokenizer, st);
+  auto tokenizer = sci::Tokenizer("fn double(x) { return x*2; }");
+  auto ast = sci::Parse(tokenizer, st);
   uint ridx = 1;
   auto code = ast->GenerateCode(ridx);
 
   tokenizer.ResetTokenizer("fn triple(x) { return call double(x) + x; }");
 
-  ast = tci::Parse(tokenizer, st);
+  ast = sci::Parse(tokenizer, st);
   ridx = 1;
   code = ast->GenerateCode(ridx);
 
   tokenizer.ResetTokenizer("let a = call triple(1);");
-  ast = tci::Parse(tokenizer, st);
+  ast = sci::Parse(tokenizer, st);
   ridx = 1;
   code = ast->GenerateCode(ridx);
 

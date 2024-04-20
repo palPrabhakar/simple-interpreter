@@ -1,4 +1,4 @@
 add_executable(run main.cpp)
 
-target_link_libraries(run PRIVATE tci)
+target_link_libraries(run PRIVATE sci)
 

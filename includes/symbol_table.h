@@ -9,7 +9,7 @@
 #include "prototype.h"
 #include "tokens.h"
 
-namespace tci {
+namespace sci {
 using Symbols = std::unordered_map<std::string, double>;
 
 class SymbolTable {
@@ -44,4 +44,4 @@ class SymbolTable {
   std::unordered_map<std::string, std::unique_ptr<FunctionPrototype>>
       m_functions;
 };
-}  // namespace tci
+}  // namespace sci

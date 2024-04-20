@@ -5,7 +5,7 @@
 
 #include "instructions.h"
 
-namespace tci {
+namespace sci {
 
 std::vector<Instruction> ValueAST::GenerateCode(uint &ridx) {
   std::vector<Instruction> instructions;
@@ -111,4 +111,4 @@ std::vector<Instruction> FunctionCallAST::GenerateCode(uint &ridx) {
   return operations;
 }
 
-}  // namespace tci
+}  // namespace sci

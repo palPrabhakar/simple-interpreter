@@ -2,7 +2,7 @@
 
 #include "instructions.h"
 
-namespace tci {
+namespace sci {
 std::vector<Instruction> ReturnStatementAST::GenerateCode(uint &ridx) {
   auto operations = m_expr->GenerateCode(ridx);
   operations.emplace_back(InsCode::rmov, static_cast<int>(m_expr->GetValue()),
@@ -21,4 +21,4 @@ std::vector<Instruction> FunctionAST::GenerateCode(uint &ridx) {
   return operations;
 }
 
-}  // namespace tci
+}  // namespace sci

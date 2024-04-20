@@ -3,7 +3,7 @@
 #include <string>
 #include <variant>
 
-namespace tci {
+namespace sci {
 enum InsCode {
   loadi,
   load,
@@ -53,4 +53,4 @@ struct Instruction {
   std::string Call() const;
   std::string Rmov() const;
 };
-}  // namespace tci
+}  // namespace sci

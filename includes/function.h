@@ -6,7 +6,7 @@
 #include "ast.h"
 #include "expr.h"
 
-namespace tci {
+namespace sci {
 class ReturnStatementAST : public BaseAST {
  public:
   ReturnStatementAST(std::unique_ptr<ExprAST> expr) : m_expr(std::move(expr)) {}
@@ -41,4 +41,4 @@ class FunctionAST : public BaseAST {
   std::vector<std::unique_ptr<BaseAST>> m_body;
 };
 
-}  // namespace tci
+}  // namespace sci

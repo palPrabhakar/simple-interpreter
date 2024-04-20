@@ -7,7 +7,7 @@
 #include "ast.h"
 #include "expr.h"
 
-namespace tci {
+namespace sci {
 class StatementAST : public BaseAST {
  public:
   StatementAST(std::string name, std::unique_ptr<ExprAST> expr)
@@ -53,4 +53,4 @@ class WhileStatementAST : public BaseAST {
   std::vector<std::unique_ptr<BaseAST>> m_body;
 };
 
-}  // namespace tci
+}  // namespace sci

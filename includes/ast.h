@@ -5,7 +5,7 @@
 
 #include "instructions.h"
 
-namespace tci {
+namespace sci {
 class BaseAST {
  public:
   virtual ~BaseAST() = default;
@@ -17,4 +17,4 @@ class DummyAST : public BaseAST {
   std::vector<Instruction> GenerateCode(uint &ridx) { return {}; }
 };
 
-}  // namespace tci
+}  // namespace sci

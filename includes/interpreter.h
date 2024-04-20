@@ -5,7 +5,7 @@
 #include "instructions.h"
 #include "symbol_table.h"
 
-namespace tci {
+namespace sci {
 class Interpreter {
  public:
   Interpreter(SymbolTable &st, size_t reg_size = 1000)
@@ -42,4 +42,4 @@ class Interpreter {
   void Call(Instruction ins, size_t &);
   void Rmov(Instruction ins, size_t &);
 };
-}  // namespace tci
+}  // namespace sci

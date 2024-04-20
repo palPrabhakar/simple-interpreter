@@ -13,8 +13,8 @@ int main(int argc, char **argv) {
     debug = true;
   }
 
-  auto st = tci::SymbolTable();
-  tci::Interpreter interpreter(st);
+  auto st = sci::SymbolTable();
+  sci::Interpreter interpreter(st);
   while (true) {
     std::string cmd;
     std::cout << ">>> ";
@@ -22,9 +22,9 @@ int main(int argc, char **argv) {
 
     if (cmd == "exit") exit(0);
 
-    tci::Tokenizer tokenizer(cmd);
+    sci::Tokenizer tokenizer(cmd);
     try {
-      auto ast = tci::Parse(tokenizer, st);
+      auto ast = sci::Parse(tokenizer, st);
       // idx 0 fixed for rax
       uint ridx = 1;
 

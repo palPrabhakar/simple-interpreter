@@ -1,6 +1,6 @@
 #pragma once
 
-namespace tci {
+namespace sci {
 enum Token {
   Text,
   // Keywords
@@ -46,4 +46,4 @@ enum Token {
   End
 };
 
-} // namespace tci
+} // namespace sci

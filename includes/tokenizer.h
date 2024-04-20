@@ -3,7 +3,7 @@
 #include "tokens.h"
 #include <string>
 
-namespace tci {
+namespace sci {
 class Tokenizer {
 public:
   Tokenizer(std::string file) : m_file(std::move(file)) {}
@@ -27,4 +27,4 @@ private:
   std::string m_file;
   size_t pos = 0;
 };
-} // namespace tci
+} // namespace sci

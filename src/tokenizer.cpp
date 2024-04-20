@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-namespace tci {
+namespace sci {
 static const std::unordered_map<std::string, Token> token_map = {
     {"let", Token::Let},
     {"mut", Token::Mut},
@@ -105,4 +105,4 @@ std::pair<Token, std::string> Tokenizer::GetNextToken() {
   return {token, word};
 }
 
-}  // namespace tci
+}  // namespace sci

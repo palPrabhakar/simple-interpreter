@@ -6,13 +6,13 @@
 #include "tokenizer.h"
 
 TEST(Where_Test, TestSimpleWhere) {
-  auto st = tci::SymbolTable();
-  auto interp = tci::Interpreter(st);
+  auto st = sci::SymbolTable();
+  auto interp = sci::Interpreter(st);
   st.InsertSymbol("x");
   st.SetValue("x", 1);
 
-  auto tokenizer = tci::Tokenizer("while (x < 10) { mut x = x + 1; }");
-  auto ast = tci::Parse(tokenizer, st);
+  auto tokenizer = sci::Tokenizer("while (x < 10) { mut x = x + 1; }");
+  auto ast = sci::Parse(tokenizer, st);
   uint ridx = 1;
   auto code = ast->GenerateCode(ridx);
 
@@ -34,18 +34,18 @@ TEST(Where_Test, TestSimpleWhere) {
 }
 
 TEST(Where_Test, TestWhereWithIf) {
-  auto st = tci::SymbolTable();
-  auto interp = tci::Interpreter(st);
+  auto st = sci::SymbolTable();
+  auto interp = sci::Interpreter(st);
   st.InsertSymbol("x");
   st.SetValue("x", 1);
 
   st.InsertSymbol("i");
   st.SetValue("i", 0);
 
-  auto tokenizer = tci::Tokenizer(
+  auto tokenizer = sci::Tokenizer(
       "while (i < 10) { if(i < 5) { mut x = x*2; } else { mut x = x+1; } mut i "
       "= i + 1; }");
-  auto ast = tci::Parse(tokenizer, st);
+  auto ast = sci::Parse(tokenizer, st);
   uint ridx = 1;
   auto code = ast->GenerateCode(ridx);
 

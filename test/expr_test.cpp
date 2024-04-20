@@ -6,11 +6,11 @@
 #include "tokenizer.h"
 
 TEST(Expr_Test, TestExpr) {
-  auto st = tci::SymbolTable();
-  auto interp = tci::Interpreter(st);
+  auto st = sci::SymbolTable();
+  auto interp = sci::Interpreter(st);
 
-  auto tokenizer = tci::Tokenizer("let x  = 1;");
-  auto ast = tci::Parse(tokenizer, st);
+  auto tokenizer = sci::Tokenizer("let x  = 1;");
+  auto ast = sci::Parse(tokenizer, st);
   uint ridx = 1;
   auto code = ast->GenerateCode(ridx);
 
@@ -23,7 +23,7 @@ TEST(Expr_Test, TestExpr) {
   EXPECT_EQ(st.GetValue("x"), 1);
 
   tokenizer.ResetTokenizer("let y = x*5;");
-  ast = tci::Parse(tokenizer, st);
+  ast = sci::Parse(tokenizer, st);
   ridx = 1;
   code = ast->GenerateCode(ridx);
 
@@ -38,7 +38,7 @@ TEST(Expr_Test, TestExpr) {
   EXPECT_EQ(st.GetValue("y"), 5);
 
   tokenizer.ResetTokenizer("let z = x+y - 5;");
-  ast = tci::Parse(tokenizer, st);
+  ast = sci::Parse(tokenizer, st);
   ridx = 1;
   code = ast->GenerateCode(ridx);
   EXPECT_EQ(code.size(), 6);
@@ -54,7 +54,7 @@ TEST(Expr_Test, TestExpr) {
   EXPECT_EQ(st.GetValue("z"), 1);
 
   tokenizer.ResetTokenizer("mut x = 5;");
-  ast = tci::Parse(tokenizer, st);
+  ast = sci::Parse(tokenizer, st);
   ridx = 1;
   code = ast->GenerateCode(ridx);
   EXPECT_EQ(code.size(), 2);
@@ -66,7 +66,7 @@ TEST(Expr_Test, TestExpr) {
   EXPECT_EQ(st.GetValue("x"), 5);
 
   tokenizer.ResetTokenizer("mut y = x/5;");
-  ast = tci::Parse(tokenizer, st);
+  ast = sci::Parse(tokenizer, st);
   ridx = 1;
   code = ast->GenerateCode(ridx);
 

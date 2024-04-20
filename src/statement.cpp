@@ -3,7 +3,7 @@
 
 #include "instructions.h"
 
-namespace tci {
+namespace sci {
 std::vector<Instruction> StatementAST::GenerateCode(uint &ridx) {
   auto operations = m_expr->GenerateCode(ridx);
   operations.emplace_back(InsCode::store, static_cast<int>(m_expr->GetValue()), m_varName);
@@ -60,4 +60,4 @@ std::vector<Instruction> WhileStatementAST::GenerateCode(uint &ridx) {
   return operations;
 }
 
-}  // namespace tci
+}  // namespace sci

@@ -3,7 +3,7 @@
 #include <format>
 #include <stdexcept>
 
-namespace tci {
+namespace sci {
 std::string Instruction::Load() const {
   return std::format("load m@{} r{}", std::get<std::string>(i0),
                      std::get<int>(i1));
@@ -110,4 +110,4 @@ std::string Instruction::ToString() const {
       throw std::runtime_error("Unknown instruction\n");
   }
 }
-}  // namespace tci
+}  // namespace sci

@@ -5,7 +5,7 @@
 
 #include "instructions.h"
 
-namespace tci {
+namespace sci {
 class FunctionPrototype {
  public:
   FunctionPrototype(std::vector<std::string> args, std::vector<Instruction> fn)
@@ -19,4 +19,4 @@ class FunctionPrototype {
   std::vector<Instruction> m_fn;
 };
 
-}  // namespace tci
+}  // namespace sci

@@ -6,15 +6,15 @@
 #include "tokenizer.h"
 
 TEST(IfElse_Test, TestIfElseStatement) {
-  auto st = tci::SymbolTable();
-  auto interp = tci::Interpreter(st);
+  auto st = sci::SymbolTable();
+  auto interp = sci::Interpreter(st);
 
   st.InsertSymbol("x");
   st.SetValue("x", 1);
 
   auto tokenizer =
-      tci::Tokenizer("if (x  < 10) { mut x = x * 4; } else { mut x = x / 2; }");
-  auto ast = tci::Parse(tokenizer, st);
+      sci::Tokenizer("if (x  < 10) { mut x = x * 4; } else { mut x = x / 2; }");
+  auto ast = sci::Parse(tokenizer, st);
   uint ridx = 1;
   auto code = ast->GenerateCode(ridx);
 
@@ -39,20 +39,20 @@ TEST(IfElse_Test, TestIfElseStatement) {
 }
 
 TEST(IfElse_Test, TestNestedIfElseStatement) {
-  auto st = tci::SymbolTable();
-  auto interp = tci::Interpreter(st);
+  auto st = sci::SymbolTable();
+  auto interp = sci::Interpreter(st);
 
   st.InsertSymbol("x");
   st.SetValue("x", 4);
 
   st.InsertSymbol("y");
   st.SetValue("y", 5);
-  auto tokenizer = tci::Tokenizer(
+  auto tokenizer = sci::Tokenizer(
       "if (x<10) { if (y>10) { mut x = y/x; } else { mut x = x*y; } } else { "
       "mut "
       "x=x*4; }");
 
-  auto ast = tci::Parse(tokenizer, st);
+  auto ast = sci::Parse(tokenizer, st);
   uint ridx = 1;
   auto code = ast->GenerateCode(ridx);
 

@@ -13,7 +13,7 @@
 #include "tokenizer.h"
 #include "tokens.h"
 
-namespace tci {
+namespace sci {
 
 inline void CheckTokenizer(Tokenizer &tokenizer) {
   if (tokenizer.EOP()) {
@@ -498,4 +498,4 @@ std::unique_ptr<BaseAST> Parse(Tokenizer &tokenizer, SymbolTable &st) {
 
   return std::make_unique<DummyAST>();
 }
-}  // namespace tci
+}  // namespace sci

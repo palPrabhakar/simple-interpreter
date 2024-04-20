@@ -3,7 +3,7 @@
 #include <format>
 #include <stdexcept>
 
-namespace tci {
+namespace sci {
 bool SymbolTable::CheckSymbol(std::string name) const {
   if (!m_st.empty() && m_st.top().contains(name)) {
     return true;
@@ -60,4 +60,4 @@ void SymbolTable::InsertFunction(std::string name,
   m_functions.insert({name, std::move(func)});
 }
 
-}  // namespace tci
+}  // namespace sci

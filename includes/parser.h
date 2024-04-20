@@ -10,7 +10,7 @@
 #include "tokenizer.h"
 #include "function.h"
 
-namespace tci {
+namespace sci {
 std::unique_ptr<BaseAST> Parse(Tokenizer &tokenizer, SymbolTable &st);
 
 std::unique_ptr<StatementAST> ParseStatement(Tokenizer &tokenizer,
@@ -39,4 +39,4 @@ std::vector<std::unique_ptr<BaseAST>> ParseConditionalBody(Tokenizer &tokenizer,
 std::vector<std::unique_ptr<BaseAST>> ParseFunctionBody(Tokenizer &tokenizer, SymbolTable &st);
 
 std::vector<std::string> ParseArgumentList(Tokenizer &tokenizer, SymbolTable &st);
-}  // namespace tci
+}  // namespace sci

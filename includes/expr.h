@@ -9,7 +9,7 @@
 #include "symbol_table.h"
 #include "tokens.h"
 
-namespace tci {
+namespace sci {
 
 class ExprAST : public BaseAST {
  public:
@@ -92,4 +92,4 @@ class FunctionCallAST : public ExprAST {
   std::vector<std::string> m_argnames;
 };
 
-}  // namespace tci
+}  // namespace sci
