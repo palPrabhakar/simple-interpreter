@@ -48,3 +48,7 @@ fn add_doubles(x, y) { return call double(x) + call double(y); }
 
 let x = call add_doubles(1, 2);
 ```
+
+## TODO
+1. Support for break/continue in a loop.
+2. Support for arrays.
