@@ -8,6 +8,12 @@
 #include "expr.h"
 
 namespace sci {
+
+class BreakStatementAST: public BaseAST {
+  public:
+    std::vector<Instruction> GenerateCode(uint &ridx);
+};
+
 class StatementAST : public BaseAST {
  public:
   StatementAST(std::string name, std::unique_ptr<ExprAST> expr)

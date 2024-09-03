@@ -26,6 +26,8 @@ std::unique_ptr<ExprAST> ParseExpression(Tokenizer &tokenizer, SymbolTable &st);
 
 std::unique_ptr<IfStatementAST> ParseIfStatement(Tokenizer &tokenizer, SymbolTable &st);
 
+std::unique_ptr<BreakStatementAST> ParseBreakStatement(Tokenizer &tokenizer, SymbolTable &st);
+
 std::unique_ptr<WhileStatementAST> ParseWhileStatement(Tokenizer &tokenzier, SymbolTable &st);
 
 std::shared_ptr<FunctionAST> ParseFunction(Tokenizer &tokenizer, SymbolTable &st);

@@ -23,7 +23,13 @@ enum InsCode {
   ret
 };
 
-struct Instruction {
+struct Label {
+  const static std::string loop_end;
+  const static std::string loop_start;
+};
+
+class Instruction {
+public:
   Instruction(InsCode _op, std::variant<int, double, std::string> _i0 = {},
               std::variant<int, double, std::string> _i1 = {},
               std::variant<int, double, std::string> _i2 = {})

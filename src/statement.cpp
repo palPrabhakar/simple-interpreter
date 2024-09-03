@@ -1,9 +1,16 @@
 #include "statement.h"
 #include <iterator>
+#include <variant>
 
 #include "instructions.h"
 
 namespace sci {
+std::vector<Instruction> BreakStatementAST::GenerateCode(uint &ridx) {
+  // std::vector<Instruction> operations;
+  // operations.emplace_back(InsCode::jmp, "loop_end");
+  return { Instruction(InsCode::jmp, Label::loop_end) };
+}
+
 std::vector<Instruction> StatementAST::GenerateCode(uint &ridx) {
   auto operations = m_expr->GenerateCode(ridx);
   operations.emplace_back(InsCode::store, static_cast<int>(m_expr->GetValue()), m_varName);
@@ -42,20 +49,26 @@ std::vector<Instruction> WhileStatementAST::GenerateCode(uint &ridx) {
   auto expr_arr = m_cexpr->GenerateCode(ridx);
   std::copy(expr_arr.begin(), expr_arr.end(), std::back_inserter(operations));
 
-  std::vector<Instruction> body;
-  for (auto &node : m_body) {
-    auto ops = node->GenerateCode(ridx);
-    std::copy(ops.begin(), ops.end(), std::back_inserter(body));
-  }
-
   operations.emplace_back(InsCode::cjmp, static_cast<int>(m_cexpr->GetValue()), 2);
 
   // false branch
-  operations.emplace_back(InsCode::jmp, static_cast<int>(body.size() + 2));
-
-  // loop body
-  std::copy(body.begin(), body.end(), std::back_inserter(operations));
+  operations.emplace_back(InsCode::jmp, Label::loop_end);
+  for (auto &node : m_body) {
+    auto ops = node->GenerateCode(ridx);
+    std::copy(ops.begin(), ops.end(), std::back_inserter(operations));
+  }
   operations.emplace_back(InsCode::jmp, -static_cast<int>(operations.size()));
+
+  for(size_t i = 0; i < operations.size(); ++i) {
+    if(operations[i].op == InsCode::jmp) {
+      if(std::holds_alternative<std::string>(operations[i].i0)) {
+        // for now lbl only loop_end 
+        // no need to check this 
+        auto lbl = std::get<std::string>(operations[i].i0);
+        operations[i].i0.emplace<int>(static_cast<int>(operations.size() - i));
+      }
+    }
+  }
 
   return operations;
 }

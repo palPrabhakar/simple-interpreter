@@ -3,7 +3,12 @@
 #include <format>
 #include <stdexcept>
 
+
 namespace sci {
+
+const std::string Label::loop_start = "begin";
+const std::string Label::loop_end = "end";
+
 std::string Instruction::Load() const {
   return std::format("load m@{} r{}", std::get<std::string>(i0),
                      std::get<int>(i1));

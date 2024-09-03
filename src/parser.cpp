@@ -170,6 +170,17 @@ std::unique_ptr<FunctionCallAST> ParseFunctionCall(Tokenizer &tokenizer,
                                            st.GetPrototype(word0));
 }
 
+std::unique_ptr<BreakStatementAST> ParseBreakStatement(Tokenizer &tokenizer, SymbolTable &st) {
+  CheckTokenizer(tokenizer);
+  auto [token, word] = tokenizer.GetNextToken();
+  if (token != SColon) {
+    throw std::runtime_error(
+        std::format("Expected ; but found {} at pos {}.\n", word,
+                    tokenizer.GetPos()));
+  }
+  return std::make_unique<BreakStatementAST>();
+}
+
 std::unique_ptr<StatementAST> ParseStatement(Tokenizer &tokenizer,
                                              SymbolTable &st) {
   CheckTokenizer(tokenizer);
@@ -308,6 +319,9 @@ std::unique_ptr<WhileStatementAST> ParseWhileStatement(Tokenizer &tokenizer,
       case Mut:
         nodes.push_back(ParseStatement(tokenizer, st));
         break;
+      case Break:
+        nodes.push_back(ParseBreakStatement(tokenizer, st));
+        break;
       case If:
         nodes.push_back(ParseIfStatement(tokenizer, st));
         break;
@@ -361,7 +375,8 @@ std::shared_ptr<FunctionAST> ParseFunction(Tokenizer &tokenizer,
   st.PopSymbolTable();
 
   return std::make_shared<FunctionAST>(fn_name, std::move(args),
-                                       std::move(symbols), std::move(body), std::move(ret));
+                                       std::move(symbols), std::move(body),
+                                       std::move(ret));
 }
 
 std::unique_ptr<ReturnStatementAST> ParseReturnStatement(Tokenizer &tokenizer,
