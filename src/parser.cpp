@@ -15,12 +15,6 @@
 
 namespace sci {
 
-inline void CheckTokenizer(Tokenizer &tokenizer) {
-  if (tokenizer.EOP()) {
-    throw std::runtime_error("Unexpected end of parsing.\n");
-  }
-}
-
 std::unique_ptr<ExprAST> ParseExpression(Tokenizer &tokenizer,
                                          SymbolTable &st) {
   CheckTokenizer(tokenizer);
@@ -229,70 +223,6 @@ std::unique_ptr<StatementAST> ParseDeclaration(Tokenizer &tokenizer,
   return std::make_unique<StatementAST>(word, std::move(expr));
 }
 
-std::vector<std::unique_ptr<BaseAST>> ParseConditionalBody(Tokenizer &tokenizer,
-                                                           SymbolTable &st) {
-  std::vector<std::unique_ptr<BaseAST>> nodes;
-
-  bool cont = true;
-  while (cont) {
-    CheckTokenizer(tokenizer);
-    auto [token, word] = tokenizer.GetNextToken();
-    switch (token) {
-      case Let:
-        nodes.push_back(ParseDeclaration(tokenizer, st));
-        break;
-      case Mut:
-        nodes.push_back(ParseStatement(tokenizer, st));
-        break;
-      case If:
-        nodes.push_back(ParseIfStatement(tokenizer, st));
-        break;
-      case While:
-        nodes.push_back(ParseWhileStatement(tokenizer, st));
-        break;
-      case RParen:
-        cont = false;
-        break;
-      default:
-        throw std::runtime_error(std::format(
-            "Invalid token: found {} at pos {}.\n", word, tokenizer.GetPos()));
-    }
-  }
-
-  return nodes;
-}
-
-std::unique_ptr<IfStatementAST> ParseIfStatement(Tokenizer &tokenizer,
-                                                 SymbolTable &st) {
-  auto cexpr = ParseExpression(tokenizer, st);
-
-  auto ast = std::make_unique<IfStatementAST>(std::move(cexpr));
-
-  auto tbranch = ParseConditionalBody(tokenizer, st);
-  ast->SetTrueBranch(std::move(tbranch));
-
-  CheckTokenizer(tokenizer);
-  auto [token0, word0] = tokenizer.GetNextToken();
-  if (token0 != Else) {
-    throw std::runtime_error(
-        std::format("Expected keyword else but found {} at pos {}.\n", word0,
-                    tokenizer.GetPos()));
-  }
-
-  CheckTokenizer(tokenizer);
-  auto [token1, word1] = tokenizer.GetNextToken();
-  if (token1 != LParen) {
-    throw std::runtime_error(
-        std::format("Expected {} but found {} at pos {}.\n", "{", word1,
-                    tokenizer.GetPos()));
-  }
-
-  auto fbranch = ParseConditionalBody(tokenizer, st);
-  ast->SetFalseBranch(std::move(fbranch));
-
-  return ast;
-}
-
 std::unique_ptr<WhileStatementAST> ParseWhileStatement(Tokenizer &tokenizer,
                                                        SymbolTable &st) {
   auto cexpr = ParseExpression(tokenizer, st);
@@ -316,7 +246,7 @@ std::unique_ptr<WhileStatementAST> ParseWhileStatement(Tokenizer &tokenizer,
         nodes.push_back(ParseLoopCtrlStatement<Continue>(tokenizer, st));
         break;
       case If:
-        nodes.push_back(ParseIfStatement(tokenizer, st));
+        nodes.push_back(ParseIfStatement<true>(tokenizer, st));
         break;
       case While:
         nodes.push_back(ParseWhileStatement(tokenizer, st));
@@ -456,16 +386,14 @@ std::vector<std::unique_ptr<BaseAST>> ParseFunctionBody(Tokenizer &tokenizer,
       case Mut:
         nodes.push_back(ParseStatement(tokenizer, st));
       case If:
-        nodes.push_back(ParseIfStatement(tokenizer, st));
+        nodes.push_back(ParseIfStatement<false>(tokenizer, st));
         break;
       case While:
         nodes.push_back(ParseWhileStatement(tokenizer, st));
         break;
-      case Return: {
-        // nodes.push_back(ParseReturnStatement(tokenizer, st));
+      case Return:
         cont = false;
         break;
-      }
       default:
         throw std::runtime_error(std::format(
             "Invalid token: found {} at pos {}.\n", word, tokenizer.GetPos()));
@@ -496,7 +424,7 @@ std::unique_ptr<BaseAST> Parse(Tokenizer &tokenizer, SymbolTable &st) {
         ast = ParseWhileStatement(tokenizer, st);
         break;
       case If:
-        ast = ParseIfStatement(tokenizer, st);
+        ast = ParseIfStatement<false>(tokenizer, st);
         break;
       default:
         throw std::runtime_error(std::format(

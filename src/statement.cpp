@@ -22,13 +22,13 @@ std::vector<Instruction> IfStatementAST::GenerateCode(uint &ridx) {
   std::copy(expr_arr.begin(), expr_arr.end(), std::back_inserter(operations));
 
   std::vector<Instruction> fb;
-  for (auto &node : false_branch) {
+  for (auto &node : m_fb) {
     auto ops = node->GenerateCode(ridx);
     std::copy(ops.begin(), ops.end(), std::back_inserter(fb));
   }
 
   std::vector<Instruction> tb;
-  for (auto &node : true_branch) {
+  for (auto &node : m_tb) {
     auto ops = node->GenerateCode(ridx);
     std::copy(ops.begin(), ops.end(), std::back_inserter(tb));
   }

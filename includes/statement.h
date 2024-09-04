@@ -34,22 +34,14 @@ class StatementAST : public BaseAST {
 
 class IfStatementAST : public BaseAST {
  public:
-  IfStatementAST(std::unique_ptr<ExprAST> cexpr) : m_cexpr(std::move(cexpr)) {}
-
-  void SetTrueBranch(std::vector<std::unique_ptr<BaseAST>> tbranch) {
-    true_branch = std::move(tbranch);
-  }
-
-  void SetFalseBranch(std::vector<std::unique_ptr<BaseAST>> fbranch) {
-    false_branch = std::move(fbranch);
-  }
+  IfStatementAST(std::unique_ptr<ExprAST> cexpr, std::vector<std::unique_ptr<BaseAST>> tb, std::vector<std::unique_ptr<BaseAST>> fb) : m_cexpr(std::move(cexpr)), m_tb(std::move(tb)), m_fb(std::move(fb)) {}
 
   std::vector<Instruction> GenerateCode(uint &ridx);
 
  private:
   std::unique_ptr<ExprAST> m_cexpr;
-  std::vector<std::unique_ptr<BaseAST>> true_branch;
-  std::vector<std::unique_ptr<BaseAST>> false_branch;
+  std::vector<std::unique_ptr<BaseAST>> m_tb;
+  std::vector<std::unique_ptr<BaseAST>> m_fb;
 };
 
 class WhileStatementAST : public BaseAST {
