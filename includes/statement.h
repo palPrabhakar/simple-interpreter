@@ -1,6 +1,5 @@
 #pragma once
 
-#include <iostream>
 #include <memory>
 #include <string>
 
@@ -9,9 +8,16 @@
 
 namespace sci {
 
-class BreakStatementAST: public BaseAST {
-  public:
-    std::vector<Instruction> GenerateCode(uint &ridx);
+template <Token token>
+class LoopCtrlStatementAST : public BaseAST {
+ public:
+  std::vector<Instruction> GenerateCode(uint &ridx) {
+    if constexpr (token == Break) {
+      return {Instruction(InsCode::jmp, Label::loop_end)};
+    } else {
+      return {Instruction(InsCode::jmp, Label::loop_start)};
+    }
+  }
 };
 
 class StatementAST : public BaseAST {

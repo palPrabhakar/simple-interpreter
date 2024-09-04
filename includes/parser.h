@@ -26,7 +26,19 @@ std::unique_ptr<ExprAST> ParseExpression(Tokenizer &tokenizer, SymbolTable &st);
 
 std::unique_ptr<IfStatementAST> ParseIfStatement(Tokenizer &tokenizer, SymbolTable &st);
 
-std::unique_ptr<BreakStatementAST> ParseBreakStatement(Tokenizer &tokenizer, SymbolTable &st);
+template<Token tk>
+std::unique_ptr<LoopCtrlStatementAST<tk>> ParseLoopCtrlStatement(Tokenizer &tokenizer, SymbolTable &st) {
+  if (tokenizer.EOP()) {
+    throw std::runtime_error("Unexpected end of parsing.\n");
+  }
+  auto [token, word] = tokenizer.GetNextToken();
+  if (token != SColon) {
+    throw std::runtime_error(
+        std::format("Expected ; but found {} at pos {}.\n", word,
+                    tokenizer.GetPos()));
+  }
+  return std::make_unique<LoopCtrlStatementAST<tk>>();
+}
 
 std::unique_ptr<WhileStatementAST> ParseWhileStatement(Tokenizer &tokenzier, SymbolTable &st);
 

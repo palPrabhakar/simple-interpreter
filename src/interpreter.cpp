@@ -1,7 +1,5 @@
 #include "interpreter.h"
 
-#include <format>
-#include <iostream>
 #include <stdexcept>
 
 #include "instructions.h"
