@@ -94,13 +94,11 @@ void Interpreter::Gteq(Instruction ins, size_t &icounter) {
 void Interpreter::Jmp(Instruction ins, size_t &icounter) {
   auto offset = std::get<int>(ins.i0);
   icounter = icounter + offset;
-  // std::cout<<std::format("jmp {}", offset)<<std::endl;
 }
 
 void Interpreter::CJmp(Instruction ins, size_t &icounter) {
   auto ridx = std::get<int>(ins.i0);
   auto offset = std::get<int>(ins.i1);
-  // std::cout<<std::format("cjmp {} {}", ridx, offset)<<std::endl;
   if (m_registers[ridx] == 1.0) {
     icounter = icounter + offset;
   } else {

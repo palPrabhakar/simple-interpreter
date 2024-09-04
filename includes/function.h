@@ -54,7 +54,7 @@ class FunctionCallAST : public ExprAST {
       : m_name(name), m_args(std::move(args)), m_fn(std::move(fn)) {
     if (m_args.size() != m_fn->GetArgumentSize()) {
       throw std::runtime_error(std::format(
-          "Argument size mismatch. Expected {} argumnets but found {}.\n",
+          "Argument size mismatch. Expected {} arguments but found {}.\n",
           m_fn->GetArgumentSize(), m_args.size()));
     }
   }
