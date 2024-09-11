@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cassert>
+#include <deque>
 #include <memory>
-#include <stack>
 #include <string>
 #include <unordered_map>
 
@@ -10,38 +10,45 @@
 
 namespace sci {
 using Symbols = std::unordered_map<std::string, double>;
+using Functions =
+    std::unordered_map<std::string, std::unique_ptr<FunctionPrototype>>;
 
+// TODO
+// Make it Singleton
 class SymbolTable {
  public:
-  SymbolTable() = default;
+  SymbolTable() {
+    assert(m_st.empty());
+    PushSymbolTable();
+  }
   SymbolTable(const SymbolTable& other) = delete;
   void operator=(const SymbolTable&) = delete;
 
-  bool CheckSymbol(std::string) const;
-  bool CheckTopLevelSymbol(std::string) const;
-  double GetValue(std::string) const;
-  void SetValue(std::string, double);
-  void InsertSymbol(std::string);
+  bool CheckSymbol(const std::string) const;
+  double GetValue(const std::string) const;
+  void SetValue(const std::string, const double);
+  void InsertSymbol(const std::string);
 
-  void PushSymbolTable() { m_st.push(Symbols()); }
-  void PopSymbolTable() { m_st.pop(); }
+  void PushSymbolTable() { m_st.push_back(Symbols()); }
+  void PopSymbolTable() { m_st.pop_back(); }
 
-  const Symbols& GetTopLevelSymbols() const { return m_st.top(); }
+  const Symbols& GetTopLevelSymbols() const { return m_st.back(); }
 
-  const Symbols& GetGlobalSymbols() const { return g_symbols; }
+  const Symbols& GetGlobalSymbols() const { return m_st.front(); }
 
-  bool CheckFunction(std::string name) { return m_functions.contains(name); }
+  bool CheckFunction(const std::string name) const {
+    return m_functions.contains(name);
+  }
 
-  void InsertPrototype(std::string name,
+  void InsertPrototype(const std::string name,
                        std::unique_ptr<FunctionPrototype> proto);
 
-  std::unique_ptr<FunctionPrototype>& GetPrototype(std::string name) {
+  const std::unique_ptr<FunctionPrototype>& GetPrototype(const std::string name) {
     return m_functions[name];
   }
 
  private:
-  std::stack<Symbols> m_st;
-  Symbols g_symbols;  // global symbol space
-  std::unordered_map<std::string, std::unique_ptr<FunctionPrototype>> m_functions;
+  std::deque<Symbols> m_st;
+  Functions m_functions;
 };
 }  // namespace sci

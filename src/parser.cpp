@@ -222,7 +222,7 @@ std::unique_ptr<StatementAST> ParseDeclaration(Tokenizer &tokenizer,
 
   auto expr = ParseExpression(tokenizer, st);
 
-  if (st.CheckTopLevelSymbol(word)) {
+  if (st.CheckSymbol(word)) {
     throw std::runtime_error(
         std::format("Redeclaration of variable {}.\n", word));
   }
@@ -275,14 +275,17 @@ std::unique_ptr<WhileStatementAST> ParseWhileStatement(Tokenizer &tokenizer,
 
 std::unique_ptr<DummyAST> ParseFunction(Tokenizer &tokenizer, SymbolTable &st) {
   CheckTokenizer(tokenizer);
-  auto [token, word] = tokenizer.GetNextToken();
+  auto [token, fn_name] = tokenizer.GetNextToken();
   if (token != Text) {
     throw std::runtime_error(
-        std::format("Expected function name but found {} at pos {}.\n", word,
+        std::format("Expected function name but found {} at pos {}.\n", fn_name,
                     tokenizer.GetPos()));
   }
 
-  std::string fn_name = word;
+  if(st.CheckFunction(fn_name)) {
+    throw std::runtime_error(
+        std::format("Redefinition of function {}.\n", fn_name));
+  }
 
   st.PushSymbolTable();
 
@@ -348,7 +351,7 @@ std::vector<std::string> ParseArgumentList(Tokenizer &tokenizer,
       }
 
       // don't want to check recursively
-      if (st.CheckTopLevelSymbol(word)) {
+      if (st.CheckSymbol(word)) {
         throw std::runtime_error(std::format(
             "Redeclaration of variable {} at {}\n", word, tokenizer.GetPos()));
       }
