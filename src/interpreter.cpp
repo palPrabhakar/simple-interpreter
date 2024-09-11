@@ -1,7 +1,6 @@
-#include "interpreter.h"
-
 #include <stdexcept>
 
+#include "interpreter.h"
 #include "instructions.h"
 
 namespace sci {

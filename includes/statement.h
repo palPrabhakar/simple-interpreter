@@ -34,7 +34,10 @@ class StatementAST : public BaseAST {
 
 class IfStatementAST : public BaseAST {
  public:
-  IfStatementAST(std::unique_ptr<ExprAST> cexpr, std::vector<std::unique_ptr<BaseAST>> tb, std::vector<std::unique_ptr<BaseAST>> fb) : m_cexpr(std::move(cexpr)), m_tb(std::move(tb)), m_fb(std::move(fb)) {}
+  IfStatementAST(std::unique_ptr<ExprAST> cexpr,
+                 std::vector<std::unique_ptr<BaseAST>> tb,
+                 std::vector<std::unique_ptr<BaseAST>> fb)
+      : m_cexpr(std::move(cexpr)), m_tb(std::move(tb)), m_fb(std::move(fb)) {}
 
   std::vector<Instruction> GenerateCode(uint &ridx);
 

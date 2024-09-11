@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <vector>
+#include <format>
 
 #include "ast.h"
 #include "expr.h"
@@ -27,7 +28,7 @@ std::unique_ptr<StatementAST> ParseDeclaration(Tokenizer &tokenizer,
                                                SymbolTable &st);
 
 std::unique_ptr<ExprAST> ParseExpression(Tokenizer &tokenizer,
-                                         std::unique_ptr<ExprAST> expr,
+                                         std::unique_ptr<OpAST> expr,
                                          SymbolTable &st);
 
 std::unique_ptr<ExprAST> ParseExpression(Tokenizer &tokenizer, SymbolTable &st);

@@ -1,11 +1,9 @@
-#include "instructions.h"
-
 #include <format>
 #include <stdexcept>
 
+#include "instructions.h"
 
 namespace sci {
-
 const std::string Label::loop_start = "begin";
 const std::string Label::loop_end = "end";
 

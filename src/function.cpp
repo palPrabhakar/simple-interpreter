@@ -1,5 +1,6 @@
-#include "function.h"
+#include <format>
 
+#include "function.h"
 #include "instructions.h"
 
 namespace sci {

@@ -1,8 +1,6 @@
 #pragma once
 
-#include <format>
 #include <memory>
-#include <stdexcept>
 #include <string>
 
 #include "ast.h"
@@ -15,9 +13,6 @@ class ExprAST : public BaseAST {
  public:
   virtual ~ExprAST() = default;
   virtual const uint GetValue() const = 0;
-  virtual void SetLhs(std::unique_ptr<ExprAST> lhs) {}
-  virtual void SetRhs(std::unique_ptr<ExprAST> rhs) {}
-  virtual const int GetPrecedence() const { return 0; }
 };
 
 class ValueAST : public ExprAST {
