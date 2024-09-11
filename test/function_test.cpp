@@ -104,3 +104,62 @@ TEST(Function_Test, TestNestedTwoArgFunction) {
   EXPECT_TRUE(st.CheckSymbol("c"));
   EXPECT_EQ(st.GetValue("c"), 36);
 }
+
+TEST(Function_Test, FactorialFunction) {
+  auto st = sci::SymbolTable();
+  auto interp = sci::Interpreter(st);
+  uint ridx = 1;
+
+  // clang-format off
+  auto tokenizer = sci::Tokenizer("fn factorial(x) {" 
+                                    " if (x < 0) {" 
+                                      "mut x = 0; "
+                                    "} else {"
+                                      "let c = x-1;"
+                                      "while(c > 0) {"
+                                        "mut x = x * c;"
+                                        "mut c = c - 1;"
+                                      "}"
+                                    "}"
+                                  "return x;"
+                                 "}");
+  // clang-format on
+  auto ast = sci::Parse(tokenizer, st);
+  auto code = ast->GenerateCode(ridx = 1);
+
+  tokenizer.ResetTokenizer("let f = call factorial(0);");
+  ast = sci::Parse(tokenizer, st);
+  interp.Interpret(ast->GenerateCode(ridx = 1));
+  EXPECT_TRUE(st.CheckSymbol("f"));
+  EXPECT_EQ(st.GetValue("f"), 0);
+
+  tokenizer.ResetTokenizer("mut f = call factorial(1);");
+  ast = sci::Parse(tokenizer, st);
+  interp.Interpret(ast->GenerateCode(ridx = 1));
+  EXPECT_TRUE(st.CheckSymbol("f"));
+  EXPECT_EQ(st.GetValue("f"), 1);
+
+  tokenizer.ResetTokenizer("mut f = call factorial(2);");
+  ast = sci::Parse(tokenizer, st);
+  interp.Interpret(ast->GenerateCode(ridx = 1));
+  EXPECT_TRUE(st.CheckSymbol("f"));
+  EXPECT_EQ(st.GetValue("f"), 2);
+
+  tokenizer.ResetTokenizer("mut f = call factorial(3);");
+  ast = sci::Parse(tokenizer, st);
+  interp.Interpret(ast->GenerateCode(ridx = 1));
+  EXPECT_TRUE(st.CheckSymbol("f"));
+  EXPECT_EQ(st.GetValue("f"), 6);
+
+  tokenizer.ResetTokenizer("mut f = call factorial(4);");
+  ast = sci::Parse(tokenizer, st);
+  interp.Interpret(ast->GenerateCode(ridx = 1));
+  EXPECT_TRUE(st.CheckSymbol("f"));
+  EXPECT_EQ(st.GetValue("f"), 24);
+
+  tokenizer.ResetTokenizer("mut f = call factorial(5);");
+  ast = sci::Parse(tokenizer, st);
+  interp.Interpret(ast->GenerateCode(ridx = 1));
+  EXPECT_TRUE(st.CheckSymbol("f"));
+  EXPECT_EQ(st.GetValue("f"), 120);
+}

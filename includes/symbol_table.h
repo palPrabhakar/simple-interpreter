@@ -7,7 +7,6 @@
 #include <unordered_map>
 
 #include "function.h"
-#include "tokens.h"
 
 namespace sci {
 using Symbols = std::unordered_map<std::string, double>;
