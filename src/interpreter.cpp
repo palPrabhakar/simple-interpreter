@@ -19,6 +19,13 @@ void Interpreter::Loadi(Instruction ins, size_t &icounter) {
   ++icounter;
 }
 
+void Interpreter::Rmov(Instruction ins, size_t &icounter) {
+  auto r1 = std::get<int>(ins.i0);
+  auto r2 = std::get<int>(ins.i1);
+  m_registers[r2] = m_registers[r1];
+  ++icounter;
+}
+
 void Interpreter::Store(Instruction ins, size_t &icounter) {
   auto ridx = std::get<int>(ins.i0);
   auto vname = std::get<std::string>(ins.i1);
@@ -109,10 +116,11 @@ void Interpreter::CJmp(Instruction ins, size_t &icounter) {
 void Interpreter::Call(Instruction ins, size_t &icounter) {
   auto fn_name = std::get<std::string>(ins.i0);
   m_st.PushSymbolTable();
-  auto proto = m_st.GetPrototype(fn_name);
+  auto& proto = m_st.GetPrototype(fn_name);
   for(auto var: proto->GetSymbols()) {
     m_st.InsertSymbol(var);
   }
+  Interpret(proto->GetCode());
   ++icounter;
 }
 
@@ -131,6 +139,9 @@ void Interpreter::Interpret(std::vector<Instruction> instructions) {
         break;
       case loadi:
         Loadi(ins, icounter);
+        break;
+      case rmov:
+        Rmov(ins, icounter);
         break;
       case store:
         Store(ins, icounter);

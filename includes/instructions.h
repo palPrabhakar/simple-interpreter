@@ -7,6 +7,7 @@ namespace sci {
 enum InsCode {
   loadi,
   load,
+  rmov,
   // storei,
   store,
   add,
@@ -58,5 +59,6 @@ public:
   std::string CJmp() const;
   std::string Call() const;
   std::string Ret() const;
+  std::string Rmov() const;
 };
 }  // namespace sci

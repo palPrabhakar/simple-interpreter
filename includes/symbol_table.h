@@ -33,17 +33,16 @@ class SymbolTable {
 
   bool CheckFunction(std::string name) { return m_functions.contains(name); }
 
-  void InsertFunction(std::string name,
-                      std::shared_ptr<FunctionAST> func);
+  void InsertPrototype(std::string name,
+                       std::unique_ptr<FunctionPrototype> proto);
 
-  std::shared_ptr<FunctionAST> GetPrototype(std::string name) {
+  std::unique_ptr<FunctionPrototype>& GetPrototype(std::string name) {
     return m_functions[name];
   }
 
  private:
   std::stack<Symbols> m_st;
   Symbols g_symbols;  // global symbol space
-  std::unordered_map<std::string, std::shared_ptr<FunctionAST>>
-      m_functions;
+  std::unordered_map<std::string, std::unique_ptr<FunctionPrototype>> m_functions;
 };
 }  // namespace sci

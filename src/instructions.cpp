@@ -18,6 +18,10 @@ std::string Instruction::Loadi() const {
   return std::format("loadi {} r{}", std::get<double>(i0), std::get<int>(i1));
 }
 
+std::string Instruction::Rmov() const {
+  return std::format("rmov r{} r{}", std::get<int>(i0), std::get<int>(i1));
+}
+
 std::string Instruction::Store() const {
   return std::format("store r{} m@{}", std::get<int>(i0),
                      std::get<std::string>(i1));
@@ -83,6 +87,8 @@ std::string Instruction::ToString() const {
       return Load();
     case loadi:
       return Loadi();
+    case rmov:
+      return Rmov();
     case store:
       return Store();
     case add:

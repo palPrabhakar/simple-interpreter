@@ -13,8 +13,12 @@ class BaseAST {
 };
 
 class DummyAST : public BaseAST {
+private:
+  std::string m_name;
  public:
+  DummyAST(std::string name): m_name(name) {}
   std::vector<Instruction> GenerateCode(uint &ridx) { return {}; }
+  std::string GetName() { return m_name; }
 };
 
 }  // namespace sci

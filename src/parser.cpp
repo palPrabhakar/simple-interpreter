@@ -3,7 +3,6 @@
 #include <cctype>
 #include <memory>
 #include <stdexcept>
-#include <unordered_map>
 
 #include "ast.h"
 #include "expr.h"
@@ -117,25 +116,29 @@ std::unique_ptr<ExprAST> ParseExpression(Tokenizer &tokenizer,
 std::unique_ptr<FunctionCallAST> ParseFunctionCall(Tokenizer &tokenizer,
                                                    SymbolTable &st) {
   CheckTokenizer(tokenizer);
-  auto [token0, word0] = tokenizer.GetNextToken();
-  if (token0 != Text) {
+  auto [tk_fname, fname] = tokenizer.GetNextToken();
+  if (tk_fname != Text) {
     throw std::runtime_error(
-        std::format("Expected function name but found {} at pos {}.\n", word0,
+        std::format("Expected function name but found {} at pos {}.\n", fname,
                     tokenizer.GetPos()));
   }
 
-  if (!st.CheckFunction(word0)) {
+  if (!st.CheckFunction(fname)) {
     throw std::runtime_error(
-        std::format("Calling undefined function  {}.\n", word0));
+        std::format("Calling undefined function  {}.\n", fname));
   }
 
   CheckTokenizer(tokenizer);
   auto [token1, word1] = tokenizer.GetNextToken();
   if (token1 != LBrack) {
     throw std::runtime_error(std::format("Expected ( but found {} at pos {}.\n",
-                                         word0, tokenizer.GetPos()));
+                                         fname, tokenizer.GetPos()));
   }
 
+  // TODO:
+  // Do check for function signature here
+  // Semantic thing? makes more sense here then
+  // code gen??
   std::vector<std::unique_ptr<ExprAST>> args;
   while (true) {
     CheckTokenizer(tokenizer);
@@ -160,10 +163,16 @@ std::unique_ptr<FunctionCallAST> ParseFunctionCall(Tokenizer &tokenizer,
     }
   }
 
-  return std::make_unique<FunctionCallAST>(word0, std::move(args),
-                                           st.GetPrototype(word0));
-}
+  auto &fn_proto = st.GetPrototype(fname);
+  if (args.size() != fn_proto->GetArgumentSize()) {
+    throw std::runtime_error(std::format(
+        "Argument size mismatch. Expected {} arguments but found {}.\n",
+        fn_proto->GetArgumentSize(), args.size()));
+  }
 
+  // Get to this point only if valid function call
+  return std::make_unique<FunctionCallAST>(fname, std::move(args));
+}
 
 std::unique_ptr<StatementAST> ParseStatement(Tokenizer &tokenizer,
                                              SymbolTable &st) {
@@ -264,8 +273,7 @@ std::unique_ptr<WhileStatementAST> ParseWhileStatement(Tokenizer &tokenizer,
                                              std::move(nodes));
 }
 
-std::shared_ptr<FunctionAST> ParseFunction(Tokenizer &tokenizer,
-                                           SymbolTable &st) {
+std::unique_ptr<DummyAST> ParseFunction(Tokenizer &tokenizer, SymbolTable &st) {
   CheckTokenizer(tokenizer);
   auto [token, word] = tokenizer.GetNextToken();
   if (token != Text) {
@@ -290,16 +298,24 @@ std::shared_ptr<FunctionAST> ParseFunction(Tokenizer &tokenizer,
                     tokenizer.GetPos()));
   }
 
-  std::vector<std::string> symbols;
+  auto arg_size = args.size();
+  auto fast_ptr = std::make_unique<FunctionAST>(
+      fn_name, std::move(args), std::move(body), std::move(ret));
+  uint ridx = 1;
+  auto code = fast_ptr->GenerateCode(ridx);
+
+  std::vector<std::string> symbols;  // required to prepare the symbol table
   for (auto &[key, val] : st.GetTopLevelSymbols()) {
     symbols.push_back(key);
   }
 
   st.PopSymbolTable();
 
-  return std::make_shared<FunctionAST>(fn_name, std::move(args),
-                                       std::move(symbols), std::move(body),
-                                       std::move(ret));
+  st.InsertPrototype(
+      fn_name, std::make_unique<FunctionPrototype>(
+                   fn_name, arg_size, std::move(code), std::move(symbols)));
+
+  return std::make_unique<DummyAST>(fn_name);
 }
 
 std::unique_ptr<ReturnStatementAST> ParseReturnStatement(Tokenizer &tokenizer,
@@ -415,9 +431,7 @@ std::unique_ptr<BaseAST> Parse(Tokenizer &tokenizer, SymbolTable &st) {
         ast = ParseStatement(tokenizer, st);
         break;
       case Fn: {
-        auto fn_ast = ParseFunction(tokenizer, st);
-        st.InsertFunction(fn_ast->GetName(), fn_ast);
-        ast = std::make_unique<DummyAST>();
+        ast = ParseFunction(tokenizer, st);
         break;
       }
       case While:
@@ -432,7 +446,6 @@ std::unique_ptr<BaseAST> Parse(Tokenizer &tokenizer, SymbolTable &st) {
     }
     return ast;
   }
-
-  return std::make_unique<DummyAST>();
+  return nullptr;
 }
 }  // namespace sci

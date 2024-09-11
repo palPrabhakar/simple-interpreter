@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <string>
 
+#include "ast.h"
 #include "interpreter.h"
 #include "parser.h"
 #include "symbol_table.h"
@@ -25,22 +26,28 @@ int main(int argc, char **argv) {
     sci::Tokenizer tokenizer(cmd);
     try {
       auto ast = sci::Parse(tokenizer, st);
-      // idx 0 fixed for rax
-      uint ridx = 1;
+      if (ast) {
+        uint ridx = 1;
 
-      auto operations = ast->GenerateCode(ridx);
-      if (!debug) {
-        interpreter.Interpret(std::move(operations));
+        auto operations = ast->GenerateCode(ridx);
+        if (!debug) {
+          interpreter.Interpret(std::move(operations));
 
-        for (auto &[k, v] : st.GetGlobalSymbols()) {
-          std::cout << std::format("{}: {}", k, v) << std::endl;
-        }
+          for (auto &[k, v] : st.GetGlobalSymbols()) {
+            std::cout << std::format("{}: {}", k, v) << std::endl;
+          }
 
-      } else {
-        // auto operations = ast->GenerateCodeStr(ridx);
-        auto count = 0;
-        for (auto &op : operations) {
-          std::cout << count++ << ": " << op.ToString() << std::endl;
+        } else {
+          auto ptr = dynamic_cast<sci::DummyAST *>(ast.get());
+          if (ptr) {
+            auto& fn_proto = st.GetPrototype(ptr->GetName());
+            operations = fn_proto->GetCode();
+          }
+
+          auto count = 0;
+          for (auto &op : operations) {
+            std::cout << count++ << ": " << op.ToString() << std::endl;
+          }
         }
       }
     } catch (std::runtime_error &err) {

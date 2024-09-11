@@ -50,8 +50,8 @@ void SymbolTable::InsertSymbol(std::string name) {
   }
 }
 
-void SymbolTable::InsertFunction(std::string name,
-                                 std::shared_ptr<FunctionAST> func) {
+void SymbolTable::InsertPrototype(std::string name,
+                                 std::unique_ptr<FunctionPrototype> func) {
   if (m_functions.contains(name)) {
     throw std::runtime_error(
         std::format("Redefinition of function {}.\n", name));

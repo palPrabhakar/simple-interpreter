@@ -1,18 +1,22 @@
 #include "function.h"
 
-#include <iostream>
-
 #include "instructions.h"
 
 namespace sci {
 std::vector<Instruction> ReturnStatementAST::GenerateCode(uint &ridx) {
   auto operations = m_expr->GenerateCode(ridx);
+  operations.emplace_back(InsCode::rmov, static_cast<int>(m_expr->GetValue()),
+                          static_cast<int>(0));
   operations.emplace_back(InsCode::ret);
   return operations;
 }
 
 std::vector<Instruction> FunctionAST::GenerateCode(uint &ridx) {
   std::vector<Instruction> operations;
+
+  for (auto arg : m_arguments) {
+    operations.emplace_back(InsCode::store, static_cast<int>(ridx++), arg);
+  }
 
   for (auto &node : m_body) {
     auto ops = node->GenerateCode(ridx);
@@ -21,7 +25,7 @@ std::vector<Instruction> FunctionAST::GenerateCode(uint &ridx) {
 
   auto ops = m_ret->GenerateCode(ridx);
   std::copy(ops.begin(), ops.end(), std::back_inserter(operations));
-
+  
   return operations;
 }
 
@@ -33,19 +37,22 @@ std::vector<Instruction> FunctionCallAST::GenerateCode(uint &ridx) {
     std::copy(ops.begin(), ops.end(), std::back_inserter(operations));
   }
 
-  operations.emplace_back(InsCode::call, m_name);
-
-  auto args_name = m_fn->GetArgumentList();
-  for (size_t i = 0; i < m_args.size(); ++i) {
-    auto &expr = m_args[i];
-    auto name = args_name[i];
-    operations.emplace_back(InsCode::store, static_cast<int>(expr->GetValue()),
-                            name);
+  // save all registers
+  for(int i = 1; i < ridx; ++i) {
+    operations.emplace_back(InsCode::store, i, std::format("_$r{}", i));
   }
 
-  auto fn_code = m_fn->GenerateCode(ridx);
-  reg = m_fn->GetRetVal();
-  std::copy(fn_code.begin(), fn_code.end(), std::back_inserter(operations));
+  int reg = 1;
+  for (auto &expr : m_args) {
+    operations.emplace_back(InsCode::rmov, static_cast<int>(expr->GetValue()), reg++);
+  }
+  
+  operations.emplace_back(InsCode::call, m_name);
+
+  // restore all registers
+  for(int i = 1; i < ridx; ++i) {
+    operations.emplace_back(InsCode::load, std::format("_$r{}", i), i);
+  }
 
   return operations;
 }
