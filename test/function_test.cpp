@@ -163,3 +163,35 @@ TEST(Function_Test, FactorialFunction) {
   EXPECT_TRUE(st.CheckSymbol("f"));
   EXPECT_EQ(st.GetValue("f"), 120);
 }
+
+TEST(Function_Test, TestLargeFunction) {
+  auto st = sci::SymbolTable();
+  auto interp = sci::Interpreter(st);
+  uint ridx = 1;
+
+  auto tokenizer = sci::Tokenizer("fn Big_Fn(x) {"
+                                    "let y = x*2;"
+                                    "let z = y+x;"
+                                    "let a = x+y*z;"
+                                    "if(z < x*4) {"
+                                      "mut z = z*x*4;"
+                                    "} else {"
+                                      "mut y = z;"
+                                      "mut z = z/4;"
+                                    "}"
+                                    "let b = a*z;"
+                                    "while (b > 0) {"
+                                      "mut b = b-1;"
+                                    "}"
+                                    "return 1;"
+                                  "}");
+  auto ast = sci::Parse(tokenizer, st);
+  auto code = ast->GenerateCode(ridx = 1);
+
+  tokenizer.ResetTokenizer("let a = call Big_Fn(1);");
+  ast = sci::Parse(tokenizer, st);
+  code = ast->GenerateCode(ridx = 1);
+  interp.Interpret(std::move(code));
+  EXPECT_TRUE(st.CheckSymbol("a"));
+  EXPECT_EQ(st.GetValue("a"), 1);
+}
