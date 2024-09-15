@@ -1,4 +1,5 @@
 #include "parser.h"
+#include "optimizers/register_alloc.hpp"
 
 #include <cctype>
 #include <memory>
@@ -306,6 +307,7 @@ std::unique_ptr<DummyAST> ParseFunction(Tokenizer &tokenizer, SymbolTable &st) {
       fn_name, std::move(args), std::move(body), std::move(ret));
   uint ridx = 1;
   auto code = fast_ptr->GenerateCode(ridx);
+  code = do_register_alloc(std::move(code));
 
   std::vector<std::string> symbols;  // required to prepare the symbol table
   for (auto &[key, val] : st.GetTopLevelSymbols()) {

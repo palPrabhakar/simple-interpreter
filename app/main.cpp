@@ -4,6 +4,7 @@
 
 #include "ast.h"
 #include "interpreter.h"
+#include "optimizers/register_alloc.hpp"
 #include "parser.h"
 #include "symbol_table.h"
 #include "tokenizer.h"
@@ -30,6 +31,7 @@ int main(int argc, char **argv) {
         uint ridx = 1;
 
         auto operations = ast->GenerateCode(ridx);
+        operations = sci::do_register_alloc(std::move(operations));
         if (!debug) {
           interpreter.Interpret(std::move(operations));
 
