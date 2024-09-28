@@ -1,10 +1,11 @@
+#include <gtest/gtest.h>
 #include "interpreter_fixture.hpp"
 
 TEST_F(InterpreterTest, TestArithmeticExpr) {
-  SetCode("let x = 11 + 22;");
+  SetCode("let x = 11+22;");
   EXPECT_EQ(st.GetValue("x"), 33);
 
-  SetCode("mut x = 4 - 7;");
+  SetCode("mut x = 4-7;");
   EXPECT_EQ(st.GetValue("x"), -3);
 
   SetCode("mut x = 3*5;");
@@ -13,13 +14,15 @@ TEST_F(InterpreterTest, TestArithmeticExpr) {
   SetCode("mut x = 22/11;");
   EXPECT_EQ(st.GetValue("x"), 2);
 
-  SetCode("mut x = 5 + 3*4;");
+  SetCode("mut x = 5+3*4;");
   EXPECT_EQ(st.GetValue("x"), 17);
 
-  SetCode("mut x = 3*4 + 5*2;");
+  SetCode("mut x = 3*4+5*2;");
   EXPECT_EQ(st.GetValue("x"), 22);
 
-  // SetCode("let n=1+2+3+4+5+6+7+8+9+10+11+12+13+14+15+16+17+18+19+20+21+22;");
+  SetCode("mut x = 2+3*4+3;");
+  EXPECT_EQ(st.GetValue("x"), 17);
+
   SetCode("let n=1+2+3+4+5+6+7+8+9+10+11+12+13+14+15+16+17+18+19+20;");
   EXPECT_EQ(st.GetValue("n"), 210);
 }
