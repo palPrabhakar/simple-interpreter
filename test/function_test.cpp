@@ -7,6 +7,14 @@ TEST_F(InterpreterTest, TestSimpleFunction) {
   EXPECT_EQ(st.GetValue("a"), 2);
 }
 
+TEST_F(InterpreterTest, TestSimpleFunctionST) {
+  SetCode("let x = 2;");
+  SetCode("fn double(x) { return x*2; }");
+  SetCode("let a = call double(x);");
+  EXPECT_TRUE(st.CheckSymbol("a"));
+  EXPECT_EQ(st.GetValue("a"), 4);
+}
+
 TEST_F(InterpreterTest, TestTwoArgFunction) {
   SetCode("fn add(x, y) { return x + y; }");
   SetCode("let a = call add(1, 2);");

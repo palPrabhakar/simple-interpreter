@@ -24,7 +24,14 @@ class SymbolTable {
   SymbolTable(const SymbolTable& other) = delete;
   void operator=(const SymbolTable&) = delete;
 
-  bool CheckSymbol(const std::string) const;
+  template <bool top_level = false>
+  bool CheckSymbol(const std::string name) const {
+    if (!m_st.empty()) {
+      return m_st.back().contains(name) ||
+             (!top_level && m_st.front().contains(name));
+    }
+    return false;
+  }
   double GetValue(const std::string) const;
   void SetValue(const std::string, const double);
   void InsertSymbol(const std::string);
@@ -43,7 +50,8 @@ class SymbolTable {
   void InsertPrototype(const std::string name,
                        std::unique_ptr<FunctionPrototype> proto);
 
-  const std::unique_ptr<FunctionPrototype>& GetPrototype(const std::string name) {
+  const std::unique_ptr<FunctionPrototype>& GetPrototype(
+      const std::string name) {
     return m_functions[name];
   }
 

@@ -29,7 +29,7 @@ std::unique_ptr<ExprAST> ParseExpression(Tokenizer &tokenizer,
       if (std::isalpha(word0[0])) {
         if (!st.CheckSymbol(word0)) {
           throw std::runtime_error(
-              std::format("Use of undefined variable {} at {}\n", word0,
+              std::format("ParseExpression: Use of undefined variable {} at {}\n", word0,
                           tokenizer.GetPos()));
         }
         op0 = std::make_unique<VarAST>(word0);
@@ -43,7 +43,7 @@ std::unique_ptr<ExprAST> ParseExpression(Tokenizer &tokenizer,
       break;
     }
     default:
-      throw std::runtime_error("Failed to parse expression.\n");
+      throw std::runtime_error("ParseExpression: Failed to parse expression.\n");
   }
 
   CheckTokenizer(tokenizer);
@@ -75,7 +75,7 @@ std::unique_ptr<ExprAST> ParseExpression(Tokenizer &tokenizer,
       if (std::isalpha(word0[0])) {
         if (!st.CheckSymbol(word0)) {
           throw std::runtime_error(
-              std::format("Use of undefined variable {} at {}\n", word0,
+              std::format("ParseExpression: Use of undefined variable {} at {}\n", word0,
                           tokenizer.GetPos()));
         }
         op0 = std::make_unique<VarAST>(word0);
@@ -91,7 +91,7 @@ std::unique_ptr<ExprAST> ParseExpression(Tokenizer &tokenizer,
       }
     }
     default:
-      throw std::runtime_error("Failed to parse expression.\n");
+      throw std::runtime_error("ParseExpression: Failed to parse expression.\n");
   }
 
   CheckTokenizer(tokenizer);
@@ -120,19 +120,19 @@ std::unique_ptr<FunctionCallAST> ParseFunctionCall(Tokenizer &tokenizer,
   auto [tk_fname, fname] = tokenizer.GetNextToken();
   if (tk_fname != Text) {
     throw std::runtime_error(
-        std::format("Expected function name but found {} at pos {}.\n", fname,
+        std::format("ParseFunctionCall: Expected function name but found {} at pos {}.\n", fname,
                     tokenizer.GetPos()));
   }
 
   if (!st.CheckFunction(fname)) {
     throw std::runtime_error(
-        std::format("Calling undefined function  {}.\n", fname));
+        std::format("ParseFunctionCall: Calling undefined function  {}.\n", fname));
   }
 
   CheckTokenizer(tokenizer);
   auto [token1, word1] = tokenizer.GetNextToken();
   if (token1 != LBrack) {
-    throw std::runtime_error(std::format("Expected ( but found {} at pos {}.\n",
+    throw std::runtime_error(std::format("ParseFunctionCall: Expected ( but found {} at pos {}.\n",
                                          fname, tokenizer.GetPos()));
   }
 
@@ -156,7 +156,7 @@ std::unique_ptr<FunctionCallAST> ParseFunctionCall(Tokenizer &tokenizer,
     if (std::isalpha(word[0])) {
       if (!st.CheckSymbol(word)) {
         throw std::runtime_error(std::format(
-            "Use of undefined variable {} at {}\n", word, tokenizer.GetPos()));
+            "ParseFunctionCall: Use of undefined variable {} at {}\n", word, tokenizer.GetPos()));
       }
       args.push_back(std::make_unique<VarAST>(word));
     } else {
@@ -167,7 +167,7 @@ std::unique_ptr<FunctionCallAST> ParseFunctionCall(Tokenizer &tokenizer,
   auto &fn_proto = st.GetPrototype(fname);
   if (args.size() != fn_proto->GetArgumentSize()) {
     throw std::runtime_error(std::format(
-        "Argument size mismatch. Expected {} arguments but found {}.\n",
+        "ParseFunctionCall: Argument size mismatch. Expected {} arguments but found {}.\n",
         fn_proto->GetArgumentSize(), args.size()));
   }
 
@@ -181,7 +181,7 @@ std::unique_ptr<StatementAST> ParseStatement(Tokenizer &tokenizer,
   auto [token, word] = tokenizer.GetNextToken();
   if (token != Text) {
     throw std::runtime_error(
-        std::format("Expected variable name but found {} at pos {}.\n", word,
+        std::format("ParseStatement: Expected variable name but found {} at pos {}.\n", word,
                     tokenizer.GetPos()));
   }
   auto varName = word;
@@ -189,7 +189,7 @@ std::unique_ptr<StatementAST> ParseStatement(Tokenizer &tokenizer,
   CheckTokenizer(tokenizer);
   auto [aToken, aWord] = tokenizer.GetNextToken();
   if (aToken != Assign) {
-    throw std::runtime_error(std::format("Expected = but found {} at pos {}.\n",
+    throw std::runtime_error(std::format("ParseStatement: Expected = but found {} at pos {}.\n",
                                          aWord, tokenizer.GetPos()));
   }
 
@@ -197,7 +197,7 @@ std::unique_ptr<StatementAST> ParseStatement(Tokenizer &tokenizer,
 
   if (!st.CheckSymbol(word)) {
     throw std::runtime_error(
-        std::format("Use of undefined variable {}.\n", word));
+        std::format("ParseStatement: Use of undefined variable {}.\n", word));
   }
 
   return std::make_unique<StatementAST>(word, std::move(expr));
@@ -209,7 +209,7 @@ std::unique_ptr<StatementAST> ParseDeclaration(Tokenizer &tokenizer,
   auto [token, word] = tokenizer.GetNextToken();
   if (token != Text) {
     throw std::runtime_error(
-        std::format("Expected variable name but found {} at pos {}.\n", word,
+        std::format("ParseDeclaration: Expected variable name but found {} at pos {}.\n", word,
                     tokenizer.GetPos()));
   }
   auto varName = word;
@@ -217,7 +217,7 @@ std::unique_ptr<StatementAST> ParseDeclaration(Tokenizer &tokenizer,
   CheckTokenizer(tokenizer);
   auto [aToken, aWord] = tokenizer.GetNextToken();
   if (aToken != Assign) {
-    throw std::runtime_error(std::format("Expected = but found {} at pos {}.\n",
+    throw std::runtime_error(std::format("ParseDeclaration: Expected = but found {} at pos {}.\n",
                                          aWord, tokenizer.GetPos()));
   }
 
@@ -225,7 +225,7 @@ std::unique_ptr<StatementAST> ParseDeclaration(Tokenizer &tokenizer,
 
   if (st.CheckSymbol(word)) {
     throw std::runtime_error(
-        std::format("Redeclaration of variable {}.\n", word));
+        std::format("ParseDeclaration: Redeclaration of variable {}.\n", word));
   }
 
   st.InsertSymbol(word);
@@ -266,7 +266,7 @@ std::unique_ptr<WhileStatementAST> ParseWhileStatement(Tokenizer &tokenizer,
         break;
       default:
         throw std::runtime_error(std::format(
-            "Invalid token: found {} at pos {}.\n", word, tokenizer.GetPos()));
+            "ParseWhileStatement: Invalid token: found {} at pos {}.\n", word, tokenizer.GetPos()));
     }
   }
 
@@ -279,13 +279,13 @@ std::unique_ptr<DummyAST> ParseFunction(Tokenizer &tokenizer, SymbolTable &st) {
   auto [token, fn_name] = tokenizer.GetNextToken();
   if (token != Text) {
     throw std::runtime_error(
-        std::format("Expected function name but found {} at pos {}.\n", fn_name,
+        std::format("ParseFunction: Expected function name but found {} at pos {}.\n", fn_name,
                     tokenizer.GetPos()));
   }
 
   if(st.CheckFunction(fn_name)) {
     throw std::runtime_error(
-        std::format("Redefinition of function {}.\n", fn_name));
+        std::format("ParseFunction: Redefinition of function {}.\n", fn_name));
   }
 
   st.PushSymbolTable();
@@ -298,7 +298,7 @@ std::unique_ptr<DummyAST> ParseFunction(Tokenizer &tokenizer, SymbolTable &st) {
   auto [token1, word1] = tokenizer.GetNextToken();
   if (token1 != RParen) {
     throw std::runtime_error(
-        std::format("Expected {} but found {} at pos {}.\n", "}", word1,
+        std::format("ParseFunction: Expected {} but found {} at pos {}.\n", "}", word1,
                     tokenizer.GetPos()));
   }
 
@@ -335,7 +335,7 @@ std::vector<std::string> ParseArgumentList(Tokenizer &tokenizer,
   CheckTokenizer(tokenizer);
   auto [token0, word0] = tokenizer.GetNextToken();
   if (token0 != LBrack) {
-    throw std::runtime_error(std::format("Expected ( but found {} at pos {}.\n",
+    throw std::runtime_error(std::format("ParseArgumentList: Expected ( but found {} at pos {}.\n",
                                          word0, tokenizer.GetPos()));
   }
 
@@ -348,14 +348,14 @@ std::vector<std::string> ParseArgumentList(Tokenizer &tokenizer,
     while (true) {
       if (token != Text) {
         throw std::runtime_error(
-            std::format("Expected variable name but found {} at pos {}.\n",
+            std::format("ParseArgumentList: Expected variable name but found {} at pos {}.\n",
                         word, tokenizer.GetPos()));
       }
 
       // don't want to check recursively
-      if (st.CheckSymbol(word)) {
+      if (st.CheckSymbol<true>(word)) {
         throw std::runtime_error(std::format(
-            "Redeclaration of variable {} at {}\n", word, tokenizer.GetPos()));
+            "ParseArgumentList: Redeclaration of variable {} at {}\n", word, tokenizer.GetPos()));
       }
 
       st.InsertSymbol(word);
@@ -370,7 +370,7 @@ std::vector<std::string> ParseArgumentList(Tokenizer &tokenizer,
 
       if (token0 != Comma) {
         throw std::runtime_error(
-            std::format("Expected , or ) but found {} at pos {}.\n", word0,
+            std::format("ParseArgumentList: Expected , or ) but found {} at pos {}.\n", word0,
                         tokenizer.GetPos()));
       }
 
@@ -390,7 +390,7 @@ std::vector<std::unique_ptr<BaseAST>> ParseFunctionBody(Tokenizer &tokenizer,
   auto [token0, word0] = tokenizer.GetNextToken();
   if (token0 != LParen) {
     throw std::runtime_error(
-        std::format("Expected {} but found {} at pos {}.\n", "{", word0,
+        std::format("ParseFunctionBody: Expected {} but found {} at pos {}.\n", "{", word0,
                     tokenizer.GetPos()));
   }
 
@@ -417,7 +417,7 @@ std::vector<std::unique_ptr<BaseAST>> ParseFunctionBody(Tokenizer &tokenizer,
         break;
       default:
         throw std::runtime_error(std::format(
-            "Invalid token: found {} at pos {}.\n", word, tokenizer.GetPos()));
+            "ParseFunctionBody: Invalid token: found {} at pos {}.\n", word, tokenizer.GetPos()));
     }
   }
 
@@ -447,7 +447,7 @@ std::unique_ptr<BaseAST> Parse(Tokenizer &tokenizer, SymbolTable &st) {
         break;
       default:
         throw std::runtime_error(std::format(
-            "Invalid token: found {} at pos {}.\n", word, tokenizer.GetPos()));
+            "ParseFunctionBody: Invalid token: found {} at pos {}.\n", word, tokenizer.GetPos()));
     }
     return ast;
   }

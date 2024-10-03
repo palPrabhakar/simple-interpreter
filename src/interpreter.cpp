@@ -182,7 +182,7 @@ void Interpreter::Interpret(std::vector<Instruction> instructions) {
         Ret(ins, icounter);
         break;
       default:
-        throw std::runtime_error("Unknown instruction\n");
+        throw std::runtime_error("Interpreter: Unknown instruction\n");
     }
   }
 }

@@ -114,7 +114,7 @@ std::string Instruction::ToString() const {
     case ret:
       return Ret();
     default:
-      throw std::runtime_error("Unknown instruction\n");
+      throw std::runtime_error("Instruction: Unknown instruction\n");
   }
 }
 }  // namespace sci
