@@ -50,5 +50,4 @@ let x = call add_doubles(1, 2);
 ```
 
 ## TODO
-1. Support for break/continue in a loop.
 2. Support for arrays.

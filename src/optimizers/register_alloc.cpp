@@ -12,9 +12,9 @@ int static inline get_register(int &reg) {
 }
 
 void static rename_uses(std::vector<Instruction> &instructions, size_t idx, int before, int after) {
-  for(int i = idx + 1; i < instructions.size(); ++i) {
+  for(size_t i = idx + 1; i < instructions.size(); ++i) {
     switch(instructions[i].op) {
-      case InsCode::rmov: 
+      case InsCode::rmov:
       case InsCode::store:
       case InsCode::cjmp: {
         if(std::get<int>(instructions[i].i0) == before) {
@@ -51,7 +51,7 @@ std::vector<Instruction> do_register_alloc(
   for (size_t i = 0; i < instructions.size(); ++i) {
     switch (instructions[i].op) {
       case InsCode::load:
-      case InsCode::loadi: 
+      case InsCode::loadi:
       case InsCode::rmov: {
         auto reg = std::get<int>(instructions[i].i1);
         if (reg >= reg_size) {

@@ -12,7 +12,7 @@ namespace sci {
 class ExprAST : public BaseAST {
  public:
   virtual ~ExprAST() = default;
-  virtual const uint GetValue() const = 0;
+  virtual uint GetValue() const = 0;
 };
 
 class ValueAST : public ExprAST {
@@ -21,7 +21,7 @@ class ValueAST : public ExprAST {
 
   std::vector<Instruction> GenerateCode(uint &ridx);
 
-  const uint GetValue() const { return reg; }
+  uint GetValue() const { return reg; }
 
  private:
   std::string m_val;
@@ -34,7 +34,7 @@ class VarAST : public ExprAST {
 
   std::vector<Instruction> GenerateCode(uint &ridx);
 
-  const uint GetValue() const { return reg; }
+  uint GetValue() const { return reg; }
 
  private:
   std::string m_name;
@@ -47,12 +47,12 @@ class OpAST : public ExprAST {
 
   std::vector<Instruction> GenerateCode(uint &ridx);
 
-  const uint GetValue() const { return reg; }
+  uint GetValue() const { return reg; }
 
   void SetLhs(std::unique_ptr<ExprAST> lhs) { this->lhs = std::move(lhs); }
   void SetRhs(std::unique_ptr<ExprAST> rhs) { this->rhs = std::move(rhs); }
 
-  const int GetPrecedence() const { return m_precedence; }
+  int GetPrecedence() const { return m_precedence; }
 
  protected:
   Token m_op;

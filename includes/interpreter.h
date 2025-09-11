@@ -4,8 +4,8 @@
 #include "symbol_table.h"
 
 namespace sci {
-  
-static constexpr unsigned int reg_size = 32;
+
+static constexpr int reg_size = 32;
 
 class Interpreter {
  public:

@@ -63,7 +63,7 @@ std::unique_ptr<IfStatementAST> ParseIfStatement(Tokenizer &tokenizer,
 
 template <Token tk>
 std::unique_ptr<LoopCtrlStatementAST<tk>> ParseLoopCtrlStatement(
-    Tokenizer &tokenizer, SymbolTable &st) {
+    Tokenizer &tokenizer, SymbolTable &st [[__maybe_unused__]]) {
   CheckTokenizer(tokenizer);
   auto [token, word] = tokenizer.GetNextToken();
   if (token != SColon) {

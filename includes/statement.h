@@ -11,7 +11,7 @@ namespace sci {
 template <Token token>
 class LoopCtrlStatementAST : public BaseAST {
  public:
-  std::vector<Instruction> GenerateCode(uint &ridx) {
+  std::vector<Instruction> GenerateCode(uint &ridx [[__maybe_unused__]]) {
     if constexpr (token == Break) {
       return {Instruction(InsCode::jmp, Label::loop_end)};
     } else {

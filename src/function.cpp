@@ -26,7 +26,7 @@ std::vector<Instruction> FunctionAST::GenerateCode(uint &ridx) {
 
   auto ops = m_ret->GenerateCode(ridx);
   std::copy(ops.begin(), ops.end(), std::back_inserter(operations));
-  
+
   return operations;
 }
 
@@ -39,7 +39,7 @@ std::vector<Instruction> FunctionCallAST::GenerateCode(uint &ridx) {
   }
 
   // save all registers
-  for(int i = 1; i < ridx; ++i) {
+  for(int i = 1; i < static_cast<int>(ridx); ++i) {
     operations.emplace_back(InsCode::store, i, std::format("_$r{}", i));
   }
 
@@ -47,11 +47,11 @@ std::vector<Instruction> FunctionCallAST::GenerateCode(uint &ridx) {
   for (auto &expr : m_args) {
     operations.emplace_back(InsCode::rmov, static_cast<int>(expr->GetValue()), reg++);
   }
-  
+
   operations.emplace_back(InsCode::call, m_name);
 
   // restore all registers
-  for(int i = 1; i < ridx; ++i) {
+  for(int i = 1; i < static_cast<int>(ridx); ++i) {
     operations.emplace_back(InsCode::load, std::format("_$r{}", i), i);
   }
 

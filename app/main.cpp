@@ -9,7 +9,7 @@
 #include "symbol_table.h"
 #include "tokenizer.h"
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv [[__maybe_unused__]]) {
   bool debug = false;
   if (argc > 1) {
     debug = true;

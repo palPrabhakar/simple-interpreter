@@ -12,7 +12,7 @@ class ReturnStatementAST : public BaseAST {
 
   // 0 -> return register
   // store value in return register
-  const uint GetRetVal() const { return 0; }
+  uint GetRetVal() const { return 0; }
 
   std::vector<Instruction> GenerateCode(uint& ridx);
 
@@ -33,7 +33,7 @@ class FunctionAST : public BaseAST {
   std::vector<Instruction> GenerateCode(uint& ridx);
 
   const std::string GetName() const { return m_name; }
-  const uint GetRetVal() const { return m_ret->GetRetVal(); }
+  uint GetRetVal() const { return m_ret->GetRetVal(); }
 
  private:
   std::string m_name;
@@ -49,12 +49,11 @@ class FunctionCallAST : public ExprAST {
 
   // 0 -> return register
   // read value from return register
-  const uint GetValue() const { return 0; }
+  uint GetValue() const { return 0; }
 
   std::vector<Instruction> GenerateCode(uint& ridx);
 
  private:
-  uint reg;
   std::string m_name;
   std::vector<std::unique_ptr<ExprAST>> m_args;
   std::shared_ptr<FunctionAST> m_fn;

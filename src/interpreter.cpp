@@ -123,7 +123,7 @@ void Interpreter::Call(Instruction ins, size_t &icounter) {
   ++icounter;
 }
 
-void Interpreter::Ret(Instruction ins, size_t &icounter) {
+void Interpreter::Ret(Instruction ins [[__maybe_unused__]], size_t &icounter) {
   m_st.PopSymbolTable();
   ++icounter;
 }
