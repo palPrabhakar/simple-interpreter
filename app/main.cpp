@@ -1,4 +1,7 @@
+#include <cstring>
+#include <fstream>
 #include <iostream>
+#include <istream>
 #include <stdexcept>
 #include <string>
 
@@ -9,19 +12,20 @@
 #include "symbol_table.h"
 #include "tokenizer.h"
 
-int main(int argc, char **argv [[__maybe_unused__]]) {
-  bool debug = false;
-  if (argc > 1) {
-    debug = true;
-  }
+void PrintHelp() {
+  std::cerr << "Usage: ./run --debug || ./run --file <filename>\n";
+  exit(0);
+}
 
+void mainLoop(std::istream &cmd_stream, bool debug, bool file) {
   auto st = sci::SymbolTable();
   sci::Interpreter interpreter(st);
-  while (true) {
-    std::string cmd;
-    std::cout << ">>> ";
-    std::getline(std::cin, cmd);
 
+  std::string cmd;
+  if (!file) {
+    std::cout << ">>> ";
+  }
+  while (std::getline(cmd_stream, cmd)) {
     if (cmd == "exit") exit(0);
 
     sci::Tokenizer tokenizer(cmd);
@@ -42,7 +46,7 @@ int main(int argc, char **argv [[__maybe_unused__]]) {
         } else {
           auto ptr = dynamic_cast<sci::DummyAST *>(ast.get());
           if (ptr) {
-            auto& fn_proto = st.GetPrototype(ptr->GetName());
+            auto &fn_proto = st.GetPrototype(ptr->GetName());
             operations = fn_proto->GetCode();
           }
 
@@ -55,6 +59,36 @@ int main(int argc, char **argv [[__maybe_unused__]]) {
     } catch (std::runtime_error &err) {
       std::cout << err.what() << "\n";
     }
+
+    if (!file) {
+      std::cout << ">>> ";
+    }
   }
+}
+
+int main(int argc, char **argv) {
+  bool debug = false;
+  std::string file_name;
+
+  if (argc != 1) {
+    if (argc == 2 && std::strncmp("--debug", argv[1], 7) == 0) {
+      debug = true;
+    } else if (argc == 3 && std::strncmp("--file", argv[1], 6) == 0) {
+      file_name = argv[2];
+    } else {
+      PrintHelp();
+    }
+  }
+
+  if (!file_name.empty()) {
+    std::ifstream file(file_name);
+    if (!file.is_open()) {
+      std::cerr << "Error opening file: " << file_name << "\n";
+    }
+    mainLoop(file, false, true);
+  } else {
+    mainLoop(std::cin, debug, false);
+  }
+
   return 0;
 }
