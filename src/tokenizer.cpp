@@ -6,12 +6,12 @@
 #include <unordered_set>
 
 namespace sci {
+// clang-format off
 static const std::unordered_map<std::string, Token> token_map = {
     {"let", Token::Let},
     {"mut", Token::Mut},
     {"if", Token::If},
     {"else", Token::Else},
-    // {"for", Token::For},
     {"while", Token::While},
     {"continue", Token::Continue},
     {"break", Token::Break},
@@ -43,7 +43,10 @@ static const std::unordered_map<std::string, Token> token_map = {
     {";", Token::SColon},
     {",", Token::Comma},
     {"fn", Token::Fn},
-    {"call", Token::Call}};
+    {"call", Token::Call},
+    {"print", Token::Print}
+};
+// clang-format on
 
 static const std::unordered_set<char> stop_words = {
     ';', '(', ')', '{', '}', ' ', '[', ']', '+', '-',

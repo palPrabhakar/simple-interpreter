@@ -10,58 +10,58 @@
 namespace sci {
 
 class ExprAST : public BaseAST {
- public:
-  virtual ~ExprAST() = default;
-  virtual uint GetValue() const = 0;
+   public:
+    virtual ~ExprAST() = default;
+    virtual uint GetValue() const = 0;
 };
 
 class ValueAST : public ExprAST {
- public:
-  ValueAST(std::string val) : m_val(val) {}
+   public:
+    ValueAST(std::string val) : m_val(val) {}
 
-  std::vector<Instruction> GenerateCode(uint &ridx);
+    std::vector<Instruction> GenerateCode(uint &ridx) override;
 
-  uint GetValue() const { return reg; }
+    uint GetValue() const override { return reg; }
 
- private:
-  std::string m_val;
-  uint reg;
+   private:
+    std::string m_val;
+    uint reg;
 };
 
 class VarAST : public ExprAST {
- public:
-  VarAST(std::string name) : m_name(name) {}
+   public:
+    VarAST(std::string name) : m_name(name) {}
 
-  std::vector<Instruction> GenerateCode(uint &ridx);
+    std::vector<Instruction> GenerateCode(uint &ridx) override;
 
-  uint GetValue() const { return reg; }
+    uint GetValue() const override { return reg; }
 
- private:
-  std::string m_name;
-  uint reg;
+   private:
+    std::string m_name;
+    uint reg;
 };
 
 class OpAST : public ExprAST {
- public:
-  OpAST(Token op, std::string sop);
+   public:
+    OpAST(Token op, std::string sop);
 
-  std::vector<Instruction> GenerateCode(uint &ridx);
+    std::vector<Instruction> GenerateCode(uint &ridx) override;
 
-  uint GetValue() const { return reg; }
+    uint GetValue() const override { return reg; }
 
-  void SetLhs(std::unique_ptr<ExprAST> lhs) { this->lhs = std::move(lhs); }
-  void SetRhs(std::unique_ptr<ExprAST> rhs) { this->rhs = std::move(rhs); }
+    void SetLhs(std::unique_ptr<ExprAST> lhs) { this->lhs = std::move(lhs); }
+    void SetRhs(std::unique_ptr<ExprAST> rhs) { this->rhs = std::move(rhs); }
 
-  int GetPrecedence() const { return m_precedence; }
+    int GetPrecedence() const { return m_precedence; }
 
- protected:
-  Token m_op;
-  std::string m_sop;
-  int m_precedence;
-  InsCode m_code;
-  uint reg;
-  std::unique_ptr<ExprAST> lhs;
-  std::unique_ptr<ExprAST> rhs;
+   protected:
+    Token m_op;
+    std::string m_sop;
+    int m_precedence;
+    InsCode m_code;
+    uint reg;
+    std::unique_ptr<ExprAST> lhs;
+    std::unique_ptr<ExprAST> rhs;
 };
 
 }  // namespace sci

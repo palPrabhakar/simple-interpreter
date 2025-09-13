@@ -21,7 +21,8 @@ enum InsCode {
   cjmp,
   jmp,
   call,
-  ret
+  ret,
+  print
 };
 
 struct Label {
@@ -60,5 +61,6 @@ public:
   std::string Call() const;
   std::string Ret() const;
   std::string Rmov() const;
+  std::string Print() const;
 };
 }  // namespace sci

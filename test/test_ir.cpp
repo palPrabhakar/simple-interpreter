@@ -130,30 +130,30 @@ TEST(IR_Loop_Test, DISABLED_TestLoopWithCondAndBreakIR) {
   uint ridx = 1;
   auto code = ast->GenerateCode(ridx);
 
-  // EXPECT_EQ(code.size(), 23);
-  // EXPECT_EQ(code[0].ToString(), "load m@i r1");
-  // EXPECT_EQ(code[1].ToString(), "loadi 10 r2");
-  // EXPECT_EQ(code[2].ToString(), "lt r1 r2 r3");
-  // EXPECT_EQ(code[3].ToString(), "cjmp r3 p@2");
-  // EXPECT_EQ(code[4].ToString(), "jmp p@19"); // jump outside loop
-  // EXPECT_EQ(code[5].ToString(), "load m@i r4"); // if case
-  // EXPECT_EQ(code[6].ToString(), "loadi 5 r5");
-  // EXPECT_EQ(code[7].ToString(), "lt r4 r5 r6");
-  // EXPECT_EQ(code[8].ToString(), "cjmp r6 p@6"); 
-  // EXPECT_EQ(code[9].ToString(), "load m@x r7");  // follow-through else branch
-  // EXPECT_EQ(code[10].ToString(), "loadi 1 r8");
-  // EXPECT_EQ(code[11].ToString(), "add r7 r8 r9");
-  // EXPECT_EQ(code[12].ToString(), "store r9 m@x");
-  // EXPECT_EQ(code[13].ToString(), "jmp p@5");        // jump past true branch
-  // EXPECT_EQ(code[14].ToString(), "load m@x r10");  // true branch
-  // EXPECT_EQ(code[15].ToString(), "loadi 2 r11");
-  // EXPECT_EQ(code[16].ToString(), "mul r10 r11 r12");
-  // EXPECT_EQ(code[17].ToString(), "store r12 m@x");
-  // EXPECT_EQ(code[18].ToString(), "load m@i r13");  //
-  // EXPECT_EQ(code[19].ToString(), "loadi 1 r14");   //
-  // EXPECT_EQ(code[20].ToString(), "add r13 r14 r15");
-  // EXPECT_EQ(code[21].ToString(), "store r15 m@i");
-  // EXPECT_EQ(code[22].ToString(), "jmp p@-22");  //
+  EXPECT_EQ(code.size(), 23);
+  EXPECT_EQ(code[0].ToString(), "load m@i r1");
+  EXPECT_EQ(code[1].ToString(), "loadi 10 r2");
+  EXPECT_EQ(code[2].ToString(), "lt r1 r2 r3");
+  EXPECT_EQ(code[3].ToString(), "cjmp r3 p@2");
+  EXPECT_EQ(code[4].ToString(), "jmp p@19"); // jump outside loop
+  EXPECT_EQ(code[5].ToString(), "load m@i r4"); // if case
+  EXPECT_EQ(code[6].ToString(), "loadi 5 r5");
+  EXPECT_EQ(code[7].ToString(), "lt r4 r5 r6");
+  EXPECT_EQ(code[8].ToString(), "cjmp r6 p@6");
+  EXPECT_EQ(code[9].ToString(), "load m@x r7");  // follow-through else branch
+  EXPECT_EQ(code[10].ToString(), "loadi 1 r8");
+  EXPECT_EQ(code[11].ToString(), "add r7 r8 r9");
+  EXPECT_EQ(code[12].ToString(), "store r9 m@x");
+  EXPECT_EQ(code[13].ToString(), "jmp p@5");        // jump past true branch
+  EXPECT_EQ(code[14].ToString(), "load m@x r10");  // true branch
+  EXPECT_EQ(code[15].ToString(), "loadi 2 r11");
+  EXPECT_EQ(code[16].ToString(), "mul r10 r11 r12");
+  EXPECT_EQ(code[17].ToString(), "store r12 m@x");
+  EXPECT_EQ(code[18].ToString(), "load m@i r13");  //
+  EXPECT_EQ(code[19].ToString(), "loadi 1 r14");   //
+  EXPECT_EQ(code[20].ToString(), "add r13 r14 r15");
+  EXPECT_EQ(code[21].ToString(), "store r15 m@i");
+  EXPECT_EQ(code[22].ToString(), "jmp p@-22");  //
 }
 
 TEST(IR_Loop_Test, TestLoopWithBreakIR) {
@@ -213,7 +213,7 @@ TEST(IR_Loop_Test, TestLoopWithContinueIR) {
   EXPECT_EQ(code[5].ToString(), "load m@i r4");
   EXPECT_EQ(code[6].ToString(), "loadi 1 r5");
   EXPECT_EQ(code[7].ToString(), "add r4 r5 r6");
-  EXPECT_EQ(code[8].ToString(), "store r6 m@i"); // mut i = i + 1; end 
+  EXPECT_EQ(code[8].ToString(), "store r6 m@i"); // mut i = i + 1; end
   EXPECT_EQ(code[9].ToString(), "jmp p@-9");
   EXPECT_EQ(code[10].ToString(), "load m@x r7");
   EXPECT_EQ(code[11].ToString(), "load m@i r8");

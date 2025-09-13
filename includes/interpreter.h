@@ -39,5 +39,6 @@ class Interpreter {
   void CJmp(Instruction ins, size_t &);
   void Call(Instruction ins, size_t &);
   void Ret(Instruction ins, size_t &);
+  void Print(Instruction ins, size_t &);
 };
 }  // namespace sci

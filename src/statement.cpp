@@ -4,6 +4,7 @@
 #include <variant>
 
 #include "instructions.h"
+#include "parser.h"
 #include "tokens.h"
 
 namespace sci {
@@ -75,6 +76,18 @@ std::vector<Instruction> WhileStatementAST::GenerateCode(uint &ridx) {
   }
 
   return operations;
+}
+
+std::vector<Instruction> PrintStatementAST::GenerateCode(uint &ridx) {
+    std::vector<Instruction> operations;
+
+    for(auto &expr: m_op) {
+        auto ops = expr->GenerateCode(ridx);
+        std::copy(ops.begin(), ops.end(), std::back_inserter(operations));
+        operations.emplace_back(InsCode::print, static_cast<int>(expr->GetValue()));
+    }
+
+    return operations;
 }
 
 }  // namespace sci

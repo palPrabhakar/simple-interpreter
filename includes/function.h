@@ -14,7 +14,7 @@ class ReturnStatementAST : public BaseAST {
   // store value in return register
   uint GetRetVal() const { return 0; }
 
-  std::vector<Instruction> GenerateCode(uint& ridx);
+  std::vector<Instruction> GenerateCode(uint& ridx) override;
 
  private:
   std::unique_ptr<ExprAST> m_expr;
@@ -30,7 +30,7 @@ class FunctionAST : public BaseAST {
         m_body(std::move(body)),
         m_ret(std::move(ret)) {}
 
-  std::vector<Instruction> GenerateCode(uint& ridx);
+  std::vector<Instruction> GenerateCode(uint& ridx) override;
 
   const std::string GetName() const { return m_name; }
   uint GetRetVal() const { return m_ret->GetRetVal(); }
@@ -49,9 +49,9 @@ class FunctionCallAST : public ExprAST {
 
   // 0 -> return register
   // read value from return register
-  uint GetValue() const { return 0; }
+  uint GetValue() const override { return 0; }
 
-  std::vector<Instruction> GenerateCode(uint& ridx);
+  std::vector<Instruction> GenerateCode(uint& ridx) override;
 
  private:
   std::string m_name;

@@ -33,9 +33,9 @@ enum Token {
   Inc,
   Dec,
   // Others
-  LBrack,
-  LParen,
-  LSBrack,
+  LBrack,  // (
+  LParen,  // {
+  LSBrack, // [
   RBrack,
   RParen,
   RSBrack,
@@ -43,7 +43,9 @@ enum Token {
   Comma,
   Fn,
   Call,
-  End
+  End,
+  // Inbuilt-functions
+  Print
 };
 
-} // namespace sci
+}  // namespace sci
