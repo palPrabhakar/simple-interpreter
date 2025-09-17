@@ -21,6 +21,8 @@ class ValueAST : public ExprAST {
 
     std::vector<Instruction> GenerateCode(uint &ridx) override;
 
+    double GetLiteralValue() const { return std::stod(m_val); }
+
     uint GetValue() const override { return reg; }
 
    private:

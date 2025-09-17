@@ -34,6 +34,13 @@ void Interpreter::Store(Instruction ins, size_t &icounter) {
     ++icounter;
 }
 
+void Interpreter::Storei(Instruction ins, size_t &icounter) {
+    auto val = std::get<double>(ins.i0);
+    auto vname = std::get<std::string>(ins.i1);
+    m_st.SetValue(vname, val);
+    ++icounter;
+}
+
 void Interpreter::Add(Instruction ins, size_t &icounter) {
     auto s0 = std::get<int>(ins.i0);
     auto s1 = std::get<int>(ins.i1);
@@ -125,9 +132,6 @@ void Interpreter::Call(Instruction ins, size_t &icounter) {
     auto fn_name = std::get<std::string>(ins.i0);
     m_st.PushSymbolTable();
     auto &proto = m_st.GetPrototype(fn_name);
-    for (auto var : proto->GetSymbols()) {
-        m_st.InsertSymbol(var);
-    }
     Interpret(proto->GetCode());
     ++icounter;
 }
@@ -153,6 +157,9 @@ void Interpreter::Interpret(std::vector<Instruction> instructions) {
                 break;
             case store:
                 Store(ins, icounter);
+                break;
+            case storei:
+                Storei(ins, icounter);
                 break;
             case add:
                 Add(ins, icounter);

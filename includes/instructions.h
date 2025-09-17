@@ -8,7 +8,7 @@ enum InsCode {
   loadi,
   load,
   rmov,
-  // storei,
+  storei,
   store,
   add,
   sub,
@@ -48,6 +48,7 @@ public:
   std::string Load() const;
   std::string Loadi() const;
   std::string Store() const;
+  std::string Storei() const;
   std::string Add() const;
   std::string Sub() const;
   std::string Mul() const;

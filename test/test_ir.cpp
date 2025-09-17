@@ -11,9 +11,8 @@ TEST(IR_Test, TestExprIR) {
   auto tokenizer = sci::Tokenizer("let x  = 1;");
   auto ast = sci::Parse(tokenizer, st);
   auto code = ast->GenerateCode(ridx);
-  EXPECT_EQ(code.size(), 2);
-  EXPECT_EQ(code[0].ToString(), "loadi 1 r1");
-  EXPECT_EQ(code[1].ToString(), "store r1 m@x");
+  EXPECT_EQ(code.size(), 1);
+  EXPECT_EQ(code[0].ToString(), "storei 1 m@x");
 
   tokenizer.ResetTokenizer("let y = x*5;");
   ast = sci::Parse(tokenizer, st);
@@ -38,9 +37,8 @@ TEST(IR_Test, TestExprIR) {
   tokenizer.ResetTokenizer("mut x = 5;");
   ast = sci::Parse(tokenizer, st);
   code = ast->GenerateCode(ridx=1);
-  EXPECT_EQ(code.size(), 2);
-  EXPECT_EQ(code[0].ToString(), "loadi 5 r1");
-  EXPECT_EQ(code[1].ToString(), "store r1 m@x");
+  EXPECT_EQ(code.size(), 1);
+  EXPECT_EQ(code[0].ToString(), "storei 5 m@x");
 
   tokenizer.ResetTokenizer("mut y = x/5;");
   ast = sci::Parse(tokenizer, st);

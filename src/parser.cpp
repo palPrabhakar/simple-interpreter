@@ -284,16 +284,10 @@ std::unique_ptr<DummyAST> ParseFunction(Tokenizer &tokenizer, SymbolTable &st) {
     auto code = fast_ptr->GenerateCode(ridx);
     code = do_register_alloc(std::move(code));
 
-    std::vector<std::string> symbols;  // required to prepare the symbol table
-    for (auto &[key, val] : st.GetTopLevelSymbols()) {
-        symbols.push_back(key);
-    }
-
     st.PopSymbolTable();
 
-    st.InsertPrototype(
-        fn_name, std::make_unique<FunctionPrototype>(
-                     fn_name, arg_size, std::move(code), std::move(symbols)));
+    st.InsertPrototype(fn_name, std::make_unique<FunctionPrototype>(
+                                    fn_name, arg_size, std::move(code)));
 
     return std::make_unique<DummyAST>(fn_name);
 }
@@ -397,7 +391,7 @@ std::unique_ptr<PrintStatementAST> ParsePrintStatement(Tokenizer &tokenizer,
         } else if (std::isalpha(word[0])) {
             if (!st.CheckSymbol(word)) {
                 throw std::runtime_error(std::format(
-                    "ParseFunctionCall: Use of undefined variable {} at {}\n",
+                    "ParsePrintStatement: Use of undefined variable {} at {}\n",
                     word, tokenizer.GetPos()));
             }
             op.push_back(std::make_unique<VarAST>(word));
@@ -533,9 +527,9 @@ std::unique_ptr<BaseAST> Parse(Tokenizer &tokenizer, SymbolTable &st) {
                 ast = ParsePrintStatement(tokenizer, st);
                 break;
             default:
-                throw std::runtime_error(std::format(
-                    "ParseFunctionBody: Invalid token: found {} at pos {}.\n",
-                    word, tokenizer.GetPos()));
+                throw std::runtime_error(
+                    std::format("Parse: Invalid token: found {} at pos {}.\n",
+                                word, tokenizer.GetPos()));
         }
         return ast;
     }

@@ -25,6 +25,11 @@ std::string Instruction::Store() const {
                      std::get<std::string>(i1));
 }
 
+std::string Instruction::Storei() const {
+  return std::format("storei {} m@{}", std::get<double>(i0),
+                     std::get<std::string>(i1));
+}
+
 std::string Instruction::Add() const {
   return std::format("add r{} r{} r{}", std::get<int>(i0), std::get<int>(i1),
                      std::get<int>(i2));
@@ -89,6 +94,8 @@ std::string Instruction::ToString() const {
       return Rmov();
     case store:
       return Store();
+    case storei:
+      return Storei();
     case add:
       return Add();
     case sub:

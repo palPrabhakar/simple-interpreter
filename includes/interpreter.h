@@ -27,6 +27,7 @@ class Interpreter {
   void Loadi(Instruction ins, size_t &);
   void Rmov(Instruction ins, size_t &);
   void Store(Instruction ins, size_t &);
+  void Storei(Instruction ins, size_t &);
   void Add(Instruction ins, size_t &);
   void Sub(Instruction ins, size_t &);
   void Mul(Instruction ins, size_t &);
