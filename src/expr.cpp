@@ -4,21 +4,35 @@
 #include <string>
 
 #include "instructions.h"
+#include "symbol_table.h"
 
 namespace sci {
 
-std::vector<Instruction> ValueAST::GenerateCode(uint &ridx) {
+std::vector<Instruction> ValueAST::GenerateCode(SymbolTable &st) {
+    // ValueAST::GenerateCode is only called by OpAST
+    // When used directly in StatementAST only the literal
+    // value is read
     std::vector<Instruction> instructions;
-    reg = ridx++;
-    instructions.emplace_back(InsCode::loadi, std::stod(m_val),
-                              static_cast<int>(reg));
+    m_reg = st.GetReg(m_val);
+    // load the immed val if not already present in some reg
+    if (m_reg == -1) {
+        m_reg = st.GetNewRegId();
+        instructions.emplace_back(InsCode::loadi, m_val, m_reg);
+        // set the register
+        st.SetReg(m_val, m_reg);
+    }
     return instructions;
 }
 
-std::vector<Instruction> VarAST::GenerateCode(uint &ridx) {
+std::vector<Instruction> VarAST::GenerateCode(SymbolTable &st) {
     std::vector<Instruction> instructions;
-    reg = ridx++;
-    instructions.emplace_back(InsCode::load, m_name, static_cast<int>(reg));
+    m_reg = st.GetReg(m_name);
+    // always load global symbols
+    if (!st.CheckSymbol<true>(m_name) || m_reg == -1) {
+        m_reg = st.GetNewRegId();
+        instructions.emplace_back(InsCode::load, m_name, m_reg);
+        st.SetReg(m_name, m_reg);
+    }
     return instructions;
 }
 
@@ -70,9 +84,9 @@ OpAST::OpAST(Token op, std::string sop) : m_op(op), m_sop(sop) {
     }
 }
 
-std::vector<Instruction> OpAST::GenerateCode(uint &ridx) {
-    auto left_tree = lhs->GenerateCode(ridx);
-    auto right_tree = rhs->GenerateCode(ridx);
+std::vector<Instruction> OpAST::GenerateCode(SymbolTable &st) {
+    auto left_tree = lhs->GenerateCode(st);
+    auto right_tree = rhs->GenerateCode(st);
 
     std::vector<Instruction> operations;
     operations.reserve(left_tree.size() + right_tree.size() + 1);
@@ -82,10 +96,12 @@ std::vector<Instruction> OpAST::GenerateCode(uint &ridx) {
     std::copy(right_tree.begin(), right_tree.end(),
               std::back_inserter(operations));
 
-    reg = ridx++;
-    operations.emplace_back(m_code, static_cast<int>(lhs->GetValue()),
-                            static_cast<int>(rhs->GetValue()),
-                            static_cast<int>(reg));
+    // binary operator will always define a new dest
+    if (!m_dest) {
+        m_reg = st.GetNewRegId();
+    }
+    operations.emplace_back(m_code, static_cast<int>(lhs->GetReg()),
+                            static_cast<int>(rhs->GetReg()), m_reg);
 
     return operations;
 }

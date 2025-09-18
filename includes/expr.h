@@ -12,58 +12,58 @@ namespace sci {
 class ExprAST : public BaseAST {
    public:
     virtual ~ExprAST() = default;
-    virtual uint GetValue() const = 0;
+    virtual int GetReg() const { return m_reg; }
+
+   protected:
+    int m_reg;
 };
 
 class ValueAST : public ExprAST {
    public:
-    ValueAST(std::string val) : m_val(val) {}
+    ValueAST(std::string val) : m_val(std::stod(val)) {}
 
-    std::vector<Instruction> GenerateCode(uint &ridx) override;
+    std::vector<Instruction> GenerateCode(SymbolTable &st) override;
 
-    double GetLiteralValue() const { return std::stod(m_val); }
-
-    uint GetValue() const override { return reg; }
+    double GetLiteralValue() const { return m_val; }
 
    private:
-    std::string m_val;
-    uint reg;
+    double m_val;
 };
 
 class VarAST : public ExprAST {
    public:
     VarAST(std::string name) : m_name(name) {}
 
-    std::vector<Instruction> GenerateCode(uint &ridx) override;
-
-    uint GetValue() const override { return reg; }
+    std::vector<Instruction> GenerateCode(SymbolTable &st) override;
 
    private:
     std::string m_name;
-    uint reg;
 };
 
 class OpAST : public ExprAST {
    public:
     OpAST(Token op, std::string sop);
 
-    std::vector<Instruction> GenerateCode(uint &ridx) override;
-
-    uint GetValue() const override { return reg; }
+    std::vector<Instruction> GenerateCode(SymbolTable &st) override;
 
     void SetLhs(std::unique_ptr<ExprAST> lhs) { this->lhs = std::move(lhs); }
     void SetRhs(std::unique_ptr<ExprAST> rhs) { this->rhs = std::move(rhs); }
 
     int GetPrecedence() const { return m_precedence; }
 
+    void SetReg(int reg) {
+        m_dest = true;
+        m_reg = reg;
+    }
+
    protected:
     Token m_op;
     std::string m_sop;
     int m_precedence;
     InsCode m_code;
-    uint reg;
     std::unique_ptr<ExprAST> lhs;
     std::unique_ptr<ExprAST> rhs;
+    bool m_dest = false;
 };
 
 }  // namespace sci

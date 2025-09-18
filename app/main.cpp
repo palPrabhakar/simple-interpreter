@@ -33,9 +33,7 @@ void mainLoop(std::istream &cmd_stream, bool debug, bool ir, bool file) {
         try {
             auto ast = sci::Parse(tokenizer, st);
             if (ast) {
-                uint ridx = 1;
-
-                auto operations = ast->GenerateCode(ridx);
+                auto operations = ast->GenerateCode(st);
                 operations = sci::do_register_alloc(std::move(operations));
                 if (!ir) {
                     interpreter.Interpret(std::move(operations));

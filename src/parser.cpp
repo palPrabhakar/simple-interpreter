@@ -278,10 +278,9 @@ std::unique_ptr<DummyAST> ParseFunction(Tokenizer &tokenizer, SymbolTable &st) {
     }
 
     auto arg_size = args.size();
-    auto fast_ptr = std::make_unique<FunctionAST>(
+    auto fptr = std::make_unique<FunctionAST>(
         fn_name, std::move(args), std::move(body), std::move(ret));
-    uint ridx = 1;
-    auto code = fast_ptr->GenerateCode(ridx);
+    auto code = fptr->GenerateCode(st);
     code = do_register_alloc(std::move(code));
 
     st.PopSymbolTable();

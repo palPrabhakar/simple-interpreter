@@ -11,7 +11,7 @@ namespace sci {
 template <Token token>
 class LoopCtrlStatementAST : public BaseAST {
    public:
-    std::vector<Instruction> GenerateCode(uint &ridx
+    std::vector<Instruction> GenerateCode(SymbolTable &st
                                           [[__maybe_unused__]]) override {
         if constexpr (token == Break) {
             return {Instruction(InsCode::jmp, Label::loop_end)};
@@ -26,7 +26,7 @@ class StatementAST : public BaseAST {
     StatementAST(std::string name, std::unique_ptr<ExprAST> expr)
         : m_varName(name), m_expr(std::move(expr)) {}
 
-    std::vector<Instruction> GenerateCode(uint &ridx) override;
+    std::vector<Instruction> GenerateCode(SymbolTable &st) override;
 
    private:
     std::string m_varName;
@@ -40,7 +40,7 @@ class IfStatementAST : public BaseAST {
                    std::vector<std::unique_ptr<BaseAST>> fb)
         : m_cexpr(std::move(cexpr)), m_tb(std::move(tb)), m_fb(std::move(fb)) {}
 
-    std::vector<Instruction> GenerateCode(uint &ridx) override;
+    std::vector<Instruction> GenerateCode(SymbolTable &st) override;
 
    private:
     std::unique_ptr<ExprAST> m_cexpr;
@@ -54,7 +54,7 @@ class WhileStatementAST : public BaseAST {
                       std::vector<std::unique_ptr<BaseAST>> body)
         : m_cexpr(std::move(expr)), m_body(std::move(body)) {}
 
-    std::vector<Instruction> GenerateCode(uint &ridx) override;
+    std::vector<Instruction> GenerateCode(SymbolTable &st) override;
 
    private:
     std::unique_ptr<ExprAST> m_cexpr;
@@ -66,7 +66,7 @@ class PrintStatementAST : public BaseAST {
     PrintStatementAST(std::vector<std::unique_ptr<ExprAST>> op)
         : m_op(std::move(op)) {}
 
-    std::vector<Instruction> GenerateCode(uint &ridx) override;
+    std::vector<Instruction> GenerateCode(SymbolTable &st) override;
 
    private:
     std::vector<std::unique_ptr<ExprAST>> m_op;

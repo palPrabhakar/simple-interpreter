@@ -15,7 +15,7 @@ class ReturnStatementAST : public BaseAST {
     // store value in return register
     uint GetRetVal() const { return 0; }
 
-    std::vector<Instruction> GenerateCode(uint& ridx) override;
+    std::vector<Instruction> GenerateCode(SymbolTable& st) override;
 
    private:
     std::unique_ptr<ExprAST> m_expr;
@@ -31,7 +31,7 @@ class FunctionAST : public BaseAST {
           m_body(std::move(body)),
           m_ret(std::move(ret)) {}
 
-    std::vector<Instruction> GenerateCode(uint& ridx) override;
+    std::vector<Instruction> GenerateCode(SymbolTable& st) override;
 
     const std::string GetName() const { return m_name; }
     uint GetRetVal() const { return m_ret->GetRetVal(); }
@@ -51,9 +51,9 @@ class FunctionCallAST : public ExprAST {
 
     // 0 -> return register
     // read value from return register
-    uint GetValue() const override { return 0; }
+    int GetReg() const override { return 0; }
 
-    std::vector<Instruction> GenerateCode(uint& ridx) override;
+    std::vector<Instruction> GenerateCode(SymbolTable& st) override;
 
    private:
     std::string m_name;
@@ -61,7 +61,7 @@ class FunctionCallAST : public ExprAST {
     std::shared_ptr<FunctionAST> m_fn;
 };
 
-// Makes no sense to inherit for BaseAST
+// Makes no sense to inherit from BaseAST
 class FunctionPrototype {
    public:
     FunctionPrototype(const std::string name, const size_t size,
@@ -75,6 +75,6 @@ class FunctionPrototype {
     const std::string m_name;
     const size_t m_arg_size;
     std::vector<Instruction> m_instructions;
+    std::vector<std::string> m_symbols;
 };
-
 }  // namespace sci

@@ -18,10 +18,9 @@ class InterpreterTest : public ::testing::Test {
   }
 
   void CodeGen() {
-    uint ridx = 1;
     auto ast = sci::Parse(tokenizer, st);
     if (ast) {
-      auto code = ast->GenerateCode(ridx);
+      auto code = ast->GenerateCode(st);
       code = sci::do_register_alloc(std::move(code));
       interp.Interpret(std::move(code));
     }

@@ -10,53 +10,68 @@
 
 namespace sci {
 using Symbols = std::unordered_map<std::string, double>;
+using Registers = std::unordered_map<std::string, int>;
 using Functions =
     std::unordered_map<std::string, std::unique_ptr<FunctionPrototype>>;
 
 // TODO
 // Make it Singleton
 class SymbolTable {
- public:
-  SymbolTable() {
-    assert(m_st.empty());
-    PushSymbolTable();
-  }
-  SymbolTable(const SymbolTable& other) = delete;
-  void operator=(const SymbolTable&) = delete;
-
-  template <bool top_level = false>
-  bool CheckSymbol(const std::string name) const {
-    if (!m_st.empty()) {
-      return m_st.back().contains(name) ||
-             (!top_level && m_st.front().contains(name));
+   public:
+    SymbolTable() {
+        PushSymbolTable();
     }
-    return false;
-  }
-  double GetValue(const std::string) const;
-  void SetValue(const std::string, const double);
-  void InsertSymbol(const std::string);
+    SymbolTable(const SymbolTable& other) = delete;
+    void operator=(const SymbolTable&) = delete;
 
-  void PushSymbolTable() { m_st.push_back(Symbols()); }
-  void PopSymbolTable() { m_st.pop_back(); }
+    template <bool top_level = false>
+    bool CheckSymbol(const std::string name) const {
+        return m_st.back().contains(name) ||
+               (!top_level && m_st.front().contains(name));
+    }
 
-  const Symbols& GetTopLevelSymbols() const { return m_st.back(); }
+    double GetValue(const std::string) const;
+    void SetValue(const std::string, const double);
+    void InsertSymbol(const std::string);
+    int GetReg(const std::string) const;
+    void SetReg(const std::string, const int);
+    int GetReg(const double) const;
+    void SetReg(const double, const int);
 
-  const Symbols& GetGlobalSymbols() const { return m_st.front(); }
+    void PushSymbolTable() {
+        m_st.push_back(Symbols());
+        m_rcount.push_back(0);
+    }
 
-  bool CheckFunction(const std::string name) const {
-    return m_functions.contains(name);
-  }
+    void PopSymbolTable() {
+        m_st.pop_back();
+        m_rcount.pop_back();
+    }
 
-  void InsertPrototype(const std::string name,
-                       std::unique_ptr<FunctionPrototype> proto);
+    const Symbols& GetTopLevelSymbols() const { return m_st.back(); }
 
-  const std::unique_ptr<FunctionPrototype>& GetPrototype(
-      const std::string name) {
-    return m_functions[name];
-  }
+    const Symbols& GetGlobalSymbols() const { return m_st.front(); }
 
- private:
-  std::deque<Symbols> m_st;
-  Functions m_functions;
+    bool CheckFunction(const std::string name) const {
+        return m_functions.contains(name);
+    }
+
+    uint GetNewRegId() { return ++(m_rcount.back()); }
+
+    uint GetRegCount() { return m_rcount.back(); }
+
+    void InsertPrototype(const std::string name,
+                         std::unique_ptr<FunctionPrototype> proto);
+
+    const std::unique_ptr<FunctionPrototype>& GetPrototype(
+        const std::string name) {
+        return m_functions[name];
+    }
+
+   private:
+    std::deque<Symbols> m_st;
+    Registers m_rt;
+    std::deque<uint> m_rcount;
+    Functions m_functions;
 };
 }  // namespace sci
