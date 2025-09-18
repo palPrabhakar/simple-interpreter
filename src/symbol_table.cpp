@@ -17,26 +17,26 @@ void SymbolTable::SetValue(const std::string name, const double val) {
 }
 
 int SymbolTable::GetReg(const std::string name) const {
-    if (m_rt.contains(name)) {
-        return m_rt.at(name);
+    if (m_rt.back().contains(name)) {
+        return m_rt.back().at(name);
     }
     return -1;
 }
 
 int SymbolTable::GetReg(const double literal) const {
     auto key = std::to_string(literal);
-    if(m_rt.contains(key)) {
-        return m_rt.at(key);
+    if(m_rt.back().contains(key)) {
+        return m_rt.back().at(key);
     }
     return -1;
 }
 
 void SymbolTable::SetReg(const std::string name, const int val) {
-    m_rt[name] = val;
+    m_rt.back()[name] = val;
 }
 
 void SymbolTable::SetReg(const double literal, const int val) {
-    m_rt[std::to_string(literal)] = val;
+    m_rt.back()[std::to_string(literal)] = val;
 }
 
 

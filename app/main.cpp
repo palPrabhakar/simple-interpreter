@@ -7,7 +7,6 @@
 
 #include "ast.h"
 #include "interpreter.h"
-#include "optimizers/register_alloc.hpp"
 #include "parser.h"
 #include "symbol_table.h"
 #include "tokenizer.h"
@@ -34,7 +33,7 @@ void mainLoop(std::istream &cmd_stream, bool debug, bool ir, bool file) {
             auto ast = sci::Parse(tokenizer, st);
             if (ast) {
                 auto operations = ast->GenerateCode(st);
-                operations = sci::do_register_alloc(std::move(operations));
+                // operations = sci::do_register_alloc(std::move(operations));
                 if (!ir) {
                     interpreter.Interpret(std::move(operations));
 

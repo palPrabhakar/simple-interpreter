@@ -13,7 +13,7 @@ class ReturnStatementAST : public BaseAST {
 
     // 0 -> return register
     // store value in return register
-    uint GetRetVal() const { return 0; }
+    // uint GetRetVal() const { return INT_MAX; }
 
     std::vector<Instruction> GenerateCode(SymbolTable& st) override;
 
@@ -34,7 +34,7 @@ class FunctionAST : public BaseAST {
     std::vector<Instruction> GenerateCode(SymbolTable& st) override;
 
     const std::string GetName() const { return m_name; }
-    uint GetRetVal() const { return m_ret->GetRetVal(); }
+    // int GetRetVal() const { return m_ret->GetRetVal(); }
 
    private:
     std::string m_name;
@@ -49,10 +49,6 @@ class FunctionCallAST : public ExprAST {
                     std::vector<std::unique_ptr<ExprAST>> args)
         : m_name(name), m_args(std::move(args)) {}
 
-    // 0 -> return register
-    // read value from return register
-    int GetReg() const override { return 0; }
-
     std::vector<Instruction> GenerateCode(SymbolTable& st) override;
 
    private:
@@ -65,11 +61,16 @@ class FunctionCallAST : public ExprAST {
 class FunctionPrototype {
    public:
     FunctionPrototype(const std::string name, const size_t size,
-                      std::vector<Instruction>&& inst)
-        : m_name(name), m_arg_size(size), m_instructions(std::move(inst)) {}
+                      std::vector<Instruction>&& inst,
+                      std::vector<std::string>&& sym)
+        : m_name(name),
+          m_arg_size(size),
+          m_instructions(std::move(inst)),
+          m_symbols(std::move(sym)) {}
 
     size_t GetArgumentSize() const { return m_arg_size; }
-    std::vector<Instruction> GetCode() { return m_instructions; }
+    const std::vector<Instruction> GetCode() { return m_instructions; }
+    const std::vector<std::string>& GetSymbols() { return m_symbols; }
 
    private:
     const std::string m_name;

@@ -18,9 +18,7 @@ using Functions =
 // Make it Singleton
 class SymbolTable {
    public:
-    SymbolTable() {
-        PushSymbolTable();
-    }
+    SymbolTable() { PushSymbolTable(); }
     SymbolTable(const SymbolTable& other) = delete;
     void operator=(const SymbolTable&) = delete;
 
@@ -30,21 +28,34 @@ class SymbolTable {
                (!top_level && m_st.front().contains(name));
     }
 
+    void Reset() {
+        m_st.clear();
+        m_rt.clear();
+        m_rcount.clear();
+        m_functions.clear();
+        PushSymbolTable();
+    }
+
     double GetValue(const std::string) const;
+
     void SetValue(const std::string, const double);
     void InsertSymbol(const std::string);
+
     int GetReg(const std::string) const;
-    void SetReg(const std::string, const int);
     int GetReg(const double) const;
+
+    void SetReg(const std::string, const int);
     void SetReg(const double, const int);
 
     void PushSymbolTable() {
         m_st.push_back(Symbols());
+        m_rt.push_back(Registers());
         m_rcount.push_back(0);
     }
 
     void PopSymbolTable() {
         m_st.pop_back();
+        m_rt.pop_back();
         m_rcount.pop_back();
     }
 
@@ -56,9 +67,9 @@ class SymbolTable {
         return m_functions.contains(name);
     }
 
-    uint GetNewRegId() { return ++(m_rcount.back()); }
+    uint GetNewRegId() { return (m_rcount.back())++; }
 
-    uint GetRegCount() { return m_rcount.back(); }
+    uint GetRegIdx() { return m_rcount.back() - 1; }
 
     void InsertPrototype(const std::string name,
                          std::unique_ptr<FunctionPrototype> proto);
@@ -70,7 +81,7 @@ class SymbolTable {
 
    private:
     std::deque<Symbols> m_st;
-    Registers m_rt;
+    std::deque<Registers> m_rt;
     std::deque<uint> m_rcount;
     Functions m_functions;
 };

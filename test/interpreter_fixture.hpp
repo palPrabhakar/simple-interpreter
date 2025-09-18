@@ -3,14 +3,16 @@
 #include <gtest/gtest.h>
 
 #include "interpreter.h"
-#include "optimizers/register_alloc.hpp"
+// #include "optimizers/register_alloc.hpp"
 #include "parser.h"
 #include "symbol_table.h"
 #include "tokenizer.h"
 
 class InterpreterTest : public ::testing::Test {
  protected:
-  virtual void SetUp() {}
+  virtual void SetUp() {
+      st.Reset();
+  }
 
   void SetCode(std::string str) {
     tokenizer.ResetTokenizer(str);
@@ -21,7 +23,7 @@ class InterpreterTest : public ::testing::Test {
     auto ast = sci::Parse(tokenizer, st);
     if (ast) {
       auto code = ast->GenerateCode(st);
-      code = sci::do_register_alloc(std::move(code));
+      // code = sci::do_register_alloc(std::move(code));
       interp.Interpret(std::move(code));
     }
   }

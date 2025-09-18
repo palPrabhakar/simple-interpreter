@@ -7,7 +7,7 @@
 namespace sci {
 
 int static inline get_register(int &reg) {
-  reg = (reg + 1 < 32) ? reg + 1 : 1;
+  reg = (reg + 1 < 128) ? reg + 1 : 1;
   return reg;
 }
 

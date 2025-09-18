@@ -12,8 +12,10 @@ namespace sci {
 
 std::vector<Instruction> StatementAST::GenerateCode(SymbolTable &st) {
     std::vector<Instruction> operations;
+
     // only do store if it's a global store
     auto *val = dynamic_cast<ValueAST *>(m_expr.get());
+
     if (val) {
         if (!st.CheckSymbol<true>(m_varName)) {
             operations.emplace_back(InsCode::storei, val->GetLiteralValue(),
@@ -48,7 +50,8 @@ std::vector<Instruction> StatementAST::GenerateCode(SymbolTable &st) {
                 st.SetReg(m_varName, op->GetReg());
             }
         } else {
-            m_expr->GenerateCode(st);
+            // either variable expr, or call expr
+            operations = m_expr->GenerateCode(st);
 
             if (reg == -1) {
                 reg = st.GetNewRegId();
@@ -66,22 +69,40 @@ std::vector<Instruction> IfStatementAST::GenerateCode(SymbolTable &st) {
     std::vector<Instruction> operations;
 
     auto expr_arr = m_cexpr->GenerateCode(st);
-    std::copy(expr_arr.begin(), expr_arr.end(), std::back_inserter(operations));
 
+    // Pull literal assignements outside control flow
+    // literal assignments might be required at a program
+    // point where it doesn't dominate. This ensures
+    // literal assignments dominate along all path.
     std::vector<Instruction> fb;
     for (auto &node : m_fb) {
         auto ops = node->GenerateCode(st);
-        std::copy(ops.begin(), ops.end(), std::back_inserter(fb));
+        for (auto &op : ops) {
+            if (op.IsLiteralAssignment()) {
+                operations.push_back(op);
+            } else {
+                fb.push_back(op);
+            }
+        }
     }
 
     std::vector<Instruction> tb;
     for (auto &node : m_tb) {
         auto ops = node->GenerateCode(st);
-        std::copy(ops.begin(), ops.end(), std::back_inserter(tb));
+        for (auto &op : ops) {
+            if (op.IsLiteralAssignment()) {
+                operations.push_back(op);
+            } else {
+                tb.push_back(op);
+            }
+        }
     }
+    std::copy(expr_arr.begin(), expr_arr.end(), std::back_inserter(operations));
 
-    operations.emplace_back(InsCode::cjmp, m_cexpr->GetReg(),
+    auto creg = m_cexpr->GetReg();
+    operations.emplace_back(InsCode::cjmp, creg,
                             static_cast<int>(fb.size() + 2));
+
     std::copy(fb.begin(), fb.end(), std::back_inserter(operations));
     operations.emplace_back(InsCode::jmp, static_cast<int>(tb.size() + 1));
     std::copy(tb.begin(), tb.end(), std::back_inserter(operations));
@@ -93,17 +114,35 @@ std::vector<Instruction> WhileStatementAST::GenerateCode(SymbolTable &st) {
     std::vector<Instruction> operations;
 
     auto expr_arr = m_cexpr->GenerateCode(st);
+
+    // pull the literal assignments out of the while body
+    // this way they are only executed once during while
+    // loop execution, hopefully reducing the number of
+    // instructions executed during runtime.
+    std::vector<Instruction> body;
+    for (auto &node : m_body) {
+        auto ops = node->GenerateCode(st);
+        for(auto &op: ops) {
+            if(op.IsLiteralAssignment()) {
+                operations.push_back(op);
+            } else {
+                body.push_back(op);
+            }
+
+        }
+    }
+
     std::copy(expr_arr.begin(), expr_arr.end(), std::back_inserter(operations));
+
 
     int condl_pos = operations.size();
     operations.emplace_back(InsCode::cjmp, m_cexpr->GetReg(), 2);
 
     // false branch
     operations.emplace_back(InsCode::jmp, Label::loop_end);
-    for (auto &node : m_body) {
-        auto ops = node->GenerateCode(st);
-        std::copy(ops.begin(), ops.end(), std::back_inserter(operations));
-    }
+
+    std::copy(body.begin(), body.end(), std::back_inserter(operations));
+
     operations.emplace_back(
         InsCode::jmp, -static_cast<int>(operations.size()) + condl_pos - 1);
 

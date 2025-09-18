@@ -7,7 +7,6 @@
 #include "ast.h"
 #include "expr.h"
 #include "function.h"
-#include "optimizers/register_alloc.hpp"
 #include "statement.h"
 #include "symbol_table.h"
 #include "tokenizer.h"
@@ -278,15 +277,21 @@ std::unique_ptr<DummyAST> ParseFunction(Tokenizer &tokenizer, SymbolTable &st) {
     }
 
     auto arg_size = args.size();
-    auto fptr = std::make_unique<FunctionAST>(
-        fn_name, std::move(args), std::move(body), std::move(ret));
+    auto fptr = std::make_unique<FunctionAST>(fn_name, std::move(args),
+                                              std::move(body), std::move(ret));
     auto code = fptr->GenerateCode(st);
-    code = do_register_alloc(std::move(code));
+    // code = do_register_alloc(std::move(code));
+
+    std::vector<std::string> symbols;  // required to prepare the symbol
+    for (auto &[key, val] : st.GetTopLevelSymbols()) {
+        symbols.push_back(key);
+    }
 
     st.PopSymbolTable();
 
-    st.InsertPrototype(fn_name, std::make_unique<FunctionPrototype>(
-                                    fn_name, arg_size, std::move(code)));
+    st.InsertPrototype(
+        fn_name, std::make_unique<FunctionPrototype>(
+                     fn_name, arg_size, std::move(code), std::move(symbols)));
 
     return std::make_unique<DummyAST>(fn_name);
 }
@@ -330,6 +335,7 @@ std::vector<std::string> ParseArgumentList(Tokenizer &tokenizer,
             }
 
             st.InsertSymbol(word);
+            st.SetReg(word, st.GetNewRegId());
             args.push_back(word);
 
             CheckTokenizer(tokenizer);

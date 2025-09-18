@@ -18,6 +18,7 @@ std::vector<Instruction> ValueAST::GenerateCode(SymbolTable &st) {
     if (m_reg == -1) {
         m_reg = st.GetNewRegId();
         instructions.emplace_back(InsCode::loadi, m_val, m_reg);
+        instructions.back().MarkLiteralAssignment();
         // set the register
         st.SetReg(m_val, m_reg);
     }
@@ -100,8 +101,8 @@ std::vector<Instruction> OpAST::GenerateCode(SymbolTable &st) {
     if (!m_dest) {
         m_reg = st.GetNewRegId();
     }
-    operations.emplace_back(m_code, static_cast<int>(lhs->GetReg()),
-                            static_cast<int>(rhs->GetReg()), m_reg);
+
+    operations.emplace_back(m_code, lhs->GetReg(), rhs->GetReg(), m_reg);
 
     return operations;
 }

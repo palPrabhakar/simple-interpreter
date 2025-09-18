@@ -1,7 +1,7 @@
 #include "interpreter.h"
 
-#include <stdexcept>
 #include <iostream>
+#include <stdexcept>
 
 #include "instructions.h"
 
@@ -9,28 +9,34 @@ namespace sci {
 void Interpreter::Load(Instruction ins, size_t &icounter) {
     auto vname = std::get<std::string>(ins.i0);
     auto ridx = std::get<int>(ins.i1);
-    m_registers[ridx] = m_st.GetValue(vname);
+    m_reg[ridx] = m_st.GetValue(vname);
     ++icounter;
 }
 
 void Interpreter::Loadi(Instruction ins, size_t &icounter) {
     auto val = std::get<double>(ins.i0);
     auto ridx = std::get<int>(ins.i1);
-    m_registers[ridx] = val;
+    m_reg[ridx] = val;
     ++icounter;
 }
 
 void Interpreter::Rmov(Instruction ins, size_t &icounter) {
     auto r1 = std::get<int>(ins.i0);
     auto r2 = std::get<int>(ins.i1);
-    m_registers[r2] = m_registers[r1];
+    if (r1 == INT_MAX) {
+        m_reg[r2] = m_ret;
+    } else if (r2 == INT_MAX) {
+        m_ret = m_reg[r1];
+    } else {
+        m_reg[r2] = m_reg[r1];
+    }
     ++icounter;
 }
 
 void Interpreter::Store(Instruction ins, size_t &icounter) {
     auto ridx = std::get<int>(ins.i0);
     auto vname = std::get<std::string>(ins.i1);
-    m_st.SetValue(vname, m_registers[ridx]);
+    m_st.SetValue(vname, m_reg[ridx]);
     ++icounter;
 }
 
@@ -45,7 +51,7 @@ void Interpreter::Add(Instruction ins, size_t &icounter) {
     auto s0 = std::get<int>(ins.i0);
     auto s1 = std::get<int>(ins.i1);
     auto d = std::get<int>(ins.i2);
-    m_registers[d] = m_registers[s0] + m_registers[s1];
+    m_reg[d] = m_reg[s0] + m_reg[s1];
     ++icounter;
 }
 
@@ -53,7 +59,7 @@ void Interpreter::Sub(Instruction ins, size_t &icounter) {
     auto s0 = std::get<int>(ins.i0);
     auto s1 = std::get<int>(ins.i1);
     auto d = std::get<int>(ins.i2);
-    m_registers[d] = m_registers[s0] - m_registers[s1];
+    m_reg[d] = m_reg[s0] - m_reg[s1];
     ++icounter;
 }
 
@@ -61,7 +67,7 @@ void Interpreter::Mul(Instruction ins, size_t &icounter) {
     auto s0 = std::get<int>(ins.i0);
     auto s1 = std::get<int>(ins.i1);
     auto d = std::get<int>(ins.i2);
-    m_registers[d] = m_registers[s0] * m_registers[s1];
+    m_reg[d] = m_reg[s0] * m_reg[s1];
     ++icounter;
 }
 
@@ -69,7 +75,7 @@ void Interpreter::Div(Instruction ins, size_t &icounter) {
     auto s0 = std::get<int>(ins.i0);
     auto s1 = std::get<int>(ins.i1);
     auto d = std::get<int>(ins.i2);
-    m_registers[d] = m_registers[s0] / m_registers[s1];
+    m_reg[d] = m_reg[s0] / m_reg[s1];
     ++icounter;
 }
 
@@ -77,7 +83,7 @@ void Interpreter::Gt(Instruction ins, size_t &icounter) {
     auto s0 = std::get<int>(ins.i0);
     auto s1 = std::get<int>(ins.i1);
     auto d = std::get<int>(ins.i2);
-    m_registers[d] = m_registers[s0] > m_registers[s1] ? 1.0 : 0.0;
+    m_reg[d] = m_reg[s0] > m_reg[s1] ? 1.0 : 0.0;
     ++icounter;
 }
 
@@ -86,7 +92,7 @@ void Interpreter::Lt(Instruction ins, size_t &icounter) {
     auto s1 = std::get<int>(ins.i1);
     auto d = std::get<int>(ins.i2);
     // std::cout<<std::format("lt {} {} {}", s0, s1, d)<<std::endl;
-    m_registers[d] = m_registers[s0] < m_registers[s1] ? 1.0 : 0.0;
+    m_reg[d] = m_reg[s0] < m_reg[s1] ? 1.0 : 0.0;
     ++icounter;
 }
 
@@ -94,7 +100,7 @@ void Interpreter::Lteq(Instruction ins, size_t &icounter) {
     auto s0 = std::get<int>(ins.i0);
     auto s1 = std::get<int>(ins.i1);
     auto d = std::get<int>(ins.i2);
-    m_registers[d] = m_registers[s0] <= m_registers[s1] ? 1.0 : 0.0;
+    m_reg[d] = m_reg[s0] <= m_reg[s1] ? 1.0 : 0.0;
     ++icounter;
 }
 
@@ -102,16 +108,15 @@ void Interpreter::Gteq(Instruction ins, size_t &icounter) {
     auto s0 = std::get<int>(ins.i0);
     auto s1 = std::get<int>(ins.i1);
     auto d = std::get<int>(ins.i2);
-    m_registers[d] = m_registers[s0] >= m_registers[s1] ? 1.0 : 0.0;
+    m_reg[d] = m_reg[s0] >= m_reg[s1] ? 1.0 : 0.0;
     ++icounter;
 }
 
 void Interpreter::Print(Instruction ins, size_t &icounter) {
     auto s0 = std::get<int>(ins.i0);
-    std::cout<<m_registers[s0]<<std::endl;
+    std::cout << m_reg[s0] << std::endl;
     ++icounter;
 }
-
 
 void Interpreter::Jmp(Instruction ins, size_t &icounter) {
     auto offset = std::get<int>(ins.i0);
@@ -121,7 +126,7 @@ void Interpreter::Jmp(Instruction ins, size_t &icounter) {
 void Interpreter::CJmp(Instruction ins, size_t &icounter) {
     auto ridx = std::get<int>(ins.i0);
     auto offset = std::get<int>(ins.i1);
-    if (m_registers[ridx] == 1.0) {
+    if (m_reg[ridx] == 1.0) {
         icounter = icounter + offset;
     } else {
         ++icounter;
@@ -132,12 +137,26 @@ void Interpreter::Call(Instruction ins, size_t &icounter) {
     auto fn_name = std::get<std::string>(ins.i0);
     m_st.PushSymbolTable();
     auto &proto = m_st.GetPrototype(fn_name);
+    for (auto sym : proto->GetSymbols()) {
+        m_st.InsertSymbol(sym);
+    }
     Interpret(proto->GetCode());
     ++icounter;
 }
 
 void Interpreter::Ret(Instruction ins [[__maybe_unused__]], size_t &icounter) {
     m_st.PopSymbolTable();
+    ++icounter;
+}
+
+void Interpreter::Push(Instruction ins [[__maybe_unused__]], size_t &icounter) {
+    m_registers.push(m_reg);
+    ++icounter;
+}
+
+void Interpreter::Pop(Instruction ins [[__maybe_unused__]], size_t &icounter) {
+    m_reg = m_registers.top();
+    m_registers.pop();
     ++icounter;
 }
 
@@ -199,6 +218,12 @@ void Interpreter::Interpret(std::vector<Instruction> instructions) {
                 break;
             case print:
                 Print(ins, icounter);
+                break;
+            case push:
+                Push(ins, icounter);
+                break;
+            case pop:
+                Pop(ins, icounter);
                 break;
             default:
                 throw std::runtime_error("Interpreter: Unknown instruction\n");
